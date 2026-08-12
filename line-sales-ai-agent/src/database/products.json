@@ -1,0 +1,57 @@
+[
+  {
+    "id": "PROD-001",
+    "name": "เสื้อเชิ้ตแขนยาว ผ้าคอตตอน พรีเมียม (สีดำ)",
+    "category": "เสื้อผ้า",
+    "price": 890,
+    "stock": 45,
+    "color": "สีดำ",
+    "size": "L",
+    "image_url": "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?auto=format&fit=crop&w=800&q=80",
+    "description": "เสื้อเชิ้ตแขนยาวสไตล์มินิมอล ใส่สบาย ระบายอากาศได้ดี เหมาะสำหรับใส่ทำงานหรือลำลอง"
+  },
+  {
+    "id": "PROD-002",
+    "name": "เสื้อเชิ้ต Oxford Slim Fit (สีขาว)",
+    "category": "เสื้อผ้า",
+    "price": 950,
+    "stock": 30,
+    "color": "สีขาว",
+    "size": "M",
+    "image_url": "https://images.unsplash.com/photo-1598033129183-c4f50c736f10?auto=format&fit=crop&w=800&q=80",
+    "description": "เสื้อเชิ้ตผ้าอ็อกฟอร์ด ทรงสลิมฟิต เข้ารูปสวยงาม ตัดเย็บประณีต"
+  },
+  {
+    "id": "PROD-003",
+    "name": "กระเป๋าเป้สะพายหลัง กันน้ำ Smart Backpack",
+    "category": "กระเป๋า",
+    "price": 1490,
+    "stock": 18,
+    "color": "สีเทาเข้ม",
+    "size": "15 นิ้ว",
+    "image_url": "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=800&q=80",
+    "description": "กระเป๋าเป้ใส่โน้ตบุ๊ก มีช่องชาร์จ USB ผลิตจากผ้ากันน้ำอย่างดี กันรอยขีดข่วน"
+  },
+  {
+    "id": "PROD-004",
+    "name": "รองเท้าสนีกเกอร์ ลำลอง Classic White",
+    "category": "รองเท้า",
+    "price": 1890,
+    "stock": 25,
+    "color": "สีขาว",
+    "size": "42",
+    "image_url": "https://images.unsplash.com/photo-1549298916-b41d501d3772?auto=format&fit=crop&w=800&q=80",
+    "description": "รองเท้าสนีกเกอร์หนังแท้สีขาว ดีไซน์คลาสสิก มิกซ์แอนด์แมตช์เข้าได้กับทุกชุด"
+  },
+  {
+    "id": "PROD-005",
+    "name": "แก้วเก็บความเย็น Stainless Steel Tumbler 900ml",
+    "category": "เครื่องใช้ไฟฟ้าและของใช้",
+    "price": 450,
+    "stock": 60,
+    "color": "สีสแตนเลสเงิน",
+    "size": "900 ml",
+    "image_url": "https://images.unsplash.com/photo-1517256064527-09c73fc73e38?auto=format&fit=crop&w=800&q=80",
+    "description": "แก้วเก็บความเย็นได้นาน 24 ชั่วโมง ไร้หยดน้ำเกาะรอบแก้ว สแตนเลส 304 ฟู้ดเกรด"
+  }
+]

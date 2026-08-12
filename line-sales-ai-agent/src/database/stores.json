@@ -1,0 +1,502 @@
+[
+  {
+    "id": "STORE-001",
+    "store_name": "ร้านสมศักดิ์การค้า",
+    "contact_person": "คุณสมศักดิ์",
+    "phone": "081-234-5678",
+    "credit_days": 30,
+    "notes": "ชอบสั่งซื้อสินค้าหมวดเสื้อผ้าช่วงต้นเดือน ส่งของเฉพาะวันจันทร์และพุธ ให้ส่วนลดพิเศษ 5% เมื่อสั่งครบ 10,000 บาท",
+    "updated_at": "2026-08-11T18:22:12.338Z",
+    "general_info": {
+      "store_name": null,
+      "contact_person": "คุณชัย (หัวหน้าโกดัง 086-777-8888), คุณบอย (ลูกชาย 0123456789), บาส (สั่งของ 9876543210)",
+      "contact_persons": [
+        "คุณชัย (หัวหน้าโกดัง 086-777-8888)",
+        "คุณบอย (ลูกชาย 0123456789)",
+        "บาส (สั่งของ 9876543210)"
+      ],
+      "phone": "0123456789",
+      "address": "ตลาดไท อ.คลองหลวง จ.ปทุมธานี",
+      "credit_days": 45,
+      "notes": "ให้ส่งของช่วงเช้าเท่านั้น\n• เข้าทำงาน หลัง13.00เท่านั้น\n• แจ้งก่อนเข้าทำงาน 1 วัน",
+      "delivery_by": "นิ่มซี่เส็ง,กวนจง,มนรักษา",
+      "delivery_schedule": "นิ่มซี่เส็ง,กวนจง,มนรักษา",
+      "map_url": "https://maps.app.goo.gl/zLdwgV3h4yVH6WpJ8"
+    },
+    "sales_details": {
+      "total_sales_ytd": 525000,
+      "payment_type": "โอนเข้าบริษัท",
+      "brands_sold": [
+        "-",
+        "TTI",
+        "ตราหมี",
+        "SPS",
+        "TT",
+        "Triple-P"
+      ],
+      "last_order_date": "7/8/69",
+      "last_order_amount": 25000,
+      "monthly_sales": 25000,
+      "yearly_sales_ytd": 525000,
+      "ordered_items": [
+        "431",
+        "335",
+        "208-2",
+        "109Aตราหมี"
+      ],
+      "top_selling_products": [
+        "SRT ตระกร้า431",
+        "TTI GW2060 สีสด"
+      ]
+    },
+    "sales_opportunities": {
+      "recommended_products": [
+        "แก้วน้ำเก็บความเย็น 30oz รุ่นพิเศษ"
+      ],
+      "reason": ""
+    }
+  },
+  {
+    "id": "STORE-002",
+    "store_name": "เจ้พรซุปเปอร์มาร์เก็ต",
+    "contact_person": "เจ้พร",
+    "phone": "089-876-5432",
+    "credit_days": 45,
+    "notes": "เน้นสั่งซื้อแก้วเก็บความเย็นและของใช้ในบ้าน ให้ส่งสินค้าเข้าโกดังหลังร้านประตู 2 เท่านั้น ติดต่อก่อนเข้าส่ง 1 ชั่วโมง",
+    "updated_at": "2026-08-11T14:30:00.000Z"
+  },
+  {
+    "id": "STORE-003",
+    "store_name": "ชัยเจริญการค้า",
+    "contact_person": "ไม่ระบุ",
+    "phone": "ไม่ระบุ",
+    "credit_days": 30,
+    "notes": " ส่งของทุกวันอังคาร เครดิต 30 วัน |  ส่งของทุกวันอังคาร เครดิต 30 วัน",
+    "updated_at": "2026-08-11T15:41:38.978Z"
+  },
+  {
+    "id": "STORE-004",
+    "store_name": "ทรัพย์ไพศาล",
+    "general_info": {
+      "delivery_schedule": null,
+      "contact_person": "คุณเดชา (เจ้าของใหม่ 086-777-8888) (โทร 086-777-8888)",
+      "phone": "086-777-8888",
+      "address": null,
+      "credit_days": 60,
+      "notes": null,
+      "contact_persons": [
+        "คุณเดชา (เจ้าของใหม่ 086-777-8888) (โทร 086-777-8888)"
+      ]
+    },
+    "sales_details": {
+      "total_sales_ytd": 0,
+      "last_order_date": "ยังไม่มีประวัติ"
+    },
+    "sales_opportunities": {
+      "opportunity_status": "ทั่วไป",
+      "reason": "ร้านใหม่"
+    },
+    "updated_at": "2026-08-11T16:35:52.768Z"
+  },
+  {
+    "id": "STORE-005",
+    "store_name": "ทรัพย์ไพศาล หนิง(คนสั่งของ)0123456789 อยู่ที่ตลาดนำไทรน้อยตรงข้ามวัดไทรใหญ่ อ.ไทรน้อย จ.นนทบุรี",
+    "general_info": {
+      "delivery_schedule": "ข้อมูลร้านค้าประจำ"
+    },
+    "sales_details": {
+      "total_sales_ytd": 0,
+      "last_order_date": "ยังไม่มีประวัติ"
+    },
+    "sales_opportunities": {
+      "opportunity_status": "ทั่วไป",
+      "reason": "ร้านใหม่"
+    },
+    "updated_at": "2026-08-11T16:04:26.147Z"
+  },
+  {
+    "id": "STORE-006",
+    "store_name": "ทดสอบการค้า",
+    "general_info": {
+      "phone": "088-999-0000",
+      "credit_days": 45,
+      "delivery_schedule": " คุณทดสอบ 088-999-0000 ส่งวันพุธ เครดิต 45 วัน",
+      "notes": " คุณทดสอบ 088-999-0000 ส่งวันพุธ เครดิต 45 วัน"
+    },
+    "sales_details": {
+      "total_sales_ytd": 150000,
+      "last_order_date": "2026-08-11",
+      "payment_status": " 150000 บาท"
+    },
+    "sales_opportunities": {
+      "opportunity_status": "ทั่วไป",
+      "reason": "ร้านใหม่"
+    },
+    "updated_at": "2026-08-11T16:10:16.599Z"
+  },
+  {
+    "id": "STORE-007",
+    "store_name": "ชัยเจริญ",
+    "general_info": {
+      "phone": "081-999-8888",
+      "credit_days": 60,
+      "delivery_schedule": " คุณชัย 081-999-8888 ส่งวันอังคาร เครดิต 60 วัน",
+      "notes": " คุณชัย 081-999-8888 ส่งวันอังคาร เครดิต 60 วัน"
+    },
+    "sales_details": {
+      "total_sales_ytd": 0,
+      "last_order_date": "ยังไม่มีประวัติ"
+    },
+    "sales_opportunities": {
+      "opportunity_status": "🔥 สูง (High Potential)",
+      "reason": " โอกาสสูง เสนอขายรองเท้าสนีกเกอร์สัปดาห์หน้า",
+      "recommended_products": [
+        "สินค้าคอลเลกชันใหม่"
+      ],
+      "target_pitch_date": "เร็วๆ นี้"
+    },
+    "updated_at": "2026-08-11T16:11:24.917Z"
+  },
+  {
+    "id": "STORE-008",
+    "store_name": "ทรัพย์ไพศาล หนิง(คนสั่งของ) 0123456789 แบงค์(เจ้าของร้าน)9876543210 อยู่ที่ตลาดน้ำไทรน้อยตรงข้ามวัดไทรใหญ่ อ.ไทรน้อย จ.นนทบุรี งดรับของและเซลล์วันอังคารกับพฤ",
+    "general_info": {
+      "phone": "081-999-8888",
+      "credit_days": 30,
+      "delivery_schedule": "ข้อมูลร้านค้าประจำ",
+      "notes": "ข้อมูลร้านค้าประจำ"
+    },
+    "sales_details": {
+      "total_sales_ytd": 0,
+      "last_order_date": "ยังไม่มีประวัติ"
+    },
+    "sales_opportunities": {
+      "opportunity_status": "ทั่วไป",
+      "reason": "ร้านใหม่"
+    },
+    "updated_at": "2026-08-11T16:13:13.595Z"
+  },
+  {
+    "id": "STORE-009",
+    "store_name": "ทรัพย์ไพศาล แบงค์(เจ้าของร้าน)9876543210  หนิง(คนสั่งของ)0123456789 อยู่ที่ตลาดน้ำไทรน้อย ตรงข้ามวัดไทรใหญ่ อ.ไทรน้อย จ.นนทบุรี",
+    "general_info": {
+      "contact_person": null,
+      "phone": "0123456789",
+      "address": "ที่ตลาดน้ำไทรน้อย ตรงข้ามวัดไทรใหญ่ อ",
+      "credit_days": null,
+      "delivery_schedule": null,
+      "notes": "บันทึกร้านทรัพย์ไพศาล แบงค์(เจ้าของร้าน)9876543210  หนิง(คนสั่งของ)0123456789 อยู่ที่ตลาดน้ำไทรน้อย ตรงข้ามวัดไทรใหญ่ อ.ไทรน้อย จ.นนทบุรี"
+    },
+    "sales_details": {
+      "total_sales_ytd": 0,
+      "last_order_date": "ยังไม่มีประวัติ"
+    },
+    "sales_opportunities": {
+      "opportunity_status": "ทั่วไป",
+      "reason": "ร้านใหม่"
+    },
+    "updated_at": "2026-08-11T16:18:51.779Z"
+  },
+  {
+    "id": "STORE-010",
+    "store_name": "ทรัพย์ไพศาล ติดต่อแบงค์(เจ้าของร้าน0123456789)หนิง(คนสั่งของ9876543210)ปิ่น(บัญชี0927917766)",
+    "general_info": {
+      "contact_person": "แบงค์(เจ้าของร้าน0123456789)หนิง(คนสั่งของ9876543210)ปิ่น(บัญชี0927917766)",
+      "contact_persons": [
+        "แบงค์(เจ้าของร้าน0123456789)หนิง(คนสั่งของ9876543210)ปิ่น(บัญชี0927917766)"
+      ],
+      "phone": "0123456789",
+      "address": null,
+      "credit_days": null,
+      "delivery_schedule": null,
+      "notes": "บันทึกร้านทรัพย์ไพศาล ติดต่อแบงค์(เจ้าของร้าน0123456789)หนิง(คนสั่งของ9876543210)ปิ่น(บัญชี0927917766)"
+    },
+    "sales_details": {
+      "total_sales_ytd": 0,
+      "last_order_date": "ยังไม่มีประวัติ"
+    },
+    "sales_opportunities": {
+      "opportunity_status": "ทั่วไป",
+      "reason": "ร้านใหม่"
+    },
+    "updated_at": "2026-08-11T16:22:39.786Z"
+  },
+  {
+    "id": "STORE-011",
+    "store_name": "ทรัพย์ไพศาล แบงค์(เจ้าของร้าน 0123456789),หนิง(คนสั่งของ9876543210,ปิ่น(บัญชี0927917766)",
+    "general_info": {
+      "contact_person": null,
+      "contact_persons": null,
+      "phone": "0123456789",
+      "address": null,
+      "credit_days": null,
+      "delivery_schedule": null,
+      "notes": "บันทึกร้านทรัพย์ไพศาล แบงค์(เจ้าของร้าน 0123456789),หนิง(คนสั่งของ9876543210,ปิ่น(บัญชี0927917766)"
+    },
+    "sales_details": {
+      "total_sales_ytd": 0,
+      "last_order_date": "ยังไม่มีประวัติ"
+    },
+    "sales_opportunities": {
+      "opportunity_status": "ทั่วไป",
+      "reason": "ร้านใหม่"
+    },
+    "updated_at": "2026-08-11T16:27:50.728Z"
+  },
+  {
+    "id": "STORE-012",
+    "store_name": "\"ทรัพย์ไพศาล",
+    "general_info": {
+      "contact_person": "คุณสมชาย (ผู้จัดการ), คุณนภา (ฝ่ายจัดซื้อ 089-111-2222) (โทร 089-111-2222), คุณชัย (หัวหน้าโกดัง)",
+      "contact_persons": [
+        "คุณสมชาย (ผู้จัดการ)",
+        "คุณนภา (ฝ่ายจัดซื้อ 089-111-2222) (โทร 089-111-2222)",
+        "คุณชัย (หัวหน้าโกดัง)"
+      ],
+      "phone": "089-111-2222",
+      "address": "45/6 ชลบุรี ส่งวันอังคาร เครดิต 30 วัน\"",
+      "credit_days": 30,
+      "delivery_schedule": "ส่งวันอังคาร เครดิต 30 วัน\"",
+      "notes": "ผู้ติดต่อคุณสมชาย (ผู้จัดการ), คุณนภา (ฝ่ายจัดซื้อ 089-111-2222), คุณชัย (หัวหน้าโกดัง) ที่อยู่ 45/6 ชลบุรี ส่งวันอังคาร เครดิต 30 วัน\""
+    },
+    "sales_details": {
+      "total_sales_ytd": 0,
+      "last_order_date": "ยังไม่มีประวัติ"
+    },
+    "sales_opportunities": {
+      "opportunity_status": "ทั่วไป",
+      "reason": "ร้านใหม่"
+    },
+    "updated_at": "2026-08-11T16:30:48.138Z"
+  },
+  {
+    "id": "STORE-013",
+    "store_name": "สมนึก ที่อยู่ตลาดไท จ.ปทุมธานี",
+    "general_info": {
+      "contact_person": "คุณสมชาย 081-222-3333, บันทึกร้านสมนึก",
+      "contact_persons": [
+        "คุณสมชาย 081-222-3333",
+        "บันทึกร้านสมนึก"
+      ],
+      "phone": null,
+      "address": "ตลาดไท อ",
+      "credit_days": null,
+      "delivery_schedule": "ส่งวันอังคาร เครดิต 30 วัน",
+      "notes": null,
+      "store_name": null
+    },
+    "sales_details": {
+      "total_sales_ytd": 0,
+      "last_order_date": "ยังไม่มีประวัติ"
+    },
+    "sales_opportunities": {
+      "opportunity_status": "ทั่วไป",
+      "reason": "ร้านใหม่"
+    },
+    "updated_at": "2026-08-11T17:29:55.971Z"
+  },
+  {
+    "id": "STORE-014",
+    "store_name": "สมนึก ที่อยู่ตลาดไท ปทุมธานี",
+    "general_info": {
+      "contact_person": null,
+      "contact_persons": null,
+      "phone": null,
+      "address": "ตลาดไท ปทุมธานี",
+      "credit_days": null,
+      "delivery_schedule": null,
+      "notes": null
+    },
+    "sales_details": {
+      "total_sales_ytd": 0,
+      "last_order_date": "ยังไม่มีประวัติ"
+    },
+    "sales_opportunities": {
+      "opportunity_status": "ทั่วไป",
+      "reason": "ร้านใหม่"
+    },
+    "updated_at": "2026-08-11T16:53:08.799Z"
+  },
+  {
+    "id": "STORE-015",
+    "store_name": "สมนึก ผู้ติดต่อ คุณเมย์(เจ้าของร้าน0123456789),คุณบอย(แฟน9876543210),ก๊อป(สั่งของ7410852963)",
+    "general_info": {
+      "contact_person": "คุณเมย์(เจ้าของร้าน0123456789) (โทร 0123456789), คุณบอย(แฟน9876543210)",
+      "contact_persons": [
+        "คุณเมย์(เจ้าของร้าน0123456789) (โทร 0123456789)",
+        "คุณบอย(แฟน9876543210)"
+      ],
+      "phone": "0123456789",
+      "address": null,
+      "credit_days": null,
+      "delivery_schedule": null,
+      "notes": null
+    },
+    "sales_details": {
+      "total_sales_ytd": 0,
+      "last_order_date": "ยังไม่มีประวัติ"
+    },
+    "sales_opportunities": {
+      "opportunity_status": "ทั่วไป",
+      "reason": "ร้านใหม่"
+    },
+    "updated_at": "2026-08-11T16:57:55.065Z"
+  },
+  {
+    "id": "STORE-016",
+    "store_name": "สมนึก ผู้ติดต่อคุณเมย์(เจ้าของ 0123456789),คุณบอย(แฟน 9876543210),บาส(สั่งของ 7410852963)",
+    "general_info": {
+      "contact_person": "คุณเมย์(เจ้าของ 0123456789) (โทร 0123456789), คุณบอย(แฟน 9876543210)",
+      "contact_persons": [
+        "คุณเมย์(เจ้าของ 0123456789) (โทร 0123456789)",
+        "คุณบอย(แฟน 9876543210)"
+      ],
+      "phone": "0123456789",
+      "address": null,
+      "credit_days": null,
+      "delivery_schedule": null,
+      "notes": null
+    },
+    "sales_details": {
+      "total_sales_ytd": 0,
+      "last_order_date": "ยังไม่มีประวัติ"
+    },
+    "sales_opportunities": {
+      "opportunity_status": "ทั่วไป",
+      "reason": "ร้านใหม่"
+    },
+    "updated_at": "2026-08-11T17:11:04.888Z"
+  },
+  {
+    "id": "STORE-017",
+    "store_name": "รุ่งอรุณพาณิชย์",
+    "general_info": {
+      "store_name": null,
+      "contact_person": "คุณอเนก 082-111-4444",
+      "contact_persons": [
+        "คุณอเนก 082-111-4444"
+      ],
+      "phone": "082-111-4444",
+      "address": "12/3 อยุธยา ส่งวันพุธ เครดิต 45 วัน",
+      "credit_days": 45,
+      "delivery_schedule": "ส่งวันพุธ เครดิต 45 วัน",
+      "notes": null
+    },
+    "sales_details": {
+      "total_sales_ytd": 0,
+      "last_order_date": "ยังไม่มีประวัติ"
+    },
+    "sales_opportunities": {
+      "opportunity_status": "ทั่วไป",
+      "reason": "ร้านใหม่"
+    },
+    "updated_at": "2026-08-11T17:16:09.312Z"
+  },
+  {
+    "id": "STORE-018",
+    "store_name": "ทรัพย์เจริญ",
+    "general_info": {
+      "store_name": null,
+      "contact_person": "คุณสมชาย 081-999-8888",
+      "contact_persons": [
+        "คุณสมชาย 081-999-8888"
+      ],
+      "phone": "081-999-8888",
+      "address": "99/9 อยุธยา",
+      "map_url": "https://maps.google.com/?q=14.35,100.57,",
+      "delivery_by": "ขนส่ง Kerry Express",
+      "delivery_schedule": "ขนส่ง Kerry Express",
+      "credit_days": 60,
+      "notes": "ให้โทรแจ้งก่อนส่ง 1 ชั่วโมง"
+    },
+    "sales_details": {
+      "total_sales_ytd": 0,
+      "last_order_date": "ยังไม่มีประวัติ"
+    },
+    "sales_opportunities": {
+      "opportunity_status": "ทั่วไป",
+      "reason": "ร้านใหม่"
+    },
+    "updated_at": "2026-08-11T17:34:18.843Z"
+  },
+  {
+    "id": "STORE-019",
+    "store_name": "สมนึก ตลาดไท",
+    "general_info": {
+      "store_name": "สมนึก ตลาดไท",
+      "contact_person": "คุณเมย์(เจ้าของ0123456789), คุณบอย(9876543210)",
+      "contact_persons": [
+        "คุณเมย์(เจ้าของ0123456789)",
+        "คุณบอย(9876543210)"
+      ],
+      "phone": "0123456789",
+      "address": null,
+      "map_url": null,
+      "delivery_by": null,
+      "delivery_schedule": null,
+      "credit_days": null,
+      "notes": "เพิ่มโน้ตร้านสมนึก ตลาดไท:"
+    },
+    "sales_details": {
+      "total_sales_ytd": 0,
+      "last_order_date": "ยังไม่มีประวัติ"
+    },
+    "sales_opportunities": {
+      "opportunity_status": "ทั่วไป",
+      "reason": "ร้านใหม่"
+    },
+    "updated_at": "2026-08-11T17:47:46.863Z"
+  },
+  {
+    "id": "STORE-1786471765486",
+    "store_name": "เจริญทรัพย์",
+    "general_info": {},
+    "sales_details": {
+      "payment_type": "ไม่ระบุ",
+      "brands_sold": [
+        "Arrow และ GQ"
+      ],
+      "last_order_date": "15000 บาท",
+      "last_order_amount": 15000,
+      "monthly_sales": 50000,
+      "yearly_sales_ytd": 50000,
+      "total_sales_ytd": 50000,
+      "ordered_items": [
+        "ซื้อล่าสุด 10 สิงหาคม 2026",
+        "กางเกงสแล็ค (5 ตัว)"
+      ],
+      "top_selling_products": [
+        "เสื้อเชิ้ตคอตตอน"
+      ]
+    },
+    "sales_opportunities": {},
+    "updated_at": "2026-08-11T18:09:34.031Z"
+  },
+  {
+    "id": "STORE-1786472113805",
+    "store_name": "วัฒนาการค้า",
+    "general_info": {},
+    "sales_details": {
+      "payment_type": "ไม่ระบุ",
+      "brands_sold": [
+        "Arrow",
+        "GQ"
+      ],
+      "last_order_date": "12/8/2569",
+      "last_order_amount": 0,
+      "monthly_sales": 0,
+      "yearly_sales_ytd": 0,
+      "total_sales_ytd": 0,
+      "ordered_items": [
+        "เสื้อเชิ้ต 10 ตัว",
+        "กางเกงสแล็ค 5 ตัว"
+      ],
+      "top_selling_products": [
+        "เสื้อเชิ้ตคอตตอน",
+        "กางเกงสแล็ค"
+      ]
+    },
+    "sales_opportunities": {},
+    "updated_at": "2026-08-11T18:16:17.592Z"
+  }
+]

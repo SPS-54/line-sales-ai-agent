@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SalesAI Assistant - Web Simulator</title>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0f172a;
+      --panel: #1e293b;
+      --line-green: #06C755;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --border: #334155;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Prompt', sans-serif; }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 16px;
+    }
+
+    .chat-container {
+      width: 100%;
+      max-width: 520px;
+      height: 92vh;
+      background: var(--panel);
+      border-radius: 24px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+      border: 1px solid var(--border);
+    }
+
+    .header {
+      padding: 18px 20px;
+      background: #06C755;
+      color: white;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 4px 12px rgba(6,199,85,0.3);
+    }
+
+    .header-icon {
+      width: 44px;
+      height: 44px;
+      background: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+    }
+
+    .header-info h2 { font-size: 17px; font-weight: 700; }
+    .header-info p { font-size: 12px; opacity: 0.9; }
+
+    .quick-chips {
+      padding: 10px 16px;
+      background: rgba(15, 23, 42, 0.6);
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      border-bottom: 1px solid var(--border);
+      scrollbar-width: thin;
+    }
+
+    .chip {
+      background: #334155;
+      color: white;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .chip:hover {
+      background: #06C755;
+      transform: translateY(-1px);
+    }
+
+    .messages {
+      flex: 1;
+      padding: 16px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      background: #0b1329;
+    }
+
+    .msg {
+      max-width: 85%;
+      padding: 12px 16px;
+      border-radius: 18px;
+      font-size: 13.5px;
+      line-height: 1.5;
+      word-break: break-word;
+    }
+
+    .msg-user {
+      align-self: flex-end;
+      background: #06C755;
+      color: white;
+      border-bottom-right-radius: 4px;
+    }
+
+    .msg-ai {
+      align-self: flex-start;
+      background: #1e293b;
+      color: #f1f5f9;
+      border-bottom-left-radius: 4px;
+      border: 1px solid var(--border);
+    }
+
+    /* Product Carousel Styling */
+    .product-carousel {
+      display: flex;
+      gap: 12px;
+      overflow-x: auto;
+      padding: 8px 0;
+      width: 100%;
+    }
+
+    .product-card {
+      min-width: 200px;
+      max-width: 220px;
+      background: #ffffff;
+      color: #0f172a;
+      border-radius: 16px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.3);
+    }
+
+    .product-img {
+      width: 100%;
+      height: 140px;
+      object-fit: cover;
+    }
+
+    .product-body { padding: 12px; display: flex; flex-direction: column; flex: 1; }
+    .product-title { font-size: 13px; font-weight: 600; margin-bottom: 4px; color: #0f172a; }
+    .product-price { color: #06C755; font-size: 15px; font-weight: 700; margin-bottom: 8px; }
+
+    .share-btn {
+      margin-top: auto;
+      background: var(--line-green);
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      text-decoration: none;
+    }
+
+    /* Info Cards Styling */
+    .info-card {
+      background: #ffffff;
+      color: #1e293b;
+      border-radius: 16px;
+      padding: 16px;
+      margin-top: 4px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+    }
+
+    .info-card-green { border-left: 6px solid #06C755; }
+    .info-card-blue { border-left: 6px solid #3B82F6; }
+    .info-card-orange { border-left: 6px solid #F59E0B; }
+
+    .info-card h3 { font-size: 16px; font-weight: 700; margin-bottom: 10px; }
+    .info-card-green h3 { color: #059669; }
+    .info-card-blue h3 { color: #2563EB; }
+    .info-card-orange h3 { color: #D97706; }
+
+    .info-card p { font-size: 13px; margin-bottom: 6px; color: #334155; line-height: 1.5; }
+
+    .action-btn-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 14px;
+      border-top: 1px solid #e2e8f0;
+      padding-top: 12px;
+    }
+
+    .action-btn {
+      border: none;
+      color: white;
+      padding: 10px 8px;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+      transition: all 0.15s ease;
+      font-family: inherit;
+    }
+
+    .action-btn:hover {
+      filter: brightness(1.1);
+      transform: translateY(-1px);
+    }
+
+    .input-box {
+      padding: 16px;
+      background: var(--panel);
+      border-top: 1px solid var(--border);
+      display: flex;
+      gap: 8px;
+    }
+
+    input {
+      flex: 1;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: #fff;
+      padding: 12px 16px;
+      border-radius: 24px;
+      outline: none;
+      font-size: 14px;
+    }
+
+    button.send-btn {
+      background: var(--line-green);
+      color: white;
+      border: none;
+      padding: 0 22px;
+      border-radius: 24px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="chat-container">
+    <div class="header">
+      <div class="header-icon">🤖</div>
+      <div class="header-info">
+        <h2>LINE Sales AI Assistant</h2>
+        <p>แยก 3 หมวดหลัก: ข้อมูลพื้นฐานร้านค้า | ข้อมูลการขาย | โอกาสเสนอขาย</p>
+      </div>
+    </div>
+
+    <div class="quick-chips">
+      <div class="chip" onclick="sendQuick('แบบฟอร์ม')">📝 ขอแบบฟอร์มป้อนข้อมูล</div>
+      <div class="chip" onclick="sendQuick('ขอข้อมูลร้านสมศักดิ์การค้า')">🏬 ดึงข้อมูลร้าน</div>
+      <div class="chip" onclick="sendQuick('ขอข้อมูลการขายร้านสมศักดิ์การค้า')">📊 ดึงข้อมูลการขาย</div>
+      <div class="chip" onclick="sendQuick('ขอโอกาสเสนอขายร้านสมศักดิ์การค้า')">🎯 ดึงโอกาสขาย</div>
+    </div>
+
+    <div class="messages" id="messages">
+      <div class="msg msg-ai">
+        สวัสดีค่ะ! SalesAI Assistant พร้อมดูแลและดึงข้อมูลแยก 3 หมวดหลักดังนี้ค่ะ:
+        <br>1. 🏬 <b>ข้อมูลพื้นฐานร้านค้า:</b> พิมพ์ <i>"ขอข้อมูลร้านสมศักดิ์"</i>
+        <br>2. 📊 <b>ข้อมูลการขาย:</b> พิมพ์ <i>"ขอข้อมูลการขายร้านสมศักดิ์"</i>
+        <br>3. 🎯 <b>โอกาสเสนอขาย:</b> พิมพ์ <i>"ขอข้อมูลโอกาสเสนอขายร้านสมศักดิ์"</i>
+        <br><br>💡 สามารถพิมพ์คำว่า <b>"แบบฟอร์ม"</b> เพื่อขอตัวอย่างฟอร์มป้อนข้อมูลตามหมวดหมู่ได้ทุกเมื่อค่ะ!
+      </div>
+    </div>
+
+    <div class="input-box">
+      <input type="text" id="userInput" placeholder="พิมพ์คำสั่ง เช่น ขอข้อมูลร้านสมศักดิ์การค้า..." onkeypress="handleKey(event)">
+      <button class="send-btn" onclick="sendMessage()">ส่ง</button>
+    </div>
+  </div>
+
+  <script>
+    async function sendMessage() {
+      const input = document.getElementById('userInput');
+      const text = input.value.trim();
+      if (!text) return;
+
+      appendMsg(text, 'user');
+      input.value = '';
+
+      try {
+        const res = await fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: text })
+        });
+        const data = await res.json();
+        
+        appendMsg(data.text, 'ai');
+
+        if (data.flexMessage) {
+          renderFlexMessage(data.flexMessage);
+        }
+      } catch (err) {
+        appendMsg('เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์', 'ai');
+      }
+    }
+
+    function sendQuick(txt) {
+      document.getElementById('userInput').value = txt;
+      sendMessage();
+    }
+
+    function handleKey(e) {
+      if (e.key === 'Enter') sendMessage();
+    }
+
+    function appendMsg(text, sender) {
+      const msgs = document.getElementById('messages');
+      const div = document.createElement('div');
+      div.className = `msg msg-${sender}`;
+      div.innerHTML = text.replace(/\n/g, '<br>');
+      msgs.appendChild(div);
+      msgs.scrollTop = msgs.scrollHeight;
+    }
+
+    // ดึงปุ่มกดทั้งหมดออกจากวัตถุ Flex (Recursive Button Extractor)
+    function extractAllButtons(item) {
+      let buttons = [];
+      if (!item) return buttons;
+      if (item.type === 'button') {
+        buttons.push(item);
+      } else if (item.contents && Array.isArray(item.contents)) {
+        item.contents.forEach(child => {
+          buttons = buttons.concat(extractAllButtons(child));
+        });
+      }
+      return buttons;
+    }
+
+    function renderFlexMessage(flex) {
+      const msgs = document.getElementById('messages');
+      const contents = flex.contents;
+
+      if (contents.type === 'carousel') {
+        const carouselDiv = document.createElement('div');
+        carouselDiv.className = 'product-carousel';
+
+        contents.contents.forEach(bubble => {
+          const title = bubble.body.contents[1].text;
+          const price = bubble.body.contents[2].contents[0].text;
+          const imgUrl = bubble.hero.url;
+          const shareUrl = bubble.footer.contents[0].action.uri;
+
+          const card = document.createElement('div');
+          card.className = 'product-card';
+          card.innerHTML = `
+            <img src="${imgUrl}" class="product-img" alt="${title}">
+            <div class="product-body">
+              <div class="product-title">${title}</div>
+              <div class="product-price">${price}</div>
+              <a href="${shareUrl}" target="_blank" class="share-btn">
+                📤 แชร์ให้ลูกค้า
+              </a>
+            </div>
+          `;
+          carouselDiv.appendChild(card);
+        });
+
+        msgs.appendChild(carouselDiv);
+      } else if (contents.type === 'bubble') {
+        const title = contents.header.contents[1].text;
+        const headerTitle = contents.header.contents[0].text;
+
+        let cardClass = 'info-card-green';
+        if (headerTitle.includes('รายละเอียดการขาย') || headerTitle.includes('Sales Performance')) cardClass = 'info-card-blue';
+        if (headerTitle.includes('โอกาสเสนอขาย') || headerTitle.includes('Sales Opportunity')) cardClass = 'info-card-orange';
+
+        let bodyHTML = `<h3>${headerTitle}: ${title}</h3>`;
+        
+        contents.body.contents.forEach(box => {
+          if (box.contents) {
+            box.contents.forEach(item => {
+              if (item.text) {
+                bodyHTML += `<p>${item.text.replace(/\n/g, '<br>')}</p>`;
+              }
+            });
+          }
+        });
+
+        // 🔘 แสดงผลปุ่มกดแก้ไขเฉพาะจุด (Action Buttons) ทั้งหมดในรูปแบบตารางปุ่มทางด่วน 2 คอลัมน์
+        const allButtons = extractAllButtons(contents.footer);
+        if (allButtons.length > 0) {
+          bodyHTML += `<div class="action-btn-grid">`;
+          allButtons.forEach(btn => {
+            if (btn.action && btn.action.text) {
+              const bg = btn.color || '#3b82f6';
+              bodyHTML += `<button class="action-btn" style="background:${bg};" onclick="sendQuick('${btn.action.text.replace(/'/g, "\\'")}')">${btn.action.label}</button>`;
+            }
+          });
+          bodyHTML += `</div>`;
+        }
+
+        const card = document.createElement('div');
+        card.className = `info-card ${cardClass}`;
+        card.innerHTML = bodyHTML;
+        msgs.appendChild(card);
+      }
+      msgs.scrollTop = msgs.scrollHeight;
+    }
+  </script>
+</body>
+</html>

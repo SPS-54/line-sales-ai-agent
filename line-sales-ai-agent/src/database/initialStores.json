@@ -1,0 +1,126 @@
+[
+  {
+    "id": "STORE-001",
+    "store_name": "สมศักดิ์การค้า",
+    "general_info": {
+      "contact_person": "คุณสมศักดิ์ (เจ้าของร้าน - 081-234-5678), คุณวิภา (ผู้จัดการจัดซื้อ - 089-111-2222)",
+      "contact_persons": [
+        "คุณสมศักดิ์ (เจ้าของร้าน - 081-234-5678)",
+        "คุณวิภา (ผู้จัดการจัดซื้อ - 089-111-2222)"
+      ],
+      "phone": "081-234-5678",
+      "address": "123/45 ถ.พหลโยธิน แขวงลาดยาว เขตจตุจักร กทม. 10900",
+      "map_url": "https://maps.google.com/?q=13.8123,100.5647",
+      "delivery_by": "รถบริษัท (ส่งทุกวันอังคารและศุกร์)",
+      "credit_days": 30,
+      "notes": "ร้านปิดทุกวันอาทิตย์ เข้าส่งของได้ช่วง 09:00 - 15:00 น."
+    },
+    "sales_details": {
+      "payment_type": "โอนเงินผ่านธนาคาร (เครดิต 30 วัน)",
+      "brands_sold": [
+        "Arrow",
+        "GQ",
+        "Beverly Hills Polo Club"
+      ],
+      "last_order_date": "2026-08-01",
+      "last_order_amount": 25000,
+      "monthly_sales": 75000,
+      "yearly_sales_ytd": 475000,
+      "calendar_year": 2026,
+      "calendar_month": 8,
+      "order_history": [
+        {
+          "date": "2024-05-10",
+          "amount": 320000,
+          "year": 2024,
+          "month": 5
+        },
+        {
+          "date": "2025-11-20",
+          "amount": 550000,
+          "year": 2025,
+          "month": 11
+        },
+        {
+          "date": "2026-01-15",
+          "amount": 400000,
+          "year": 2026,
+          "month": 1
+        },
+        {
+          "date": "2026-08-01",
+          "amount": 75000,
+          "year": 2026,
+          "month": 8
+        }
+      ],
+      "yearly_breakdown": [
+        {
+          "year": 2026,
+          "buddhistYear": 2569,
+          "total": 475000
+        },
+        {
+          "year": 2025,
+          "buddhistYear": 2568,
+          "total": 550000
+        },
+        {
+          "year": 2024,
+          "buddhistYear": 2567,
+          "total": 320000
+        }
+      ],
+      "ordered_items": [
+        "เสื้อเชิ้ตคอตตอนแขนยาว (20 ตัว)",
+        "กระเป๋าเป้สะพายหลัง (10 ใบ)"
+      ],
+      "top_selling_products": [
+        "เสื้อเชิ้ตคอตตอนแขนยาว",
+        "กระเป๋าเป้สะพายหลัง"
+      ]
+    },
+    "sales_opportunities": {
+      "opportunity_status": "🔥 สูง (High Potential)",
+      "recommended_products": [
+        "ร่มแม่ค้า",
+        "เมลามีนตราปลา"
+      ],
+      "reason": "มีขายร่มแม่ค้าอยู่",
+      "target_pitch_date": "22/8/69"
+    },
+    "updated_at": "2026-08-11T18:55:47.212Z"
+  },
+  {
+    "id": "STORE-1786473856244",
+    "store_name": "ทรัพย์ไพศาล",
+    "general_info": {
+      "store_name": null,
+      "contact_person": "คุณสมชาย (ผู้จัดการ 081-222-3333)",
+      "contact_persons": [
+        "คุณสมชาย (ผู้จัดการ 081-222-3333)"
+      ],
+      "phone": "081-222-3333",
+      "address": "45/6 ชลบุรี",
+      "map_url": "https://maps.google.com/?q=13.81,100.56,",
+      "delivery_by": "รถบริษัท",
+      "delivery_schedule": "รถบริษัท",
+      "credit_days": 30,
+      "notes": "ให้โทรแจ้งล่วงหน้า"
+    },
+    "sales_details": {},
+    "sales_opportunities": {},
+    "updated_at": "2026-08-11T18:44:16.244Z"
+  },
+  {
+    "id": "STORE-1786475738574",
+    "store_name": "",
+    "general_info": {
+      "notes": "1190",
+      "contact_person": ""
+    },
+    "sales_details": {},
+    "sales_opportunities": {},
+    "updated_at": "2026-08-11T19:15:38.573Z"
+  }
+]

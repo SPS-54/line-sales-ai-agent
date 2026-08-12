@@ -1,0 +1,253 @@
+[
+  {
+    "id": "PROD-001",
+    "product_code": "SKU-SHIRT-01",
+    "name": "เสื้อเชิ้ตคอตตอน",
+    "brand": "Arrow",
+    "category": "เสื้อผ้า",
+    "price": 890,
+    "stock": 50,
+    "tags": [
+      "เสื้อเชิ้ต",
+      "คอตตอน",
+      "Arrow"
+    ],
+    "image_url": "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=500"
+  },
+  {
+    "id": "PROD-002",
+    "product_code": "SKU-BAG-02",
+    "name": "กระเป๋าเป้สะพายหลัง",
+    "brand": "GQ",
+    "category": "กระเป๋า",
+    "price": 1250,
+    "stock": 25,
+    "tags": [
+      "กระเป๋าเป้",
+      "เป้สะพายหลัง",
+      "GQ",
+      "กระเป๋าแฟชั่น"
+    ],
+    "image_url": "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=500&auto=format&fit=crop&q=60"
+  },
+  {
+    "id": "PROD-003",
+    "product_code": "SKU-SHOES-03",
+    "name": "รองเท้าสนีกเกอร์รุ่นใหม่",
+    "brand": "Nike",
+    "category": "รองเท้า",
+    "price": 2490,
+    "stock": 15,
+    "tags": [
+      "รองเท้า",
+      "สนีกเกอร์",
+      "Nike",
+      "รองเท้าผ้าใบ"
+    ],
+    "image_url": "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500&auto=format&fit=crop&q=60"
+  },
+  {
+    "id": "PROD-004",
+    "product_code": "SKU-MUG-04",
+    "name": "แก้วน้ำเก็บความเย็น 30oz",
+    "brand": "Yeti",
+    "category": "แก้วน้ำ",
+    "price": 450,
+    "stock": 100,
+    "tags": [
+      "แก้วน้ำ",
+      "แก้วเก็บความเย็น",
+      "Yeti",
+      "สแตนเลส"
+    ],
+    "image_url": "https://images.unsplash.com/photo-1517256064527-09c73fc73e38?w=500&auto=format&fit=crop&q=60"
+  },
+  {
+    "id": "PROD-1786475275672",
+    "product_code": "SKU-275672",
+    "name": "ชื่อสินค้า เสื้อเชิ้ตลายสก็อต, , , ,  บาท, , ลิ้งค์รูปภาพ",
+    "brand": "ไม่ระบุ",
+    "category": "สินค้าทั่วไป",
+    "price": 590,
+    "stock": 10,
+    "tags": [
+      "ชื่อสินค้า เสื้อเชิ้ตลายสก็อต, , , ,  บาท, , ลิ้งค์รูปภาพ"
+    ],
+    "image_url": "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=500"
+  },
+  {
+    "id": "PROD-1786475554685",
+    "product_code": "SKU-SHIRT-99",
+    "name": "เสื้อเชิ้ตลายสก็อต",
+    "brand": "Arrow",
+    "category": "เสื้อผ้า",
+    "price": 590,
+    "stock": 10,
+    "tags": [
+      "เสื้อเชิ้ต",
+      "ลายสก็อต",
+      "Arrow"
+    ],
+    "image_url": "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=500"
+  },
+  {
+    "id": "PROD-1786475774524",
+    "product_code": "SKU-774524",
+    "name": "เสื้อเชิ้ตคอตตอนแขนยาว",
+    "brand": "GQ Premium",
+    "category": "สินค้าทั่วไป",
+    "price": 1290,
+    "stock": 10,
+    "tags": [
+      "เสื้อเชิ้ตคอตตอนแขนยาว",
+      "Arrow Premium"
+    ],
+    "image_url": "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&auto=format&fit=crop&q=60"
+  },
+  {
+    "id": "PROD-1786475927099",
+    "product_code": "SKU-927099",
+    "name": "เสื้อแจ็คเก็ตยีนส์",
+    "brand": "ไม่ระบุ",
+    "category": "สินค้าทั่วไป",
+    "price": 0,
+    "stock": 10,
+    "tags": [
+      "เสื้อแจ็คเก็ตยีนส์"
+    ],
+    "image_url": "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&auto=format&fit=crop&q=60"
+  },
+  {
+    "id": "PROD-1786476018624",
+    "product_code": "SKU-018624",
+    "name": "แก้ว 16 oz. (1*10) แพ็คโหล",
+    "brand": "ไม่ระบุ",
+    "category": "สินค้าทั่วไป",
+    "price": 0,
+    "stock": 10,
+    "tags": [
+      "แก้ว 16 oz. (1*10) แพ็คโหล"
+    ],
+    "image_url": "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&auto=format&fit=crop&q=60"
+  },
+  {
+    "id": "PROD-1786476044391",
+    "product_code": "-774524:",
+    "name": "สินค้าใหม่",
+    "brand": "GQ Premium",
+    "category": "สินค้าทั่วไป",
+    "price": 1290,
+    "stock": 10,
+    "tags": [
+      "สินค้าใหม่"
+    ],
+    "image_url": "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&auto=format&fit=crop&q=60"
+  },
+  {
+    "id": "PROD-1786476341730",
+    "product_code": "SKU-341730",
+    "name": "เสื้อลายลูกไม้  บาท",
+    "brand": "ไม่ระบุ",
+    "category": "สินค้าทั่วไป",
+    "price": 0,
+    "stock": 10,
+    "tags": [
+      "เสื้อลายลูกไม้  บาท"
+    ],
+    "image_url": "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&auto=format&fit=crop&q=60"
+  },
+  {
+    "id": "PROD-1786476853856",
+    "product_code": "SKU-853856",
+    "name": "แก้ไขสินค้า เสื้อเชิ้ตคอตตอนแขนยาว  บาท",
+    "brand": "Arrow Premium",
+    "category": "สินค้าทั่วไป",
+    "price": 990,
+    "stock": 10,
+    "tags": [
+      "แก้ไขสินค้า เสื้อเชิ้ตคอตตอนแขนยาว  บาท",
+      "Arrow Premium"
+    ],
+    "image_url": "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&auto=format&fit=crop&q=60"
+  },
+  {
+    "id": "PROD-1786476862330",
+    "product_code": "SKU-862330",
+    "name": "เสื้อเชิ้ตคอตตอนแขนยาว  บาท",
+    "brand": "Arrow Premium",
+    "category": "สินค้าทั่วไป",
+    "price": 990,
+    "stock": 10,
+    "tags": [
+      "เสื้อเชิ้ตคอตตอนแขนยาว  บาท",
+      "Arrow Premium"
+    ],
+    "image_url": "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&auto=format&fit=crop&q=60"
+  },
+  {
+    "id": "PROD-1786476894404",
+    "product_code": "SKU-894404",
+    "name": "ขอฟอร์ม",
+    "brand": "ไม่ระบุ",
+    "category": "สินค้าทั่วไป",
+    "price": 0,
+    "stock": 10,
+    "tags": [
+      "ขอฟอร์ม"
+    ],
+    "image_url": "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&auto=format&fit=crop&q=60"
+  },
+  {
+    "id": "PROD-1786476992052",
+    "product_code": "SKU-POLO-01",
+    "name": "เสื้อโปโลคอตตอน",
+    "brand": "GQ Sport",
+    "category": "เสื้อผ้า",
+    "price": 750,
+    "stock": 10,
+    "tags": [
+      "เสื้อโปโล",
+      "GQ"
+    ],
+    "image_url": "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&auto=format&fit=crop&q=60"
+  },
+  {
+    "id": "PROD-1786477054193",
+    "product_code": "SKU-054193",
+    "name": "ขอฟอร์มเพิ่มสินค้า",
+    "brand": "ไม่ระบุ",
+    "category": "สินค้าทั่วไป",
+    "price": 0,
+    "stock": 10,
+    "tags": [
+      "ขอฟอร์มเพิ่มสินค้า"
+    ],
+    "image_url": "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&auto=format&fit=crop&q=60"
+  },
+  {
+    "id": "PROD-1786477110448",
+    "product_code": "SKU-110448",
+    "name": "เสื้อกีฬาไมโคร",
+    "brand": "ไม่ระบุ",
+    "category": "สินค้าทั่วไป",
+    "price": 290,
+    "stock": 10,
+    "tags": [
+      "เสื้อกีฬาไมโคร"
+    ],
+    "image_url": "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&auto=format&fit=crop&q=60"
+  },
+  {
+    "id": "PROD-1786477663293",
+    "product_code": "GW020-8",
+    "name": "ขันด้าม โดเรม่อน",
+    "brand": "TTI",
+    "category": "พลาสติก",
+    "price": 190,
+    "stock": 10,
+    "tags": [
+      "ขันด้าม"
+    ],
+    "image_url": "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=500"
+  }
+]
