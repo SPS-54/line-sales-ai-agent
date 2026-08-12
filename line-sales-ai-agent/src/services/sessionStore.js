@@ -36,11 +36,11 @@ export const sessionStore = {
     pendingConfirmations.delete(key);
   },
 
-  findActivePending() {
-    if (pendingConfirmations.size === 0) return null;
-    const entries = Array.from(pendingConfirmations.entries());
-    const [key, val] = entries[entries.length - 1];
-    return { key, ...val };
+  findActivePending(userId = 'default') {
+    const key = String(userId || 'default').toLowerCase().trim();
+    const val = pendingConfirmations.get(key);
+    if (val) return { key, ...val };
+    return null;
   },
 
   // 3. จัดการสถานะรอเติมข้อมูลหัวข้อเดียว (1-Field Prompt State)
@@ -62,10 +62,32 @@ export const sessionStore = {
     pendingFieldUpdates.delete(key);
   },
 
-  findActivePendingField() {
-    if (pendingFieldUpdates.size === 0) return null;
-    const entries = Array.from(pendingFieldUpdates.entries());
-    const [key, val] = entries[entries.length - 1];
-    return { key, ...val };
+  findActivePendingField(userId = 'default') {
+    const key = String(userId || 'default').toLowerCase().trim();
+    const val = pendingFieldUpdates.get(key);
+    if (val) return { key, ...val };
+    return null;
+  },
+
+  // 4. จัดการสถานะกำลังบันทึกข้อมูลพื้นฐานร้านค้าค้างอยู่ (Active Store Recording Session)
+  setActiveStoreSession(userId, storeName) {
+    const key = String(userId || 'default').toLowerCase().trim();
+    activeStoreSessions.set(key, {
+      storeName,
+      isRecording: true,
+      created_at: Date.now()
+    });
+  },
+
+  getActiveStoreSession(userId) {
+    const key = String(userId || 'default').toLowerCase().trim();
+    return activeStoreSessions.get(key) || null;
+  },
+
+  clearActiveStoreSession(userId) {
+    const key = String(userId || 'default').toLowerCase().trim();
+    activeStoreSessions.delete(key);
   }
 };
+
+const activeStoreSessions = new Map();

@@ -49,7 +49,8 @@ const server = http.createServer(async (req, res) => {
           return;
         }
 
-        const result = await processUserMessage(message);
+        const contextId = payload.contextId || payload.userId || 'default';
+        const result = await processUserMessage(message, contextId);
         res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
         res.end(JSON.stringify(result));
       } catch (err) {
@@ -73,14 +74,22 @@ const server = http.createServer(async (req, res) => {
         for (const event of events) {
           if (event.type === 'message' && event.message && event.message.type === 'text') {
             const userText = event.message.text;
-            console.log(`[User LINE Msg]: ${userText}`);
-            const aiResult = await processUserMessage(userText);
+            const source = event.source || {};
+            const contextId = source.groupId || source.roomId || source.userId || 'default';
+            console.log(`[User LINE Msg (${contextId})]: ${userText}`);
+            const aiResult = await processUserMessage(userText, contextId);
             
             // Reply via LINE Messaging API if Access Token is provided
             if (config.line.channelAccessToken && config.line.channelAccessToken !== 'your_line_channel_access_token_here') {
               const messagesToSend = [];
               if (aiResult.text) messagesToSend.push({ type: 'text', text: aiResult.text });
-              if (aiResult.flexMessage) messagesToSend.push(aiResult.flexMessage);
+              if (aiResult.flexMessage) {
+                if (Array.isArray(aiResult.flexMessage)) {
+                  aiResult.flexMessage.filter(Boolean).forEach(flex => messagesToSend.push(flex));
+                } else {
+                  messagesToSend.push(aiResult.flexMessage);
+                }
+              }
 
               const replyRes = await fetch('https://api.line.me/v2/bot/message/reply', {
                 method: 'POST',

@@ -35,33 +35,33 @@ const SYSTEM_INSTRUCTION = `คุณคือ "SalesAI Assistant" ผู้ช�
 2. "ข้อมูลการขาย": บันทึก/ดึงข้อมูลการขาย (ประเภทการชำระ, แบรนด์ที่ขาย, สั่งซื้อล่าสุด, ยอดขายล่าสุด, ยอดขายสะสม เดือน/ปี, ยอดขายรายปี, สินค้าที่สั่ง, สินค้าขายดี) (ใช้ get_store_sales_details / save_store_sales_details)
 3. "โอกาสเสนอขาย": บันทึก/ดึงโอกาสเสนอขาย (สถานะโอกาส, สินค้าแนะนำ, เหตุผล, แผนงานวันเข้าเสนอขาย) (ใช้ get_store_sales_opportunities / save_store_sales_opportunities)`;
 
-export async function processUserMessage(userMessage) {
+export async function processUserMessage(userMessage, contextId = 'default') {
   const text = (userMessage || '').trim();
   const lowerText = text.toLowerCase();
 
   // 1. ตรวจสอบสถานะรอรับค่าเฉพาะหัวข้อเดียว (1-Field Prompt Response Handling)
-  const pendingField = sessionStore.findActivePendingField();
+  const pendingField = sessionStore.findActivePendingField(contextId);
   if (pendingField && !text.includes('ขอเพิ่ม') && !text.includes('ขอเปลี่ยน') && !text.includes('ขอใส่') && !text.includes('ขอเลือกลบ') && !text.includes('ขอข้อมูล') && !text.includes('แบบฟอร์ม')) {
-    return handleSingleFieldPromptResponse(pendingField, userMessage);
+    return handleSingleFieldPromptResponse(pendingField, userMessage, contextId);
   }
 
   // 2. ตรวจสอบการตอบคำถามรอยืนยัน (Confirmation Answer Handling)
-  const pending = sessionStore.findActivePending();
+  const pending = sessionStore.findActivePending(contextId);
   if (pending) {
     if (lowerText.includes('เปลี่ยนแปลง') || lowerText.includes('แทนที่') || lowerText.includes('เขียนทับ') || lowerText.includes('replace')) {
-      return executeConfirmedUpdate(pending, 'replace');
+      return executeConfirmedUpdate(pending, 'replace', contextId);
     }
     if (lowerText.includes('เพิ่มเติม') || lowerText.includes('ต่อท้าย') || lowerText.includes('append')) {
-      return executeConfirmedUpdate(pending, 'append');
+      return executeConfirmedUpdate(pending, 'append', contextId);
     }
     if (lowerText.includes('ยกเลิก') || lowerText.includes('cancel')) {
-      sessionStore.clearPending(pending.key);
+      sessionStore.clearPending(contextId);
       return { text: '❌ ยกเลิกการอัปเดตข้อมูลเรียบร้อยแล้วค่ะ', flexMessage: null };
     }
   }
 
   // 3. ใช้ Local Fallback Mode ประมวลผลคำสั่งตรง
-  return handleLocalFallbackMode(userMessage);
+  return handleLocalFallbackMode(userMessage, contextId);
 }
 
 // ประมวลผลเมื่อพิมพ์ค่าตอบกลับคำถามเฉพาะหัวข้อเดียว
@@ -153,11 +153,11 @@ function handleSingleFieldPromptResponse(pendingField, userMessage) {
 }
 
 // ประมวลผลเมื่อเลือก "เปลี่ยนแปลง" หรือ "เพิ่มเติม"
-function executeConfirmedUpdate(pending, mode) {
+function executeConfirmedUpdate(pending, mode, contextId = 'default') {
   const { storeName, categoryKey, parsedData } = pending;
-  sessionStore.clearPending(pending.key);
+  sessionStore.clearPending(contextId);
 
-  const activeSession = sessionStore.getActiveStoreSession('default');
+  const activeSession = sessionStore.getActiveStoreSession(contextId);
   const isRecording = activeSession && activeSession.isRecording;
 
   let store;
@@ -166,16 +166,16 @@ function executeConfirmedUpdate(pending, mode) {
 
   if (categoryKey === 'general_info') {
     title = 'ข้อมูลพื้นฐานร้านค้า';
-    store = db.saveGeneralInfo(storeName, parsedData, mode);
-    flexCard = buildStoreGeneralInfoFlex(store, isRecording);
+    store = db.saveGeneralInfo(storeName, parsedData, mode, contextId);
+    flexCard = isRecording ? buildAll3CategoryFlexCards(store, true) : buildStoreGeneralInfoFlex(store, isRecording);
   } else if (categoryKey === 'sales_details') {
     title = 'ข้อมูลการขาย';
-    store = db.saveSalesDetails(storeName, parsedData, mode);
-    flexCard = buildStoreSalesDetailsFlex(store);
+    store = db.saveSalesDetails(storeName, parsedData, mode, contextId);
+    flexCard = isRecording ? buildAll3CategoryFlexCards(store, true) : buildStoreSalesDetailsFlex(store);
   } else if (categoryKey === 'sales_opportunities') {
     title = 'โอกาสเสนอขาย';
-    store = db.saveSalesOpportunities(storeName, parsedData, mode);
-    flexCard = buildStoreSalesOpportunitiesFlex(store);
+    store = db.saveSalesOpportunities(storeName, parsedData, mode, contextId);
+    flexCard = isRecording ? buildAll3CategoryFlexCards(store, true) : buildStoreSalesOpportunitiesFlex(store);
   }
 
   const modeText = mode === 'replace' ? 'เปลี่ยนแปลง (เขียนทับ)' : 'เพิ่มเติม (ต่อท้าย)';
@@ -187,8 +187,8 @@ function executeConfirmedUpdate(pending, mode) {
 }
 
 // ตรวจสอบข้อมูลเดิมและส่งการ์ดถามยืนยัน Replace vs Append
-function checkConflictAndPrompt(storeName, categoryKey, categoryTitle, parsedData, defaultSaveFn) {
-  const store = db.findStoreByName(storeName);
+function checkConflictAndPrompt(storeName, categoryKey, categoryTitle, parsedData, defaultSaveFn, contextId = 'default') {
+  const store = db.findStoreByName(storeName, contextId);
   const oldCategory = store ? store[categoryKey] : null;
 
   const hasOldData = oldCategory && Object.keys(oldCategory).length > 0 && 
@@ -209,7 +209,7 @@ function checkConflictAndPrompt(storeName, categoryKey, categoryTitle, parsedDat
       newSummary = `สถานะ: ${parsedData.opportunity_status || '-'}\nสินค้าแนะนำ: ${Array.isArray(parsedData.recommended_products) ? parsedData.recommended_products.join(', ') : '-'}`;
     }
 
-    sessionStore.setPending('default', {
+    sessionStore.setPending(contextId, {
       storeName: storeName,
       categoryKey: categoryKey,
       parsedData: parsedData
@@ -237,17 +237,17 @@ function checkConflictAndPrompt(storeName, categoryKey, categoryTitle, parsedDat
   }
 }
 
-function handleLocalFallbackMode(userMessage) {
+function handleLocalFallbackMode(userMessage, contextId = 'default') {
   const text = userMessage.toLowerCase();
 
   // 🎯 0. คำสั่งจบการบันทึกข้อมูลพื้นฐานร้านค้า (End Store Recording Session)
   if (text.includes('จบการบันทึก') || text.includes('เสร็จสิ้นการบันทึก') || text.includes('เลิกบันทึก')) {
-    const activeSession = sessionStore.getActiveStoreSession('default');
+    const activeSession = sessionStore.getActiveStoreSession(contextId);
     const rawTarget = userMessage.replace(/จบการบันทึกข้อมูลร้าน|จบการบันทึกข้อมูล|จบการบันทึก|เสร็จสิ้นการบันทึก|เลิกบันทึก/g, '').trim();
-    const targetStoreName = activeSession ? activeSession.storeName : (cleanStoreName(rawTarget) || sessionStore.getLastStore('default') || 'ร้านค้า');
+    const targetStoreName = activeSession ? activeSession.storeName : (cleanStoreName(rawTarget) || sessionStore.getLastStore(contextId) || 'ร้านค้า');
 
-    sessionStore.clearActiveStoreSession('default');
-    const store = db.findStoreByName(targetStoreName) || { store_name: targetStoreName };
+    sessionStore.clearActiveStoreSession(contextId);
+    const store = db.findStoreByName(targetStoreName, contextId) || { store_name: targetStoreName };
     const displayStoreName = store.store_name || targetStoreName || 'ร้านค้า';
 
     return {
@@ -268,10 +268,10 @@ function handleLocalFallbackMode(userMessage) {
       };
     }
 
-    sessionStore.setActiveStoreSession('default', storeName);
-    let store = db.findStoreByName(storeName);
+    sessionStore.setActiveStoreSession(contextId, storeName);
+    let store = db.findStoreByName(storeName, contextId);
     if (!store) {
-      store = db.saveGeneralInfo(storeName, {}, 'append');
+      store = db.saveGeneralInfo(storeName, {}, 'append', contextId);
     }
 
     return {
@@ -285,11 +285,11 @@ function handleLocalFallbackMode(userMessage) {
   }
 
   // 🎯 0.2 หากกำลังอยู่ในโหมดบันทึกข้อมูลพื้นฐานร้านค้าค้างอยู่ (Active Store Recording Session Fallback)
-  const activeSession = sessionStore.getActiveStoreSession('default');
+  const activeSession = sessionStore.getActiveStoreSession(contextId);
   if (activeSession && activeSession.isRecording && !text.includes('ขอข้อมูล') && !text.includes('ขอรายละเอียด') && !text.includes('แบบฟอร์ม') && !text.includes('การขาย') && !text.includes('โอกาส') && !text.includes('ขอเพิ่ม') && !text.includes('ขอเปลี่ยน') && !text.includes('ขอใส่')) {
     const storeName = activeSession.storeName;
     const parsed = parseGeneralInfoText(userMessage);
-    const updatedStore = db.saveGeneralInfo(storeName, parsed, 'append');
+    const updatedStore = db.saveGeneralInfo(storeName, parsed, 'append', contextId);
     return {
       text: `✅ บันทึกข้อมูลเพิ่มลงในร้าน "${storeName}" เรียบร้อยแล้วค่ะ!\n*(ยังอยู่ในโหมดบันทึกข้อมูลร้านนี้ สามารถเลือกใส่ข้อมูลในการ์ดใดก็ได้ หรือกดปุ่ม [✅ จบการบันทึกข้อมูลร้านค้า] บนการ์ดใดก็ได้เมื่อเสร็จสิ้นนะคะ)*`,
       flexMessage: buildAll3CategoryFlexCards(updatedStore, true)
@@ -299,86 +299,86 @@ function handleLocalFallbackMode(userMessage) {
   // 🎯 1. คำสั่งกดปุ่ม 1-Tap หมวดข้อมูลพื้นฐานร้านค้า (Store Profile)
   if (text.includes('ขอเพิ่มผู้ติดต่อร้าน')) {
     const storeName = cleanStoreName(userMessage.replace(/ขอเพิ่มผู้ติดต่อร้าน/g, '').trim());
-    sessionStore.setPendingField('default', { storeName, field: 'contact_persons', label: 'รายชื่อผู้ติดต่อ', mode: 'append' });
+    sessionStore.setPendingField(contextId, { storeName, field: 'contact_persons', label: 'รายชื่อผู้ติดต่อ', mode: 'append' });
     return { text: `👥 กรุณาพิมพ์รายชื่อผู้ติดต่อใหม่ของร้าน "${storeName}" ส่งมาได้เลยค่ะ:\n*(เช่น: คุณชัย 086-777-8888)*`, flexMessage: null };
   }
   else if (text.includes('ขอเปลี่ยนเบอร์ร้าน')) {
     const storeName = cleanStoreName(userMessage.replace(/ขอเปลี่ยนเบอร์ร้าน/g, '').trim());
-    sessionStore.setPendingField('default', { storeName, field: 'phone', label: 'เบอร์โทรศัพท์หลัก', mode: 'replace' });
+    sessionStore.setPendingField(contextId, { storeName, field: 'phone', label: 'เบอร์โทรศัพท์หลัก', mode: 'replace' });
     return { text: `📞 กรุณาพิมพ์เบอร์โทรศัพท์หลักใหม่ของร้าน "${storeName}" ส่งมาได้เลยค่ะ:\n*(เช่น: 089-999-8888)*`, flexMessage: null };
   }
   else if (text.includes('ขอเปลี่ยนที่อยู่ร้าน')) {
     const storeName = cleanStoreName(userMessage.replace(/ขอเปลี่ยนที่อยู่ร้าน/g, '').trim());
-    sessionStore.setPendingField('default', { storeName, field: 'address', label: 'ที่อยู่ร้าน', mode: 'replace' });
+    sessionStore.setPendingField(contextId, { storeName, field: 'address', label: 'ที่อยู่ร้าน', mode: 'replace' });
     return { text: `📍 กรุณาพิมพ์ที่อยู่ใหม่ของร้าน "${storeName}" ส่งมาได้เลยค่ะ:\n*(เช่น: 45/6 ถ.สุขุมวิท ชลบุรี)*`, flexMessage: null };
   }
   else if (text.includes('ขอใส่แผนที่ร้าน')) {
     const storeName = cleanStoreName(userMessage.replace(/ขอใส่แผนที่ร้าน/g, '').trim());
-    sessionStore.setPendingField('default', { storeName, field: 'map_url', label: 'แผนที่ร้าน', mode: 'replace' });
+    sessionStore.setPendingField(contextId, { storeName, field: 'map_url', label: 'แผนที่ร้าน', mode: 'replace' });
     return { text: `🗺️ กรุณาส่งลิงก์ Google Maps หรือ พิกัดแผนที่ร้าน "${storeName}" มาได้เลยค่ะ:\n*(เช่น: https://maps.google.com/?q=13.81,100.56)*`, flexMessage: null };
   }
   else if (text.includes('ขอเปลี่ยนจัดส่งร้าน')) {
     const storeName = cleanStoreName(userMessage.replace(/ขอเปลี่ยนจัดส่งร้าน/g, '').trim());
-    sessionStore.setPendingField('default', { storeName, field: 'delivery_by', label: 'จัดส่งโดย', mode: 'replace' });
+    sessionStore.setPendingField(contextId, { storeName, field: 'delivery_by', label: 'จัดส่งโดย', mode: 'replace' });
     return { text: `🚚 กรุณาพิมพ์ช่องทาง/รอบจัดส่งใหม่ของร้าน "${storeName}" ส่งมาได้เลยค่ะ:\n*(เช่น: ขนส่ง Kerry Express / รถบริษัท)*`, flexMessage: null };
   }
   else if (text.includes('ขอเปลี่ยนเครดิตร้าน')) {
     const storeName = cleanStoreName(userMessage.replace(/ขอเปลี่ยนเครดิตร้าน/g, '').trim());
-    sessionStore.setPendingField('default', { storeName, field: 'credit_days', label: 'เครดิตเทอม', mode: 'replace' });
+    sessionStore.setPendingField(contextId, { storeName, field: 'credit_days', label: 'เครดิตเทอม', mode: 'replace' });
     return { text: `💳 กรุณาพิมพ์จำนวนวันเครดิตเทอมใหม่ของร้าน "${storeName}" ส่งมาได้เลยค่ะ:\n*(เช่น: 60 วัน)*`, flexMessage: null };
   }
   else if (text.includes('ขอเพิ่มโน้ตร้าน')) {
     const storeName = cleanStoreName(userMessage.replace(/ขอเพิ่มโน้ตร้าน/g, '').trim());
-    sessionStore.setPendingField('default', { storeName, field: 'notes', label: 'โน้ตเพิ่มเติม', mode: 'append' });
+    sessionStore.setPendingField(contextId, { storeName, field: 'notes', label: 'โน้ตเพิ่มเติม', mode: 'append' });
     return { text: `📌 กรุณาพิมพ์ข้อความโน้ตเพิ่มเติมของร้าน "${storeName}" ส่งมาได้เลยค่ะ:\n*(เช่น: ให้โทรแจ้งก่อนเข้าส่ง 1 ชั่วโมง)*`, flexMessage: null };
   }
 
   // 🎯 2. คำสั่งกดปุ่ม 1-Tap หมวดข้อมูลการขาย (Sales Details)
   else if (text.includes('ขอเปลี่ยนประเภทชำระร้าน')) {
     const storeName = cleanStoreName(userMessage.replace(/ขอเปลี่ยนประเภทชำระร้าน/g, '').trim());
-    sessionStore.setPendingField('default', { storeName, field: 'payment_type', label: 'ประเภทการชำระ', mode: 'replace' });
+    sessionStore.setPendingField(contextId, { storeName, field: 'payment_type', label: 'ประเภทการชำระ', mode: 'replace' });
     return { text: `💳 กรุณาพิมพ์ประเภทการชำระเงินใหม่ของร้าน "${storeName}" ส่งมาได้เลยค่ะ:\n*(เช่น: โอนเงิน / เครดิต 30 วัน)*`, flexMessage: null };
   }
   else if (text.includes('ขอเปลี่ยนแบรนด์ร้าน')) {
     const storeName = cleanStoreName(userMessage.replace(/ขอเปลี่ยนแบรนด์ร้าน/g, '').trim());
-    sessionStore.setPendingField('default', { storeName, field: 'brands_sold', label: 'แบรนด์ที่ขาย', mode: 'append' });
+    sessionStore.setPendingField(contextId, { storeName, field: 'brands_sold', label: 'แบรนด์ที่ขาย', mode: 'append' });
     return { text: `🏷️ กรุณาพิมพ์แบรนด์ที่ขายเพิ่มเติมของร้าน "${storeName}" ส่งมาได้เลยค่ะ:\n*(เช่น: Arrow, GQ)*`, flexMessage: null };
   }
   else if (text.includes('ขอเปลี่ยนวันสั่งล่าสุดร้าน')) {
     const storeName = cleanStoreName(userMessage.replace(/ขอเปลี่ยนวันสั่งล่าสุดร้าน/g, '').trim());
-    sessionStore.setPendingField('default', { storeName, field: 'last_order_date', label: 'สั่งซื้อล่าสุด', mode: 'replace' });
+    sessionStore.setPendingField(contextId, { storeName, field: 'last_order_date', label: 'สั่งซื้อล่าสุด', mode: 'replace' });
     return { text: `📅 กรุณาพิมพ์วันที่สั่งซื้อล่าสุดใหม่ของร้าน "${storeName}" ส่งมาได้เลยค่ะ:\n*(เช่น: 10 สิงหาคม 2026)*`, flexMessage: null };
   }
   else if (text.includes('ขอเพิ่มยอดขายล่าสุดร้าน')) {
     const storeName = cleanStoreName(userMessage.replace(/ขอเพิ่มยอดขายล่าสุดร้าน/g, '').trim());
-    sessionStore.setPendingField('default', { storeName, field: 'last_order_amount', label: 'ยอดขายล่าสุด', mode: 'append' });
+    sessionStore.setPendingField(contextId, { storeName, field: 'last_order_amount', label: 'ยอดขายล่าสุด', mode: 'append' });
     return { text: `💵 กรุณาพิมพ์ยอดขายล่าสุด (บาท) ของร้าน "${storeName}" ส่งมาได้เลยค่ะ:\n*(ระบบจะนำไปรวมสรุปยอดสะสมให้อัตโนมัติ)*`, flexMessage: null };
   }
   else if (text.includes('ขอเพิ่มสินค้าที่สั่งร้าน')) {
     const storeName = cleanStoreName(userMessage.replace(/ขอเพิ่มสินค้าที่สั่งร้าน/g, '').trim());
-    sessionStore.setPendingField('default', { storeName, field: 'ordered_items', label: 'สินค้าที่สั่ง', mode: 'append' });
+    sessionStore.setPendingField(contextId, { storeName, field: 'ordered_items', label: 'สินค้าที่สั่ง', mode: 'append' });
     return { text: `📦 กรุณาพิมพ์รายการสินค้าที่สั่งเพิ่มเติมของร้าน "${storeName}" ส่งมาได้เลยค่ะ:\n*(เช่น: เสื้อเชิ้ต 10 ตัว)*`, flexMessage: null };
   }
   else if (text.includes('ขอเพิ่มสินค้าขายดีร้าน')) {
     const storeName = cleanStoreName(userMessage.replace(/ขอเพิ่มสินค้าขายดีร้าน/g, '').trim());
-    sessionStore.setPendingField('default', { storeName, field: 'top_selling_products', label: 'สินค้าขายดี', mode: 'append' });
+    sessionStore.setPendingField(contextId, { storeName, field: 'top_selling_products', label: 'สินค้าขายดี', mode: 'append' });
     return { text: `⭐ กรุณาพิมพ์สินค้าขายดีประจำร้านเพิ่มเติมของร้าน "${storeName}" ส่งมาได้เลยค่ะ:\n*(เช่น: เสื้อเชิ้ตคอตตอน)*`, flexMessage: null };
   }
 
   // 🎯 3. คำสั่งกดปุ่ม 1-Tap หมวดโอกาสเสนอขาย (Sales Opportunities)
   else if (text.includes('ขอเปลี่ยนสถานะโอกาสร้าน')) {
     const storeName = cleanStoreName(userMessage.replace(/ขอเปลี่ยนสถานะโอกาสร้าน/g, '').trim());
-    sessionStore.setPendingField('default', { storeName, field: 'opportunity_status', label: 'สถานะโอกาส', mode: 'replace' });
+    sessionStore.setPendingField(contextId, { storeName, field: 'opportunity_status', label: 'สถานะโอกาส', mode: 'replace' });
     return { text: `🎯 กรุณาพิมพ์สถานะโอกาสเสนอขายใหม่ของร้าน "${storeName}" ส่งมาได้เลยค่ะ:\n*(เช่น: 🔥 สูง / ⚡ ปานกลาง / 💤 ต่ำ)*`, flexMessage: null };
   }
   else if (text.includes('ขอเพิ่มสินค้าแนะนำร้าน')) {
     const storeName = cleanStoreName(userMessage.replace(/ขอเพิ่มสินค้าแนะนำร้าน/g, '').trim());
-    sessionStore.setPendingField('default', { storeName, field: 'recommended_products', label: 'สินค้าแนะนำเสนอขาย', mode: 'append' });
+    sessionStore.setPendingField(contextId, { storeName, field: 'recommended_products', label: 'สินค้าแนะนำเสนอขาย', mode: 'append' });
     return { text: `🛍️ กรุณาพิมพ์สินค้าแนะนำเสนอขายเพิ่มเติมของร้าน "${storeName}" ส่งมาได้เลยค่ะ:\n*(เช่น: กระเป๋าเป้สะพายหลัง)*`, flexMessage: null };
   }
   else if (text.includes('ขอเลือกลบสินค้าแนะนำร้าน')) {
     const storeName = cleanStoreName(userMessage.replace(/ขอเลือกลบสินค้าแนะนำร้าน/g, '').trim());
-    const store = db.findStoreByName(storeName);
+    const store = db.findStoreByName(storeName, contextId);
     const deleteFlex = buildDeleteRecommendedProductsFlex(store);
 
     if (deleteFlex) {
@@ -395,7 +395,7 @@ function handleLocalFallbackMode(userMessage) {
   }
   else if (text.includes('ลบสินค้าแนะนำทั้งหมด ร้าน')) {
     const storeName = cleanStoreName(userMessage.replace(/ลบสินค้าแนะนำทั้งหมด ร้าน/g, '').trim());
-    const updatedStore = db.removeRecommendedProduct(storeName, 'ALL');
+    const updatedStore = db.removeRecommendedProduct(storeName, 'ALL', contextId);
     return {
       text: `✅ ลบรายการสินค้าแนะนำเสนอขายทั้งหมดของร้าน "${storeName}" เรียบร้อยแล้วค่ะ!`,
       flexMessage: buildStoreSalesOpportunitiesFlex(updatedStore)
@@ -406,7 +406,7 @@ function handleLocalFallbackMode(userMessage) {
     if (match) {
       const item = match[1].trim();
       const storeName = cleanStoreName(match[2].trim());
-      const updatedStore = db.removeRecommendedProduct(storeName, item);
+      const updatedStore = db.removeRecommendedProduct(storeName, item, contextId);
       return {
         text: `✅ ลบสินค้าแนะนำ "${item}" ของร้าน "${storeName}" เรียบร้อยแล้วค่ะ!`,
         flexMessage: buildStoreSalesOpportunitiesFlex(updatedStore)
@@ -415,23 +415,23 @@ function handleLocalFallbackMode(userMessage) {
   }
   else if (text.includes('ขอเพิ่มเหตุผลโอกาสทองร้าน') || text.includes('ขอเพิ่มเหตุผลร้าน') || text.includes('ขอเปลี่ยนเหตุผลร้าน')) {
     const storeName = cleanStoreName(userMessage.replace(/ขอเพิ่มเหตุผลโอกาสทองร้าน|ขอเพิ่มเหตุผลร้าน|ขอเปลี่ยนเหตุผลร้าน/g, '').trim());
-    sessionStore.setPendingField('default', { storeName, field: 'reason', label: 'เหตุผล / โอกาสทอง', mode: 'replace' });
+    sessionStore.setPendingField(contextId, { storeName, field: 'reason', label: 'เหตุผล / โอกาสทอง', mode: 'replace' });
     return { text: `💡 กรุณาพิมพ์เหตุผลหรือโอกาสทองใหม่ของร้าน "${storeName}" ส่งมาได้เลยค่ะ:\n*(เช่น: ร้านเปิดโซนใหม่ / กำลังจัดโปรโมชั่นประจำปี)*`, flexMessage: null };
   }
   else if (text.includes('ขอเปลี่ยนแผนงานวันเข้าเสนอขายร้าน')) {
     const storeName = cleanStoreName(userMessage.replace(/ขอเปลี่ยนแผนงานวันเข้าเสนอขายร้าน/g, '').trim());
-    sessionStore.setPendingField('default', { storeName, field: 'target_pitch_date', label: 'แผนงานวันเข้าเสนอขาย', mode: 'replace' });
+    sessionStore.setPendingField(contextId, { storeName, field: 'target_pitch_date', label: 'แผนงานวันเข้าเสนอขาย', mode: 'replace' });
     return { text: `🗓️ กรุณาพิมพ์แผนงานวันเข้าเสนอขายใหม่ของร้าน "${storeName}" ส่งมาได้เลยค่ะ:\n*(เช่น: 15 กันยายน 2026 / สัปดาห์หน้า)*`, flexMessage: null };
   }
 
   // C0. คำสั่งแสดงรายชื่อและที่อยู่ของทุกร้านค้าที่มีในระบบ (พร้อมจัดกลุ่ม จังหวัด -> อำเภอ)
   if (text.includes('แสดงรายชื่อ') || text.includes('ขอรายชื่อ') || text.includes('รายชื่อร้าน') || text.includes('รายชื่อร้านค้า') || text.includes('ร้านค้าทั้งหมด')) {
-    const stores = db.getStores();
+    const stores = db.getStores(contextId);
 
     // C0.1 หากสั่งดูทั้งหมดในระบบ
     if (text.includes('แสดงรายชื่อทั้งหมด') && !text.includes('จ.') && !text.includes('จังหวัด')) {
       return {
-        text: `🏪 รายชื่อและที่อยู่ของร้านค้าทั้งหมดในระบบ (${stores.length} ร้าน) ค่ะ:`,
+        text: `🏪 รายชื่อและที่อยู่ของร้านค้าทั้งหมดในกลุ่มแชตนี้ (${stores.length} ร้าน) ค่ะ:`,
         flexMessage: buildFilteredStoresListFlex(`ทั้งหมดในระบบ (${stores.length} ร้าน)`, stores)
       };
     }
@@ -498,32 +498,32 @@ function handleLocalFallbackMode(userMessage) {
   // C. คำสั่งดึงข้อมูลสรุปตามหมวดหมู่ (Retrieval Commands)
   if (text.includes('ขอข้อมูลการขาย') || text.includes('ขอรายละเอียดการขาย') || text.includes('ขอยอดขาย') || text.includes('ขอประวัติการสั่ง')) {
     const storeName = text.replace(/ขอข้อมูลการขาย|ขอรายละเอียดการขาย|ขอประวัติการสั่ง|ขอยอดขายร้าน|ขอยอดขาย|ยอดขายร้าน|ยอดขาย|ร้าน/g, '').trim();
-    const store = db.findStoreByName(storeName);
+    const store = db.findStoreByName(storeName, contextId);
     if (store) {
-      sessionStore.setLastStore('default', store.store_name);
+      sessionStore.setLastStore(contextId, store.store_name);
       return { text: `📊 ข้อมูลการขาย 7 หัวข้อหลักของร้าน "${store.store_name}" ค่ะ`, flexMessage: buildStoreSalesDetailsFlex(store) };
-    } else { return { text: `ไม่พบข้อมูลการขายของร้าน "${storeName}" ค่ะ`, flexMessage: null }; }
+    } else { return { text: `ไม่พบข้อมูลการขายของร้าน "${storeName}" ในกลุ่มแชตนี้ค่ะ`, flexMessage: null }; }
   }
   else if (text.includes('ขอโอกาสเสนอขาย') || text.includes('ขอโอกาสขาย') || text.includes('ขอโอกาส')) {
     const storeName = text.replace(/ขอโอกาสเสนอขาย|ขอโอกาสขาย|ขอโอกาส|โอกาสเสนอขายร้าน|โอกาสขายร้าน|ร้าน/g, '').trim();
-    const store = db.findStoreByName(storeName);
+    const store = db.findStoreByName(storeName, contextId);
     if (store) {
-      sessionStore.setLastStore('default', store.store_name);
+      sessionStore.setLastStore(contextId, store.store_name);
       return { text: `🎯 สรุปโอกาสเสนอขายและสินค้าแนะนำ (Upsell/Cross-sell) ของร้าน "${store.store_name}" ค่ะ`, flexMessage: buildStoreSalesOpportunitiesFlex(store) };
-    } else { return { text: `ไม่พบข้อมูลโอกาสเสนอขายของร้าน "${storeName}" ค่ะ`, flexMessage: null }; }
+    } else { return { text: `ไม่พบข้อมูลโอกาสเสนอขายของร้าน "${storeName}" ในกลุ่มแชตนี้ค่ะ`, flexMessage: null }; }
   }
   else if (text.includes('ขอข้อมูลร้าน') || text.includes('ขอข้อมูลพื้นฐาน') || text.includes('ขอข้อมูล') || text.includes('ดึงข้อมูลร้าน')) {
     const rawTarget = text.replace(/ขอข้อมูลร้าน|ขอข้อมูลพื้นฐาน|ขอข้อมูล|ดึงข้อมูลร้าน|ดึงข้อมูล|ร้าน/g, '').trim();
-    const targetStoreName = cleanStoreName(rawTarget) || sessionStore.getLastStore('default');
-    const store = db.findStoreByName(targetStoreName);
+    const targetStoreName = cleanStoreName(rawTarget) || sessionStore.getLastStore(contextId);
+    const store = db.findStoreByName(targetStoreName, contextId);
     if (store) {
-      sessionStore.setLastStore('default', store.store_name);
+      sessionStore.setLastStore(contextId, store.store_name);
       return {
         text: `🏬 สรุปข้อมูลครบทั้ง 3 หมวดหมู่หลักของร้าน "${store.store_name}" ค่ะ\n(1. ข้อมูลพื้นฐานร้านค้า | 2. ข้อมูลการขาย | 3. โอกาสเสนอขาย)`,
         flexMessage: buildAll3CategoryFlexCards(store)
       };
     } else {
-      return { text: targetStoreName ? `ไม่พบข้อมูลร้าน "${targetStoreName}" ในระบบค่ะ` : `กรุณาระบุชื่อร้านค้าที่ต้องการขอข้อมูลค่ะ\n*(เช่น: ขอข้อมูลร้านสมศักดิ์การค้า)*`, flexMessage: null };
+      return { text: targetStoreName ? `ไม่พบข้อมูลร้าน "${targetStoreName}" ในกลุ่มแชตนี้ค่ะ` : `กรุณาระบุชื่อร้านค้าที่ต้องการขอข้อมูลค่ะ\n*(เช่น: ขอข้อมูลร้านสมศักดิ์การค้า)*`, flexMessage: null };
     }
   }
 
@@ -548,7 +548,7 @@ function handleLocalFallbackMode(userMessage) {
       storeName = firstWord.replace(/บันทึกโอกาส|บันทึก|โอกาส/g, '').trim();
     }
 
-    return checkConflictAndPrompt(storeName, 'sales_opportunities', 'โอกาสเสนอขาย', parsed, () => db.saveSalesOpportunities(storeName, parsed));
+    return checkConflictAndPrompt(storeName, 'sales_opportunities', 'โอกาสเสนอขาย', parsed, () => db.saveSalesOpportunities(storeName, parsed, 'replace', contextId), contextId);
   }
 
   // A2. บันทึกข้อมูลการขาย
@@ -571,7 +571,7 @@ function handleLocalFallbackMode(userMessage) {
       storeName = firstWord.replace(/บันทึกการขาย|บันทึก/g, '').trim();
     }
 
-    return checkConflictAndPrompt(storeName, 'sales_details', 'ข้อมูลการขาย', parsed, () => db.saveSalesDetails(storeName, parsed));
+    return checkConflictAndPrompt(storeName, 'sales_details', 'ข้อมูลการขาย', parsed, () => db.saveSalesDetails(storeName, parsed, 'append', contextId), contextId);
   }
 
   // A3. บันทึกข้อมูลพื้นฐานร้านค้า
@@ -594,7 +594,7 @@ function handleLocalFallbackMode(userMessage) {
       storeName = firstWord.replace(/บันทึกร้าน|บันทึก/g, '').trim();
     }
 
-    return checkConflictAndPrompt(storeName, 'general_info', 'ข้อมูลพื้นฐานร้านค้า', parsed, () => db.saveGeneralInfo(storeName, parsed));
+    return checkConflictAndPrompt(storeName, 'general_info', 'ข้อมูลพื้นฐานร้านค้า', parsed, () => db.saveGeneralInfo(storeName, parsed, 'append', contextId), contextId);
   }
 
   // B. คำสั่งขอคู่มือ / แบบฟอร์มป้อนข้อมูล (Form Guide & Help)

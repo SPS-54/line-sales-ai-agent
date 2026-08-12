@@ -4,12 +4,16 @@ import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const storesFilePath = path.join(__dirname, 'initialStores.json');
-const productsFilePath = path.join(__dirname, 'initialProducts.json');
+const storesFilePath = fs.existsSync(path.join(__dirname, 'stores.json'))
+  ? path.join(__dirname, 'stores.json')
+  : path.join(__dirname, 'initialStores.json');
+const productsFilePath = fs.existsSync(path.join(__dirname, 'products.json'))
+  ? path.join(__dirname, 'products.json')
+  : path.join(__dirname, 'initialProducts.json');
 
 export function cleanStoreName(name) {
   if (!name) return '';
-  return name.replace(/^ร้าน\s*/, '').trim();
+  return String(name).replace(/^ร้าน\s*/, '').trim();
 }
 
 export function parseCalendarYearMonth(dateInput) {
@@ -64,7 +68,22 @@ export function parseCalendarYearMonth(dateInput) {
 }
 
 export const db = {
-  getStores() {
+  getStores(contextId = null) {
+    try {
+      const data = fs.readFileSync(storesFilePath, 'utf-8');
+      const stores = JSON.parse(data);
+      if (!contextId || contextId === 'all') return stores;
+      const cleanCtx = String(contextId).toLowerCase().trim();
+      return stores.filter(s => {
+        const sCtx = String(s.context_id || 'default').toLowerCase().trim();
+        return sCtx === cleanCtx;
+      });
+    } catch {
+      return [];
+    }
+  },
+
+  getAllStoresRaw() {
     try {
       const data = fs.readFileSync(storesFilePath, 'utf-8');
       return JSON.parse(data);
@@ -77,30 +96,44 @@ export const db = {
     fs.writeFileSync(storesFilePath, JSON.stringify(stores, null, 2), 'utf-8');
   },
 
-  findStoreByName(name) {
+  findStoreByName(name, contextId = null) {
     if (!name) return null;
-    const cleanTarget = cleanStoreName(name).toLowerCase();
-    const stores = this.getStores();
-    return stores.find(s => cleanStoreName(s.store_name).toLowerCase().includes(cleanTarget) || cleanTarget.includes(cleanStoreName(s.store_name).toLowerCase())) || null;
+    const cleanTarget = cleanStoreName(name).toLowerCase().trim();
+    if (!cleanTarget) return null;
+
+    const stores = this.getStores(contextId);
+    return stores.find(s => {
+      const cleanSName = cleanStoreName(s.store_name || '').toLowerCase().trim();
+      if (!cleanSName) return false;
+      return cleanSName.includes(cleanTarget) || cleanTarget.includes(cleanSName);
+    }) || null;
   },
 
   // 1. ข้อมูลพื้นฐานร้านค้า (Store Profile)
-  saveGeneralInfo(storeName, infoData, mode = 'append') {
-    const stores = this.getStores();
+  saveGeneralInfo(storeName, infoData, mode = 'append', contextId = 'default') {
+    const allStores = this.getAllStoresRaw();
     const targetName = cleanStoreName(storeName);
-    let store = stores.find(s => cleanStoreName(s.store_name).toLowerCase() === targetName.toLowerCase());
+    const cleanCtx = String(contextId || 'default').toLowerCase().trim();
+
+    let store = allStores.find(s => {
+      const sName = cleanStoreName(s.store_name).toLowerCase();
+      const sCtx = String(s.context_id || 'default').toLowerCase().trim();
+      return sName === targetName.toLowerCase() && sCtx === cleanCtx;
+    });
+
     const now = new Date().toISOString();
 
     if (!store) {
       store = {
         id: `STORE-${Date.now()}`,
+        context_id: contextId || 'default',
         store_name: targetName,
         general_info: {},
         sales_details: {},
         sales_opportunities: {},
         updated_at: now
       };
-      stores.push(store);
+      allStores.push(store);
     }
 
     if (mode === 'append') {
@@ -139,13 +172,13 @@ export const db = {
 
       store.general_info = {
         ...oldInfo,
-        ...infoData,
-        contact_persons: mergedContacts.length > 0 ? mergedContacts : oldInfo.contact_persons,
-        contact_person: mergedContacts.join(', '),
-        map_url: mergedMap || oldInfo.map_url,
-        delivery_by: mergedDelivery || oldInfo.delivery_by,
-        delivery_schedule: mergedDelivery || oldInfo.delivery_schedule,
-        notes: mergedNotes || oldInfo.notes
+        store_name: targetName,
+        contact_persons: mergedContacts,
+        phone: infoData.phone !== undefined ? infoData.phone : oldInfo.phone,
+        address: infoData.address !== undefined ? infoData.address : oldInfo.address,
+        map_url: mergedMap,
+        delivery_by: mergedDelivery,
+        delivery_schedule: mergedDelivery
       };
     } else {
       store.general_info = {
@@ -156,26 +189,25 @@ export const db = {
     }
 
     store.updated_at = now;
-    this.saveStores(stores);
+    this.saveStores(allStores);
     return store;
   },
 
   // 2. ข้อมูลการขาย (Sales Details)
-  saveSalesDetails(storeName, salesData, mode = 'append') {
-    const stores = this.getStores();
+  saveSalesDetails(storeName, salesData, mode = 'append', contextId = 'default') {
+    const allStores = this.getAllStoresRaw();
     const cleanName = cleanStoreName(storeName);
+    const cleanCtx = String(contextId || 'default').toLowerCase().trim();
 
-    let store = stores.find(s => cleanStoreName(s.store_name) === cleanName);
+    let store = allStores.find(s => {
+      const sName = cleanStoreName(s.store_name).toLowerCase();
+      const sCtx = String(s.context_id || 'default').toLowerCase().trim();
+      return sName === cleanName.toLowerCase() && sCtx === cleanCtx;
+    });
+
     if (!store) {
-      store = {
-        id: `STORE-${Date.now()}`,
-        store_name: cleanName,
-        general_info: {},
-        sales_details: {},
-        sales_opportunities: {},
-        updated_at: new Date().toISOString()
-      };
-      stores.push(store);
+      store = this.saveGeneralInfo(cleanName, { contact_person: 'ไม่ระบุ' }, 'append', contextId);
+      return this.saveSalesDetails(cleanName, salesData, mode, contextId);
     }
 
     const oldDetails = store.sales_details || {};
@@ -266,19 +298,27 @@ export const db = {
     };
 
     store.updated_at = new Date().toISOString();
-    this.saveStores(stores);
+    this.saveStores(allStores);
     return store;
   },
 
   // 3. โอกาสเสนอขายของร้านค้า (Store Sales Opportunities)
-  saveSalesOpportunities(storeName, oppData, mode = 'replace') {
-    const stores = this.getStores();
+  saveSalesOpportunities(storeName, oppData, mode = 'replace', contextId = 'default') {
+    const allStores = this.getAllStoresRaw();
     const targetName = cleanStoreName(storeName);
-    let store = stores.find(s => cleanStoreName(s.store_name).toLowerCase() === targetName.toLowerCase());
+    const cleanCtx = String(contextId || 'default').toLowerCase().trim();
+
+    let store = allStores.find(s => {
+      const sName = cleanStoreName(s.store_name).toLowerCase();
+      const sCtx = String(s.context_id || 'default').toLowerCase().trim();
+      return sName === targetName.toLowerCase() && sCtx === cleanCtx;
+    });
+
     const now = new Date().toISOString();
 
     if (!store) {
-      store = this.saveGeneralInfo(targetName, { contact_person: 'ไม่ระบุ' });
+      store = this.saveGeneralInfo(targetName, { contact_person: 'ไม่ระบุ' }, 'append', contextId);
+      return this.saveSalesOpportunities(targetName, oppData, mode, contextId);
     }
 
     if (mode === 'append') {
@@ -299,15 +339,21 @@ export const db = {
     }
 
     store.updated_at = now;
-    this.saveStores(stores);
+    this.saveStores(allStores);
     return store;
   },
 
   // ลบสินค้าแนะนำเสนอขายออกจากรายการ
-  removeRecommendedProduct(storeName, itemToRemove) {
-    const stores = this.getStores();
+  removeRecommendedProduct(storeName, itemToRemove, contextId = 'default') {
+    const allStores = this.getAllStoresRaw();
     const targetName = cleanStoreName(storeName);
-    let store = stores.find(s => cleanStoreName(s.store_name).toLowerCase() === targetName.toLowerCase());
+    const cleanCtx = String(contextId || 'default').toLowerCase().trim();
+
+    let store = allStores.find(s => {
+      const sName = cleanStoreName(s.store_name).toLowerCase();
+      const sCtx = String(s.context_id || 'default').toLowerCase().trim();
+      return sName === targetName.toLowerCase() && sCtx === cleanCtx;
+    });
 
     if (!store || !store.sales_opportunities) return null;
 
@@ -323,7 +369,7 @@ export const db = {
 
     store.sales_opportunities.recommended_products = newRec;
     store.updated_at = new Date().toISOString();
-    this.saveStores(stores);
+    this.saveStores(allStores);
     return store;
   },
 
