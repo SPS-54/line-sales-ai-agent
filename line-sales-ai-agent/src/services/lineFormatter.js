@@ -1,5 +1,7 @@
 import { config } from '../config.js';
 import { generateGoogleCalendarUrl } from './googleCalendarService.js';
+import { sessionStore } from './sessionStore.js';
+import { cleanStoreName } from '../database/db.js';
 
 /**
  * 1. รูปสินค้า (Product Carousel Flex Message)
@@ -319,9 +321,21 @@ export function buildAddProductGuideFlex() {
 /**
  * 2. ข้อมูลพื้นฐานร้านค้า (Store Profile Flex Card - 7 หัวข้อหลัก)
  */
-export function buildStoreGeneralInfoFlex(store) {
+export function buildStoreGeneralInfoFlex(store, isRecordingSession = false) {
   if (!store) return null;
   const info = store.general_info || store;
+  const activeSession = sessionStore.getActiveStoreSession('default');
+  const activeStoreName = activeSession ? activeSession.storeName : null;
+  const lastStoreName = sessionStore.getLastStore('default');
+
+  const isSessionActive = isRecordingSession || (activeSession && activeSession.isRecording === true);
+
+  const displayName = store.store_name || 
+                      (store.general_info && store.general_info.store_name) || 
+                      store.name || 
+                      activeStoreName || 
+                      lastStoreName || 
+                      'ร้านค้า';
 
   const contactBoxContents = [];
 
@@ -346,39 +360,89 @@ export function buildStoreGeneralInfoFlex(store) {
   } else {
     contactBoxContents.push({
       type: 'text',
-      text: `👥 รายชื่อผู้ติดต่อ: ${info.contact_person || '-'}`,
+      text: `👥 รายชื่อผู้ติดต่อ: ${info.contact_person || 'ยังไม่มีข้อมูล'}`,
       size: 'sm',
       color: '#333333'
     });
   }
 
   // 2. เบอร์โทรศัพท์หลัก
-  contactBoxContents.push({ type: 'text', text: `📞 เบอร์โทรศัพท์หลัก: ${info.phone || '-'}`, size: 'sm', color: '#333333', margin: 'md' });
+  contactBoxContents.push({ type: 'text', text: `📞 เบอร์โทรศัพท์หลัก: ${info.phone || 'ยังไม่มีข้อมูล'}`, size: 'sm', color: '#333333', margin: 'md' });
 
   // 3. ที่อยู่ร้าน
-  contactBoxContents.push({ type: 'text', text: `📍 ที่อยู่ร้าน: ${info.address || '-'}`, size: 'sm', color: '#333333', wrap: true });
+  contactBoxContents.push({ type: 'text', text: `📍 ที่อยู่ร้าน: ${info.address || 'ยังไม่มีข้อมูล'}`, size: 'sm', color: '#333333', wrap: true });
 
   // 4. แผนที่ร้าน
-  contactBoxContents.push({ type: 'text', text: `🗺️ แผนที่ร้าน: ${info.map_url || '-'}`, size: 'sm', color: info.map_url ? '#3B82F6' : '#333333', wrap: true });
+  contactBoxContents.push({ type: 'text', text: `🗺️ แผนที่ร้าน: ${info.map_url || 'ยังไม่มีข้อมูล'}`, size: 'sm', color: info.map_url ? '#3B82F6' : '#333333', wrap: true });
 
   // 5. จัดส่งโดย
-  const deliveryVal = info.delivery_by || info.delivery_schedule || '-';
+  const deliveryVal = info.delivery_by || info.delivery_schedule || 'ยังไม่มีข้อมูล';
   contactBoxContents.push({ type: 'text', text: `🚚 จัดส่งโดย: ${deliveryVal}`, size: 'sm', color: '#333333' });
 
   // 6. เครดิตเทอม
   contactBoxContents.push({ type: 'text', text: `💳 เครดิตเทอม: ${info.credit_days || 0} วัน`, size: 'sm', color: '#06C755', weight: 'bold' });
 
+  const footerButtons = [
+    {
+      type: 'box', layout: 'horizontal', spacing: 'xs', contents: [
+        {
+          type: 'button', style: 'primary', height: 'sm', color: '#06C755', flex: 1,
+          action: { type: 'message', label: '👥 +เพิ่มผู้ติดต่อ', text: `ขอเพิ่มผู้ติดต่อร้าน${displayName}` }
+        },
+        {
+          type: 'button', style: 'primary', height: 'sm', color: '#3B82F6', flex: 1,
+          action: { type: 'message', label: '📞 เปลี่ยนเบอร์', text: `ขอเปลี่ยนเบอร์ร้าน${displayName}` }
+        }
+      ]
+    },
+    {
+      type: 'box', layout: 'horizontal', spacing: 'xs', contents: [
+        {
+          type: 'button', style: 'secondary', height: 'sm', flex: 1,
+          action: { type: 'message', label: '📍 เปลี่ยนที่อยู่', text: `ขอเปลี่ยนที่อยู่ร้าน${displayName}` }
+        },
+        {
+          type: 'button', style: 'secondary', height: 'sm', flex: 1,
+          action: { type: 'message', label: '🗺️ ใส่แผนที่', text: `ขอใส่แผนที่ร้าน${displayName}` }
+        }
+      ]
+    },
+    {
+      type: 'box', layout: 'horizontal', spacing: 'xs', contents: [
+        {
+          type: 'button', style: 'secondary', height: 'sm', flex: 1,
+          action: { type: 'message', label: '🚚 เปลี่ยนจัดส่ง', text: `ขอเปลี่ยนจัดส่งร้าน${displayName}` }
+        },
+        {
+          type: 'button', style: 'secondary', height: 'sm', flex: 1,
+          action: { type: 'message', label: '💳 เปลี่ยนเครดิต', text: `ขอเปลี่ยนเครดิตร้าน${displayName}` }
+        }
+      ]
+    },
+    {
+      type: 'button', style: 'primary', height: 'sm', color: '#F59E0B',
+      action: { type: 'message', label: '📌 +เพิ่มโน้ตใหม่', text: `ขอเพิ่มโน้ตร้าน${displayName}` }
+    }
+  ];
+
+  if (isSessionActive) {
+    footerButtons.push({
+      type: 'button', style: 'primary', height: 'sm', color: '#10B981', margin: 'md',
+      action: { type: 'message', label: '✅ จบการบันทึกข้อมูลพื้นฐานร้านค้า', text: `จบการบันทึกข้อมูลร้าน ${displayName}` }
+    });
+  }
+
   return {
     type: 'flex',
-    altText: `ข้อมูลร้านค้า: ${store.store_name}`,
+    altText: `ข้อมูลร้านค้า: ${displayName}`,
     contents: {
       type: 'bubble',
       size: 'mega',
       header: {
-        type: 'box', layout: 'vertical', backgroundColor: '#06C755', paddingAll: 'lg',
+        type: 'box', layout: 'vertical', backgroundColor: isSessionActive ? '#10B981' : '#06C755', paddingAll: 'lg',
         contents: [
-          { type: 'text', text: '🏬 ข้อมูลพื้นฐานร้านค้า (Store Profile)', color: '#FFFFFF', size: 'xs', weight: 'bold' },
-          { type: 'text', text: store.store_name, color: '#FFFFFF', size: 'xl', weight: 'bold', margin: 'xs' }
+          { type: 'text', text: isSessionActive ? '🔄 กำลังบันทึกข้อมูลพื้นฐานร้านค้า (โหมดบันทึกต่อเนื่อง)' : '🏬 ข้อมูลพื้นฐานร้านค้า (Store Profile)', color: '#FFFFFF', size: 'xs', weight: 'bold' },
+          { type: 'text', text: displayName, color: '#FFFFFF', size: 'xl', weight: 'bold', margin: 'xs' }
         ]
       },
       body: {
@@ -396,48 +460,7 @@ export function buildStoreGeneralInfoFlex(store) {
         ]
       },
       footer: {
-        type: 'box', layout: 'vertical', spacing: 'xs', contents: [
-          {
-            type: 'box', layout: 'horizontal', spacing: 'xs', contents: [
-              {
-                type: 'button', style: 'primary', height: 'sm', color: '#06C755', flex: 1,
-                action: { type: 'message', label: '👥 +เพิ่มผู้ติดต่อ', text: `ขอเพิ่มผู้ติดต่อร้าน${store.store_name}` }
-              },
-              {
-                type: 'button', style: 'primary', height: 'sm', color: '#3B82F6', flex: 1,
-                action: { type: 'message', label: '📞 เปลี่ยนเบอร์', text: `ขอเปลี่ยนเบอร์ร้าน${store.store_name}` }
-              }
-            ]
-          },
-          {
-            type: 'box', layout: 'horizontal', spacing: 'xs', contents: [
-              {
-                type: 'button', style: 'secondary', height: 'sm', flex: 1,
-                action: { type: 'message', label: '📍 เปลี่ยนที่อยู่', text: `ขอเปลี่ยนที่อยู่ร้าน${store.store_name}` }
-              },
-              {
-                type: 'button', style: 'secondary', height: 'sm', flex: 1,
-                action: { type: 'message', label: '🗺️ ใส่แผนที่', text: `ขอใส่แผนที่ร้าน${store.store_name}` }
-              }
-            ]
-          },
-          {
-            type: 'box', layout: 'horizontal', spacing: 'xs', contents: [
-              {
-                type: 'button', style: 'secondary', height: 'sm', flex: 1,
-                action: { type: 'message', label: '🚚 เปลี่ยนจัดส่ง', text: `ขอเปลี่ยนจัดส่งร้าน${store.store_name}` }
-              },
-              {
-                type: 'button', style: 'secondary', height: 'sm', flex: 1,
-                action: { type: 'message', label: '💳 เปลี่ยนเครดิต', text: `ขอเปลี่ยนเครดิตร้าน${store.store_name}` }
-              }
-            ]
-          },
-          {
-            type: 'button', style: 'primary', height: 'sm', color: '#F59E0B',
-            action: { type: 'message', label: '📌 +เพิ่มโน้ตใหม่', text: `ขอเพิ่มโน้ตร้าน${store.store_name}` }
-          }
-        ]
+        type: 'box', layout: 'vertical', spacing: 'xs', contents: footerButtons
       }
     }
   };
@@ -446,9 +469,15 @@ export function buildStoreGeneralInfoFlex(store) {
 /**
  * 3. ข้อมูลการขายของร้านค้า (Store Sales Details Flex Card)
  */
-export function buildStoreSalesDetailsFlex(store) {
+export function buildStoreSalesDetailsFlex(store, isRecordingSession = false) {
   if (!store) return null;
   const details = store.sales_details || {};
+  const activeSession = sessionStore.getActiveStoreSession('default');
+  const activeStoreName = activeSession ? activeSession.storeName : null;
+  const lastStoreName = sessionStore.getLastStore('default');
+
+  const isSessionActive = isRecordingSession || (activeSession && activeSession.isRecording === true);
+  const displayName = store.store_name || (store.general_info && store.general_info.store_name) || store.name || activeStoreName || lastStoreName || 'ร้านค้า';
 
   const brandsStr = Array.isArray(details.brands_sold) && details.brands_sold.length > 0 
     ? details.brands_sold.join(', ') 
@@ -486,17 +515,63 @@ export function buildStoreSalesDetailsFlex(store) {
     });
   }
 
+  const footerButtons = [
+    {
+      type: 'box', layout: 'horizontal', spacing: 'xs', contents: [
+        {
+          type: 'button', style: 'primary', height: 'sm', color: '#3B82F6', flex: 1,
+          action: { type: 'message', label: '💳 ประเภทการชำระ', text: `ขอเปลี่ยนประเภทชำระร้าน${displayName}` }
+        },
+        {
+          type: 'button', style: 'primary', height: 'sm', color: '#10B981', flex: 1,
+          action: { type: 'message', label: '🏷️ +เพิ่มแบรนด์ที่ขาย', text: `ขอเปลี่ยนแบรนด์ร้าน${displayName}` }
+        }
+      ]
+    },
+    {
+      type: 'box', layout: 'horizontal', spacing: 'xs', contents: [
+        {
+          type: 'button', style: 'secondary', height: 'sm', flex: 1,
+          action: { type: 'message', label: '📅 สั่งซื้อล่าสุด', text: `ขอเปลี่ยนวันสั่งล่าสุดร้าน${displayName}` }
+        },
+        {
+          type: 'button', style: 'secondary', height: 'sm', flex: 1,
+          action: { type: 'message', label: '💵 ยอดขายล่าสุด', text: `ขอเพิ่มยอดขายล่าสุดร้าน${displayName}` }
+        }
+      ]
+    },
+    {
+      type: 'box', layout: 'horizontal', spacing: 'xs', contents: [
+        {
+          type: 'button', style: 'primary', height: 'sm', color: '#059669', flex: 1,
+          action: { type: 'message', label: '📦 +เพิ่มสินค้าที่สั่ง', text: `ขอเพิ่มสินค้าที่สั่งร้าน${displayName}` }
+        },
+        {
+          type: 'button', style: 'primary', height: 'sm', color: '#F59E0B', flex: 1,
+          action: { type: 'message', label: '⭐ +เพิ่มสินค้าขายดี', text: `ขอเพิ่มสินค้าขายดีร้าน${displayName}` }
+        }
+      ]
+    }
+  ];
+
+  if (isSessionActive) {
+    footerButtons.push({
+      type: 'button', style: 'primary', height: 'sm', color: '#10B981', margin: 'md',
+      action: { type: 'message', label: '✅ จบการบันทึกข้อมูลร้านค้า', text: `จบการบันทึกข้อมูลร้าน ${displayName}` }
+    });
+  }
+
   return {
     type: 'flex',
-    altText: `ข้อมูลการขาย: ${store.store_name}`,
+    altText: `ข้อมูลการขาย: ${displayName}`,
     contents: {
       type: 'bubble',
       size: 'mega',
       header: {
-        type: 'box', layout: 'vertical', backgroundColor: '#3B82F6', paddingAll: 'lg',
+        type: 'box', layout: 'vertical', backgroundColor: isSessionActive ? '#10B981' : '#3B82F6', paddingAll: 'lg',
         contents: [
-          { type: 'text', text: '📊 ข้อมูลการขาย (Sales Performance)', color: '#FFFFFF', size: 'xs', weight: 'bold' },
-          { type: 'text', text: store.store_name, color: '#FFFFFF', size: 'xl', weight: 'bold', margin: 'xs' }
+          { type: 'text', text: isSessionActive ? '🔄 กำลังบันทึกข้อมูลการขาย (โหมดบันทึกต่อเนื่อง)' : '📊 ข้อมูลการขาย (Sales Performance)', color: '#FFFFFF', size: 'xs', weight: 'bold' },
+          { type: 'text', text: displayName, color: '#FFFFFF', size: 'xl', weight: 'bold', margin: 'xs' }
         ]
       },
       body: {
@@ -536,44 +611,7 @@ export function buildStoreSalesDetailsFlex(store) {
         ]
       },
       footer: {
-        type: 'box', layout: 'vertical', spacing: 'xs', contents: [
-          {
-            type: 'box', layout: 'horizontal', spacing: 'xs', contents: [
-              {
-                type: 'button', style: 'primary', height: 'sm', color: '#3B82F6', flex: 1,
-                action: { type: 'message', label: '💳 ประเภทการชำระ', text: `ขอเปลี่ยนประเภทชำระร้าน${store.store_name}` }
-              },
-              {
-                type: 'button', style: 'primary', height: 'sm', color: '#10B981', flex: 1,
-                action: { type: 'message', label: '🏷️ +เพิ่มแบรนด์ที่ขาย', text: `ขอเปลี่ยนแบรนด์ร้าน${store.store_name}` }
-              }
-            ]
-          },
-          {
-            type: 'box', layout: 'horizontal', spacing: 'xs', contents: [
-              {
-                type: 'button', style: 'secondary', height: 'sm', flex: 1,
-                action: { type: 'message', label: '📅 สั่งซื้อล่าสุด', text: `ขอเปลี่ยนวันสั่งล่าสุดร้าน${store.store_name}` }
-              },
-              {
-                type: 'button', style: 'secondary', height: 'sm', flex: 1,
-                action: { type: 'message', label: '💵 ยอดขายล่าสุด', text: `ขอเพิ่มยอดขายล่าสุดร้าน${store.store_name}` }
-              }
-            ]
-          },
-          {
-            type: 'box', layout: 'horizontal', spacing: 'xs', contents: [
-              {
-                type: 'button', style: 'primary', height: 'sm', color: '#059669', flex: 1,
-                action: { type: 'message', label: '📦 +เพิ่มสินค้าที่สั่ง', text: `ขอเพิ่มสินค้าที่สั่งร้าน${store.store_name}` }
-              },
-              {
-                type: 'button', style: 'primary', height: 'sm', color: '#F59E0B', flex: 1,
-                action: { type: 'message', label: '⭐ +เพิ่มสินค้าขายดี', text: `ขอเพิ่มสินค้าขายดีร้าน${store.store_name}` }
-              }
-            ]
-          }
-        ]
+        type: 'box', layout: 'vertical', spacing: 'xs', contents: footerButtons
       }
     }
   };
@@ -582,24 +620,72 @@ export function buildStoreSalesDetailsFlex(store) {
 /**
  * 4. โอกาสเสนอขายของร้านค้า (Store Sales Opportunities Flex Card)
  */
-export function buildStoreSalesOpportunitiesFlex(store) {
+export function buildStoreSalesOpportunitiesFlex(store, isRecordingSession = false) {
   if (!store) return null;
   const opp = store.sales_opportunities || {};
   const info = store.general_info || {};
+  const activeSession = sessionStore.getActiveStoreSession('default');
+  const activeStoreName = activeSession ? activeSession.storeName : null;
+  const lastStoreName = sessionStore.getLastStore('default');
 
-  const googleCalUrl = generateGoogleCalendarUrl(store.store_name, opp, info);
+  const isSessionActive = isRecordingSession || (activeSession && activeSession.isRecording === true);
+  const displayName = store.store_name || (store.general_info && store.general_info.store_name) || store.name || activeStoreName || lastStoreName || 'ร้านค้า';
+
+  const googleCalUrl = generateGoogleCalendarUrl(displayName, opp, info);
+
+  const footerButtons = [
+    {
+      type: 'button', style: 'primary', height: 'sm', color: '#4285F4',
+      action: { type: 'uri', label: '📅 ➕ เพิ่มนัดหมายลง Google Calendar', uri: googleCalUrl }
+    },
+    {
+      type: 'box', layout: 'horizontal', spacing: 'xs', contents: [
+        {
+          type: 'button', style: 'primary', height: 'sm', color: '#F59E0B', flex: 1,
+          action: { type: 'message', label: '🎯 เปลี่ยนสถานะ', text: `ขอเปลี่ยนสถานะโอกาสร้าน${displayName}` }
+        },
+        {
+          type: 'button', style: 'primary', height: 'sm', color: '#059669', flex: 1,
+          action: { type: 'message', label: '🛍️ +เพิ่มสินค้าแนะนำ', text: `ขอเพิ่มสินค้าแนะนำร้าน${displayName}` }
+        }
+      ]
+    },
+    {
+      type: 'button', style: 'primary', height: 'sm', color: '#D97706',
+      action: { type: 'message', label: '💡 +เพิ่มเหตุผล/โอกาสทอง', text: `ขอเพิ่มเหตุผลโอกาสทองร้าน${displayName}` }
+    },
+    {
+      type: 'box', layout: 'horizontal', spacing: 'xs', contents: [
+        {
+          type: 'button', style: 'secondary', height: 'sm', flex: 1,
+          action: { type: 'message', label: '🗑️ เลือกลบสินค้าแนะนำ', text: `ขอเลือกลบสินค้าแนะนำร้าน${displayName}` }
+        },
+        {
+          type: 'button', style: 'secondary', height: 'sm', flex: 1,
+          action: { type: 'message', label: '🗓️ เปลี่ยนแผนงานเสนอขาย', text: `ขอเปลี่ยนแผนงานวันเข้าเสนอขายร้าน${displayName}` }
+        }
+      ]
+    }
+  ];
+
+  if (isSessionActive) {
+    footerButtons.push({
+      type: 'button', style: 'primary', height: 'sm', color: '#10B981', margin: 'md',
+      action: { type: 'message', label: '✅ จบการบันทึกข้อมูลร้านค้า', text: `จบการบันทึกข้อมูลร้าน ${displayName}` }
+    });
+  }
 
   return {
     type: 'flex',
-    altText: `โอกาสเสนอขาย: ${store.store_name}`,
+    altText: `โอกาสเสนอขาย: ${displayName}`,
     contents: {
       type: 'bubble',
       size: 'mega',
       header: {
-        type: 'box', layout: 'vertical', backgroundColor: '#F59E0B', paddingAll: 'lg',
+        type: 'box', layout: 'vertical', backgroundColor: isSessionActive ? '#10B981' : '#F59E0B', paddingAll: 'lg',
         contents: [
-          { type: 'text', text: '🎯 โอกาสเสนอขาย (Sales Opportunity & Pitch)', color: '#FFFFFF', size: 'xs', weight: 'bold' },
-          { type: 'text', text: store.store_name, color: '#FFFFFF', size: 'xl', weight: 'bold', margin: 'xs' }
+          { type: 'text', text: isSessionActive ? '🔄 กำลังบันทึกโอกาสเสนอขาย (โหมดบันทึกต่อเนื่อง)' : '🎯 โอกาสเสนอขาย (Sales Opportunity & Pitch)', color: '#FFFFFF', size: 'xs', weight: 'bold' },
+          { type: 'text', text: displayName, color: '#FFFFFF', size: 'xl', weight: 'bold', margin: 'xs' }
         ]
       },
       body: {
@@ -627,39 +713,22 @@ export function buildStoreSalesOpportunitiesFlex(store) {
         ]
       },
       footer: {
-        type: 'box', layout: 'vertical', spacing: 'xs', contents: [
-          {
-            type: 'button', style: 'primary', height: 'sm', color: '#4285F4',
-            action: { type: 'uri', label: '📅 ➕ เพิ่มนัดหมายลง Google Calendar', uri: googleCalUrl }
-          },
-          {
-            type: 'box', layout: 'horizontal', spacing: 'xs', contents: [
-              {
-                type: 'button', style: 'primary', height: 'sm', color: '#F59E0B', flex: 1,
-                action: { type: 'message', label: '🎯 เปลี่ยนสถานะ', text: `ขอเปลี่ยนสถานะโอกาสร้าน${store.store_name}` }
-              },
-              {
-                type: 'button', style: 'primary', height: 'sm', color: '#059669', flex: 1,
-                action: { type: 'message', label: '🛍️ +เพิ่มสินค้าแนะนำ', text: `ขอเพิ่มสินค้าแนะนำร้าน${store.store_name}` }
-              }
-            ]
-          },
-          {
-            type: 'box', layout: 'horizontal', spacing: 'xs', contents: [
-              {
-                type: 'button', style: 'secondary', height: 'sm', flex: 1,
-                action: { type: 'message', label: '🗑️ เลือกลบสินค้าแนะนำ', text: `ขอเลือกลบสินค้าแนะนำร้าน${store.store_name}` }
-              },
-              {
-                type: 'button', style: 'secondary', height: 'sm', flex: 1,
-                action: { type: 'message', label: '🗓️ เปลี่ยนแผนงานเสนอขาย', text: `ขอเปลี่ยนแผนงานวันเข้าเสนอขายร้าน${store.store_name}` }
-              }
-            ]
-          }
-        ]
+        type: 'box', layout: 'vertical', spacing: 'xs', contents: footerButtons
       }
     }
   };
+}
+
+/**
+ * 4.1 สร้างการ์ดครบทั้ง 3 หมวดหมู่พร้อมกันเสมอ (All 3 Category Flex Cards Helper)
+ */
+export function buildAll3CategoryFlexCards(store, isRecordingSession = false) {
+  if (!store) return null;
+  return [
+    buildStoreGeneralInfoFlex(store, isRecordingSession),
+    buildStoreSalesDetailsFlex(store, isRecordingSession),
+    buildStoreSalesOpportunitiesFlex(store, isRecordingSession)
+  ].filter(Boolean);
 }
 
 /**
@@ -1013,4 +1082,295 @@ export function buildWizardPromptFlex(storeName, categoryKey, mode) {
       }
     }
   };
+}
+
+/**
+ * ฟังก์ชันช่วยสกัดแยก "จังหวัด" และ "อำเภอ/เขต" จากข้อความที่อยู่
+ */
+export function parseAddressLocation(addressStr) {
+  if (!addressStr || typeof addressStr !== 'string') {
+    return { province: 'ไม่ระบุจังหวัด', district: 'ไม่ระบุอำเภอ' };
+  }
+
+  const str = addressStr.trim();
+  let province = 'ไม่ระบุจังหวัด';
+  let district = 'ไม่ระบุอำเภอ';
+
+  // สกัดจังหวัด
+  if (str.includes('กทม') || str.includes('กรุงเทพ')) {
+    province = 'กรุงเทพมหานคร';
+  } else {
+    const provMatch = str.match(/(?:จ\.|จังหวัด)\s*([^\s,;]+)/);
+    if (provMatch && provMatch[1]) {
+      province = provMatch[1].trim();
+    }
+  }
+
+  // สกัดอำเภอ / เขต
+  const distMatch = str.match(/(?:อ\.|อำเภอ|เขต)\s*([^\s,;]+)/);
+  if (distMatch && distMatch[1]) {
+    const prefix = str.includes('เขต') ? 'เขต' : 'อ.';
+    const cleanDist = distMatch[1].replace(/^(อ\.|อำเภอ|เขต)/, '').trim();
+    district = `${prefix}${cleanDist}`;
+  }
+
+  return { province, district };
+}
+
+/**
+ * 10.1 การ์ดจัดกลุ่มร้านค้าตามจังหวัด (Province Directory Flex Card)
+ */
+export function buildProvinceGroupFlex(stores = []) {
+  const provMap = {};
+
+  stores.forEach(s => {
+    const info = s.general_info || s;
+    const addr = info.address || s.address || '';
+    const loc = parseAddressLocation(addr);
+    const prov = loc.province;
+    if (!provMap[prov]) provMap[prov] = [];
+    provMap[prov].push(s);
+  });
+
+  const provList = Object.keys(provMap);
+
+  const provButtons = provList.map(prov => {
+    const count = provMap[prov].length;
+    return {
+      type: 'button',
+      style: 'primary',
+      height: 'sm',
+      color: prov === 'ไม่ระบุจังหวัด' ? '#6B7280' : '#4F46E5',
+      margin: 'xs',
+      action: {
+        type: 'message',
+        label: `📍 จ.${prov} (${count} ร้าน)`,
+        text: `แสดงรายชื่อ จ.${prov}`
+      }
+    };
+  });
+
+  provButtons.push({
+    type: 'button',
+    style: 'secondary',
+    height: 'sm',
+    margin: 'md',
+    action: {
+      type: 'message',
+      label: `🏪 แสดงร้านค้าทั้งหมด (${stores.length} ร้าน)`,
+      text: 'แสดงรายชื่อทั้งหมด'
+    }
+  });
+
+  return {
+    type: 'flex',
+    altText: `กรุ๊ปรายชื่อร้านค้าตามจังหวัด (${provList.length} จังหวัด)`,
+    contents: {
+      type: 'bubble',
+      size: 'mega',
+      header: {
+        type: 'box', layout: 'vertical', backgroundColor: '#4F46E5', paddingAll: 'lg',
+        contents: [
+          { type: 'text', text: '📍 สมุดรายชื่อร้านค้าตามจังหวัด (Province Directory)', color: '#FFFFFF', size: 'xs', weight: 'bold' },
+          { type: 'text', text: `เลือกจังหวัด (พบ ${provList.length} จังหวัด)`, color: '#FFFFFF', size: 'xl', weight: 'bold', margin: 'xs' }
+        ]
+      },
+      body: {
+        type: 'box', layout: 'vertical', spacing: 'xs', contents: [
+          { type: 'text', text: 'กรุณาเลือกจังหวัดที่ต้องการดูรายชื่อร้านค้าค่ะ:', size: 'sm', color: '#111827', weight: 'bold' },
+          { type: 'separator', margin: 'sm' },
+          ...provButtons
+        ]
+      }
+    }
+  };
+}
+
+/**
+ * 10.2 การ์ดจัดกลุ่มย่อยตามอำเภอ/เขต (District Directory Flex Card)
+ */
+export function buildDistrictGroupFlex(provinceName, storesInProvince = []) {
+  const distMap = {};
+
+  storesInProvince.forEach(s => {
+    const info = s.general_info || s;
+    const addr = info.address || s.address || '';
+    const loc = parseAddressLocation(addr);
+    const dist = loc.district;
+    if (!distMap[dist]) distMap[dist] = [];
+    distMap[dist].push(s);
+  });
+
+  const distList = Object.keys(distMap);
+
+  const distButtons = distList.map(dist => {
+    const count = distMap[dist].length;
+    return {
+      type: 'button',
+      style: 'primary',
+      height: 'sm',
+      color: '#059669',
+      margin: 'xs',
+      action: {
+        type: 'message',
+        label: `🏘️ ${dist} (${count} ร้าน)`,
+        text: `แสดงรายชื่อ ${dist} จ.${provinceName}`
+      }
+    };
+  });
+
+  distButtons.push({
+    type: 'button',
+    style: 'secondary',
+    height: 'sm',
+    margin: 'md',
+    action: {
+      type: 'message',
+      label: `🏬 แสดงร้านทั้งหมดใน จ.${provinceName} (${storesInProvince.length} ร้าน)`,
+      text: `แสดงรายชื่อทั้งหมด จ.${provinceName}`
+    }
+  });
+
+  distButtons.push({
+    type: 'button',
+    style: 'secondary',
+    height: 'sm',
+    color: '#6B7280',
+    margin: 'xs',
+    action: {
+      type: 'message',
+      label: '⬅️ ย้อนกลับไปเลือกจังหวัด',
+      text: 'แสดงรายชื่อ'
+    }
+  });
+
+  return {
+    type: 'flex',
+    altText: `กรุ๊ปอำเภอใน จ.${provinceName}`,
+    contents: {
+      type: 'bubble',
+      size: 'mega',
+      header: {
+        type: 'box', layout: 'vertical', backgroundColor: '#059669', paddingAll: 'lg',
+        contents: [
+          { type: 'text', text: `🏘️ เลือกอำเภอ/เขต ใน จ.${provinceName}`, color: '#FFFFFF', size: 'xs', weight: 'bold' },
+          { type: 'text', text: `จ.${provinceName} (${distList.length} อำเภอ/เขต)`, color: '#FFFFFF', size: 'xl', weight: 'bold', margin: 'xs' }
+        ]
+      },
+      body: {
+        type: 'box', layout: 'vertical', spacing: 'xs', contents: [
+          { type: 'text', text: `กรุณาเลือกอำเภอ/เขต ใน จ.${provinceName} ค่ะ:`, size: 'sm', color: '#111827', weight: 'bold' },
+          { type: 'separator', margin: 'sm' },
+          ...distButtons
+        ]
+      }
+    }
+  };
+}
+
+/**
+ * 10.3 การ์ดแสดงรายชื่อร้านค้าตามตัวกรองที่เลือก (Filtered Stores List Flex Card)
+ */
+export function buildFilteredStoresListFlex(titleLabel, stores = []) {
+  if (!Array.isArray(stores) || stores.length === 0) {
+    return {
+      type: 'flex',
+      altText: `รายชื่อร้านค้า: ${titleLabel}`,
+      contents: {
+        type: 'bubble',
+        size: 'mega',
+        header: {
+          type: 'box', layout: 'vertical', backgroundColor: '#4F46E5', paddingAll: 'lg',
+          contents: [
+            { type: 'text', text: `🏪 รายชื่อร้านค้า: ${titleLabel}`, color: '#FFFFFF', size: 'xs', weight: 'bold' },
+            { type: 'text', text: 'ไม่พบร้านค้า', color: '#FFFFFF', size: 'xl', weight: 'bold', margin: 'xs' }
+          ]
+        },
+        body: {
+          type: 'box', layout: 'vertical', contents: [
+            { type: 'text', text: `ยังไม่มีข้อมูลร้านค้าในกลุ่ม ${titleLabel} ค่ะ`, size: 'sm', color: '#666666', wrap: true }
+          ]
+        },
+        footer: {
+          type: 'box', layout: 'vertical', contents: [
+            {
+              type: 'button', style: 'secondary', height: 'sm',
+              action: { type: 'message', label: '⬅️ ย้อนกลับไปเลือกจังหวัด', text: 'แสดงรายชื่อ' }
+            }
+          ]
+        }
+      }
+    };
+  }
+
+  const storeBoxes = [];
+
+  stores.forEach((s, idx) => {
+    const info = s.general_info || s;
+    const rawName = s.store_name || info.store_name || s.name || `ร้านค้า ${idx + 1}`;
+    const storeName = cleanStoreName(rawName);
+    const address = info.address || s.address || 'ยังไม่มีข้อมูลที่อยู่';
+    const phone = info.phone || s.phone || '-';
+
+    if (idx > 0) {
+      storeBoxes.push({ type: 'separator', margin: 'md' });
+    }
+
+    storeBoxes.push({
+      type: 'box',
+      layout: 'vertical',
+      margin: 'md',
+      spacing: 'xs',
+      contents: [
+        {
+          type: 'text',
+          text: `${idx + 1}. 🏪 ร้าน ${storeName}`,
+          size: 'md',
+          color: '#1E1B4B',
+          weight: 'bold',
+          wrap: true
+        },
+        { type: 'text', text: `📍 ที่อยู่: ${address}`, size: 'sm', color: '#4B5563', wrap: true },
+        { type: 'text', text: `📞 เบอร์โทรศัพท์: ${phone}`, size: 'xs', color: '#059669' },
+        {
+          type: 'button',
+          style: 'secondary',
+          height: 'sm',
+          color: '#3B82F6',
+          action: { type: 'message', label: `🏬 ขอข้อมูลร้าน ${storeName}`, text: `ขอข้อมูลร้าน${storeName}` }
+        }
+      ]
+    });
+  });
+
+  return {
+    type: 'flex',
+    altText: `รายชื่อร้านค้า: ${titleLabel} (${stores.length} ร้าน)`,
+    contents: {
+      type: 'bubble',
+      size: 'mega',
+      header: {
+        type: 'box', layout: 'vertical', backgroundColor: '#4F46E5', paddingAll: 'lg',
+        contents: [
+          { type: 'text', text: `🏪 รายชื่อร้านค้า: ${titleLabel}`, color: '#FFFFFF', size: 'xs', weight: 'bold' },
+          { type: 'text', text: `รวม ${stores.length} ร้านค้า`, color: '#FFFFFF', size: 'xl', weight: 'bold', margin: 'xs' }
+        ]
+      },
+      body: {
+        type: 'box', layout: 'vertical', contents: storeBoxes
+      },
+      footer: {
+        type: 'box', layout: 'vertical', spacing: 'xs', contents: [
+          {
+            type: 'button', style: 'secondary', height: 'sm',
+            action: { type: 'message', label: '⬅️ ย้อนกลับไปเลือกจังหวัด', text: 'แสดงรายชื่อ' }
+          }
+        ]
+      }
+    }
+  };
+}
+
+export function buildAllStoresListFlex(stores = []) {
+  return buildProvinceGroupFlex(stores);
 }

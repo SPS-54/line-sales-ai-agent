@@ -12,9 +12,16 @@ import {
   getSalesOpportunitiesDeclaration, saveSalesOpportunitiesDeclaration
 } from '../tools/storeTool.js';
 import { 
+  buildProductCarouselFlex,
   buildStoreGeneralInfoFlex,
   buildStoreSalesDetailsFlex,
   buildStoreSalesOpportunitiesFlex,
+  buildAll3CategoryFlexCards,
+  buildAllStoresListFlex,
+  buildProvinceGroupFlex,
+  buildDistrictGroupFlex,
+  buildFilteredStoresListFlex,
+  parseAddressLocation,
   buildDeleteRecommendedProductsFlex,
   buildConfirmationFlex,
   buildCategoryMenuFlex,
@@ -62,6 +69,9 @@ function handleSingleFieldPromptResponse(pendingField, userMessage) {
   const { storeName, field, label, mode } = pendingField;
   sessionStore.clearPendingField(pendingField.key);
 
+  const activeSession = sessionStore.getActiveStoreSession('default');
+  const isRecordingSession = activeSession && activeSession.isRecording;
+
   let store;
   let flexMessage;
 
@@ -69,52 +79,52 @@ function handleSingleFieldPromptResponse(pendingField, userMessage) {
   if (field === 'contact_persons') {
     const parsed = parseGeneralInfoText(`ผู้ติดต่อ ${userMessage}`);
     store = db.saveGeneralInfo(storeName, parsed, mode || 'append');
-    flexMessage = buildStoreGeneralInfoFlex(store);
+    flexMessage = isRecordingSession ? buildAll3CategoryFlexCards(store, true) : buildStoreGeneralInfoFlex(store, false);
   } else if (field === 'phone') {
     store = db.saveGeneralInfo(storeName, { phone: userMessage.trim() }, 'replace');
-    flexMessage = buildStoreGeneralInfoFlex(store);
+    flexMessage = isRecordingSession ? buildAll3CategoryFlexCards(store, true) : buildStoreGeneralInfoFlex(store, false);
   } else if (field === 'address') {
     store = db.saveGeneralInfo(storeName, { address: userMessage.trim() }, 'replace');
-    flexMessage = buildStoreGeneralInfoFlex(store);
+    flexMessage = isRecordingSession ? buildAll3CategoryFlexCards(store, true) : buildStoreGeneralInfoFlex(store, false);
   } else if (field === 'map_url') {
     store = db.saveGeneralInfo(storeName, { map_url: userMessage.trim() }, 'replace');
-    flexMessage = buildStoreGeneralInfoFlex(store);
+    flexMessage = isRecordingSession ? buildAll3CategoryFlexCards(store, true) : buildStoreGeneralInfoFlex(store, false);
   } else if (field === 'delivery_by') {
     store = db.saveGeneralInfo(storeName, { delivery_by: userMessage.trim(), delivery_schedule: userMessage.trim() }, 'replace');
-    flexMessage = buildStoreGeneralInfoFlex(store);
+    flexMessage = isRecordingSession ? buildAll3CategoryFlexCards(store, true) : buildStoreGeneralInfoFlex(store, false);
   } else if (field === 'credit_days') {
     const match = userMessage.match(/\d+/);
     const days = match ? parseInt(match[0]) : 0;
     store = db.saveGeneralInfo(storeName, { credit_days: days }, 'replace');
-    flexMessage = buildStoreGeneralInfoFlex(store);
+    flexMessage = isRecordingSession ? buildAll3CategoryFlexCards(store, true) : buildStoreGeneralInfoFlex(store, false);
   } else if (field === 'notes') {
     store = db.saveGeneralInfo(storeName, { notes: userMessage.trim() }, 'append');
-    flexMessage = buildStoreGeneralInfoFlex(store);
+    flexMessage = isRecordingSession ? buildAll3CategoryFlexCards(store, true) : buildStoreGeneralInfoFlex(store, false);
   }
   // หมวดข้อมูลการขาย (Sales Details)
   else if (field === 'payment_type') {
     store = db.saveSalesDetails(storeName, { payment_type: userMessage.trim() }, 'replace');
-    flexMessage = buildStoreSalesDetailsFlex(store);
+    flexMessage = isRecordingSession ? buildAll3CategoryFlexCards(store, true) : buildStoreSalesDetailsFlex(store);
   } else if (field === 'brands_sold') {
     const brands = userMessage.split(/[,;\n]|และ/).map(b => b.trim()).filter(Boolean);
     store = db.saveSalesDetails(storeName, { brands_sold: brands }, 'append');
-    flexMessage = buildStoreSalesDetailsFlex(store);
+    flexMessage = isRecordingSession ? buildAll3CategoryFlexCards(store, true) : buildStoreSalesDetailsFlex(store);
   } else if (field === 'last_order_date') {
     store = db.saveSalesDetails(storeName, { last_order_date: userMessage.trim() }, 'replace');
-    flexMessage = buildStoreSalesDetailsFlex(store);
+    flexMessage = isRecordingSession ? buildAll3CategoryFlexCards(store, true) : buildStoreSalesDetailsFlex(store);
   } else if (field === 'last_order_amount') {
     const match = userMessage.match(/\d+/);
     const amt = match ? parseInt(match[0]) : 0;
     store = db.saveSalesDetails(storeName, { last_order_amount: amt }, 'append');
-    flexMessage = buildStoreSalesDetailsFlex(store);
+    flexMessage = isRecordingSession ? buildAll3CategoryFlexCards(store, true) : buildStoreSalesDetailsFlex(store);
   } else if (field === 'ordered_items') {
     const items = userMessage.split(/[,;\n]|และ/).map(i => i.trim()).filter(Boolean);
     store = db.saveSalesDetails(storeName, { ordered_items: items }, 'append');
-    flexMessage = buildStoreSalesDetailsFlex(store);
+    flexMessage = isRecordingSession ? buildAll3CategoryFlexCards(store, true) : buildStoreSalesDetailsFlex(store);
   } else if (field === 'top_selling_products') {
     const top = userMessage.split(/[,;\n]|และ/).map(t => t.trim()).filter(Boolean);
     store = db.saveSalesDetails(storeName, { top_selling_products: top }, 'append');
-    flexMessage = buildStoreSalesDetailsFlex(store);
+    flexMessage = isRecordingSession ? buildAll3CategoryFlexCards(store, true) : buildStoreSalesDetailsFlex(store);
   }
   // หมวดโอกาสเสนอขาย (Sales Opportunities)
   else if (field === 'opportunity_status') {
@@ -131,11 +141,13 @@ function handleSingleFieldPromptResponse(pendingField, userMessage) {
     flexMessage = buildStoreSalesOpportunitiesFlex(store);
   } else {
     store = db.saveGeneralInfo(storeName, { notes: userMessage.trim() }, 'append');
-    flexMessage = buildStoreGeneralInfoFlex(store);
+    flexMessage = buildStoreGeneralInfoFlex(store, isRecordingSession);
   }
 
+  const sessionNotice = isRecordingSession ? ' (ยังอยู่ในโหมดบันทึกข้อมูลร้านนี้ กดปุ่ม [✅ จบการบันทึกข้อมูลพื้นฐานร้านค้า] เมื่อบันทึกเสร็จนะคะ)' : '';
+
   return {
-    text: `✅ อัปเดตหัวข้อ [${label}] ของร้าน "${store.store_name}" เรียบร้อยแล้วค่ะ!`,
+    text: `✅ อัปเดตหัวข้อ [${label}] ของร้าน "${store.store_name}" เรียบร้อยแล้วค่ะ!${sessionNotice}`,
     flexMessage: flexMessage
   };
 }
@@ -145,6 +157,9 @@ function executeConfirmedUpdate(pending, mode) {
   const { storeName, categoryKey, parsedData } = pending;
   sessionStore.clearPending(pending.key);
 
+  const activeSession = sessionStore.getActiveStoreSession('default');
+  const isRecording = activeSession && activeSession.isRecording;
+
   let store;
   let flexCard;
   let title = '';
@@ -152,7 +167,7 @@ function executeConfirmedUpdate(pending, mode) {
   if (categoryKey === 'general_info') {
     title = 'ข้อมูลพื้นฐานร้านค้า';
     store = db.saveGeneralInfo(storeName, parsedData, mode);
-    flexCard = buildStoreGeneralInfoFlex(store);
+    flexCard = buildStoreGeneralInfoFlex(store, isRecording);
   } else if (categoryKey === 'sales_details') {
     title = 'ข้อมูลการขาย';
     store = db.saveSalesDetails(storeName, parsedData, mode);
@@ -207,8 +222,11 @@ function checkConflictAndPrompt(storeName, categoryKey, categoryTitle, parsedDat
     };
   } else {
     const savedStore = defaultSaveFn();
+    const activeSession = sessionStore.getActiveStoreSession('default');
+    const isRecording = activeSession && activeSession.isRecording;
+
     let flex;
-    if (categoryKey === 'general_info') flex = buildStoreGeneralInfoFlex(savedStore);
+    if (categoryKey === 'general_info') flex = buildStoreGeneralInfoFlex(savedStore, isRecording);
     if (categoryKey === 'sales_details') flex = buildStoreSalesDetailsFlex(savedStore);
     if (categoryKey === 'sales_opportunities') flex = buildStoreSalesOpportunitiesFlex(savedStore);
 
@@ -221,6 +239,62 @@ function checkConflictAndPrompt(storeName, categoryKey, categoryTitle, parsedDat
 
 function handleLocalFallbackMode(userMessage) {
   const text = userMessage.toLowerCase();
+
+  // 🎯 0. คำสั่งจบการบันทึกข้อมูลพื้นฐานร้านค้า (End Store Recording Session)
+  if (text.includes('จบการบันทึก') || text.includes('เสร็จสิ้นการบันทึก') || text.includes('เลิกบันทึก')) {
+    const activeSession = sessionStore.getActiveStoreSession('default');
+    const rawTarget = userMessage.replace(/จบการบันทึกข้อมูลร้าน|จบการบันทึกข้อมูล|จบการบันทึก|เสร็จสิ้นการบันทึก|เลิกบันทึก/g, '').trim();
+    const targetStoreName = activeSession ? activeSession.storeName : (cleanStoreName(rawTarget) || sessionStore.getLastStore('default') || 'ร้านค้า');
+
+    sessionStore.clearActiveStoreSession('default');
+    const store = db.findStoreByName(targetStoreName) || { store_name: targetStoreName };
+    const displayStoreName = store.store_name || targetStoreName || 'ร้านค้า';
+
+    return {
+      text: `✅ จบการบันทึกข้อมูลพื้นฐานร้านค้า "${displayStoreName}" เรียบร้อยแล้วค่ะ ข้อมูลถูกจัดเก็บสมบูรณ์ในระบบแล้วค่ะ!`,
+      flexMessage: buildStoreGeneralInfoFlex(store, false)
+    };
+  }
+
+  // 🎯 0.1 คำสั่งเริ่มบันทึกข้อมูลพื้นฐานร้านค้าใหม่ (Start Store Recording Session)
+  if ((text.includes('บันทึกข้อมูล') || text.includes('ขอลงทะเบียนร้าน') || text.includes('เพิ่มร้าน')) && !text.includes('การขาย') && !text.includes('โอกาส') && !text.includes('สินค้า')) {
+    const rawStore = userMessage.replace(/ขอแบบฟอร์มบันทึกข้อมูล|บันทึกข้อมูลร้าน|บันทึกข้อมูล|ขอลงทะเบียนร้านค้า|ขอลงทะเบียนร้าน|เพิ่มร้านใหม่|เพิ่มร้าน|ร้าน/g, '').trim();
+    const storeName = cleanStoreName(rawStore);
+
+    if (!storeName || storeName === 'ใหม่') {
+      return {
+        text: `📝 กรุณาระบุ "ชื่อร้านค้า" ที่ต้องการเริ่มบันทึกข้อมูลพื้นฐานค่ะ:\n*(เช่น พิมพ์สั่ง: บันทึกข้อมูล ร้านมิตรภาพการค้า)*`,
+        flexMessage: null
+      };
+    }
+
+    sessionStore.setActiveStoreSession('default', storeName);
+    let store = db.findStoreByName(storeName);
+    if (!store) {
+      store = db.saveGeneralInfo(storeName, {}, 'append');
+    }
+
+    return {
+      text: `🔄 เริ่มโหมดบันทึกข้อมูลร้านค้า "${storeName}" เรียบร้อยแล้วค่ะ!\n\nระบบจัดเตรียมแบบฟอร์มการ์ดครบทั้ง 3 หมวดหลัก (1. ข้อมูลพื้นฐานร้านค้า, 2. ข้อมูลการขาย, 3. โอกาสเสนอขาย) ให้คุณเลือกกดปุ่ม 1-Tap หรือพิมพ์ป้อนข้อมูลต่อได้ทันทีค่ะ!`,
+      flexMessage: [
+        buildStoreGeneralInfoFlex(store, true),
+        buildStoreSalesDetailsFlex(store),
+        buildStoreSalesOpportunitiesFlex(store)
+      ]
+    };
+  }
+
+  // 🎯 0.2 หากกำลังอยู่ในโหมดบันทึกข้อมูลพื้นฐานร้านค้าค้างอยู่ (Active Store Recording Session Fallback)
+  const activeSession = sessionStore.getActiveStoreSession('default');
+  if (activeSession && activeSession.isRecording && !text.includes('ขอข้อมูล') && !text.includes('ขอรายละเอียด') && !text.includes('แบบฟอร์ม') && !text.includes('การขาย') && !text.includes('โอกาส') && !text.includes('ขอเพิ่ม') && !text.includes('ขอเปลี่ยน') && !text.includes('ขอใส่')) {
+    const storeName = activeSession.storeName;
+    const parsed = parseGeneralInfoText(userMessage);
+    const updatedStore = db.saveGeneralInfo(storeName, parsed, 'append');
+    return {
+      text: `✅ บันทึกข้อมูลเพิ่มลงในร้าน "${storeName}" เรียบร้อยแล้วค่ะ!\n*(ยังอยู่ในโหมดบันทึกข้อมูลร้านนี้ สามารถเลือกใส่ข้อมูลในการ์ดใดก็ได้ หรือกดปุ่ม [✅ จบการบันทึกข้อมูลร้านค้า] บนการ์ดใดก็ได้เมื่อเสร็จสิ้นนะคะ)*`,
+      flexMessage: buildAll3CategoryFlexCards(updatedStore, true)
+    };
+  }
 
   // 🎯 1. คำสั่งกดปุ่ม 1-Tap หมวดข้อมูลพื้นฐานร้านค้า (Store Profile)
   if (text.includes('ขอเพิ่มผู้ติดต่อร้าน')) {
@@ -339,10 +413,86 @@ function handleLocalFallbackMode(userMessage) {
       };
     }
   }
+  else if (text.includes('ขอเพิ่มเหตุผลโอกาสทองร้าน') || text.includes('ขอเพิ่มเหตุผลร้าน') || text.includes('ขอเปลี่ยนเหตุผลร้าน')) {
+    const storeName = cleanStoreName(userMessage.replace(/ขอเพิ่มเหตุผลโอกาสทองร้าน|ขอเพิ่มเหตุผลร้าน|ขอเปลี่ยนเหตุผลร้าน/g, '').trim());
+    sessionStore.setPendingField('default', { storeName, field: 'reason', label: 'เหตุผล / โอกาสทอง', mode: 'replace' });
+    return { text: `💡 กรุณาพิมพ์เหตุผลหรือโอกาสทองใหม่ของร้าน "${storeName}" ส่งมาได้เลยค่ะ:\n*(เช่น: ร้านเปิดโซนใหม่ / กำลังจัดโปรโมชั่นประจำปี)*`, flexMessage: null };
+  }
   else if (text.includes('ขอเปลี่ยนแผนงานวันเข้าเสนอขายร้าน')) {
     const storeName = cleanStoreName(userMessage.replace(/ขอเปลี่ยนแผนงานวันเข้าเสนอขายร้าน/g, '').trim());
     sessionStore.setPendingField('default', { storeName, field: 'target_pitch_date', label: 'แผนงานวันเข้าเสนอขาย', mode: 'replace' });
     return { text: `🗓️ กรุณาพิมพ์แผนงานวันเข้าเสนอขายใหม่ของร้าน "${storeName}" ส่งมาได้เลยค่ะ:\n*(เช่น: 15 กันยายน 2026 / สัปดาห์หน้า)*`, flexMessage: null };
+  }
+
+  // C0. คำสั่งแสดงรายชื่อและที่อยู่ของทุกร้านค้าที่มีในระบบ (พร้อมจัดกลุ่ม จังหวัด -> อำเภอ)
+  if (text.includes('แสดงรายชื่อ') || text.includes('ขอรายชื่อ') || text.includes('รายชื่อร้าน') || text.includes('รายชื่อร้านค้า') || text.includes('ร้านค้าทั้งหมด')) {
+    const stores = db.getStores();
+
+    // C0.1 หากสั่งดูทั้งหมดในระบบ
+    if (text.includes('แสดงรายชื่อทั้งหมด') && !text.includes('จ.') && !text.includes('จังหวัด')) {
+      return {
+        text: `🏪 รายชื่อและที่อยู่ของร้านค้าทั้งหมดในระบบ (${stores.length} ร้าน) ค่ะ:`,
+        flexMessage: buildFilteredStoresListFlex(`ทั้งหมดในระบบ (${stores.length} ร้าน)`, stores)
+      };
+    }
+
+    // C0.2 หากสั่งดูทั้งหมดในจังหวัดเฉพาะ (เช่น "แสดงรายชื่อทั้งหมด จ.นนทบุรี")
+    if (text.includes('ทั้งหมด จ.') || text.includes('ทั้งหมดจังหวัด') || text.includes('ทั้งหมดใน จ.')) {
+      const provName = text.replace(/.*(?:ทั้งหมด จ\.|ทั้งหมดจังหวัด|ทั้งหมดใน จ\.)\s*/, '').trim();
+      const filtered = stores.filter(s => {
+        const addr = (s.general_info && s.general_info.address) || s.address || '';
+        const loc = parseAddressLocation(addr);
+        return loc.province.includes(provName) || provName.includes(loc.province);
+      });
+      return {
+        text: `🏬 รายชื่อและที่อยู่ของร้านค้าทั้งหมดใน จ.${provName} (${filtered.length} ร้าน) ค่ะ:`,
+        flexMessage: buildFilteredStoresListFlex(`จ.${provName}`, filtered)
+      };
+    }
+
+    // C0.3 หากระบุทั้ง อำเภอ และ จังหวัด (เช่น "แสดงรายชื่อ อ.ไทรน้อย จ.นนทบุรี")
+    if ((text.includes('อ.') || text.includes('อำเภอ') || text.includes('เขต')) && (text.includes('จ.') || text.includes('จังหวัด'))) {
+      const distMatch = text.match(/(?:อ\.|อำเภอ|เขต)\s*([^\s]+)/);
+      const provMatch = text.match(/(?:จ\.|จังหวัด)\s*([^\s]+)/);
+      const distName = distMatch ? distMatch[1].trim() : '';
+      const provName = provMatch ? provMatch[1].trim() : '';
+
+      const filtered = stores.filter(s => {
+        const addr = (s.general_info && s.general_info.address) || s.address || '';
+        const loc = parseAddressLocation(addr);
+        const matchProv = !provName || loc.province.includes(provName) || provName.includes(loc.province);
+        const matchDist = !distName || loc.district.includes(distName) || distName.includes(loc.district);
+        return matchProv && matchDist;
+      });
+
+      return {
+        text: `🏘️ รายชื่อและที่อยู่ของร้านค้าใน ${distName} จ.${provName} (${filtered.length} ร้าน) ค่ะ:`,
+        flexMessage: buildFilteredStoresListFlex(`${distName} จ.${provName}`, filtered)
+      };
+    }
+
+    // C0.4 หากระบุเฉพาะ จังหวัด (เช่น "แสดงรายชื่อ จ.นนทบุรี") -> แสดงกรุ๊ปย่อยตามอำเภอ/เขต
+    if (text.includes('จ.') || text.includes('จังหวัด')) {
+      const provMatch = text.match(/(?:จ\.|จังหวัด)\s*([^\s]+)/);
+      const provName = provMatch ? provMatch[1].trim() : text.replace(/.*(?:จ\.|จังหวัด)\s*/, '').trim();
+
+      const filtered = stores.filter(s => {
+        const addr = (s.general_info && s.general_info.address) || s.address || '';
+        const loc = parseAddressLocation(addr);
+        return loc.province.includes(provName) || provName.includes(loc.province);
+      });
+
+      return {
+        text: `📍 พบทั้งหมด ${filtered.length} ร้านค้าใน จ.${provName} ค่ะ กรุณาเลือกกลุ่มย่อยตามอำเภอ/เขต หรือเลือกดูร้านทั้งหมดได้เลยค่ะ:`,
+        flexMessage: buildDistrictGroupFlex(provName, filtered)
+      };
+    }
+
+    // C0.5 คำสั่งเริ่มต้น "แสดงรายชื่อ" -> แสดงกรุ๊ปตามจังหวัด
+    return {
+      text: `📍 กรุณาเลือกจังหวัดที่ต้องการดูรายชื่อร้านค้า หรือเลือกดูร้านค้าทั้งหมดได้เลยค่ะ:`,
+      flexMessage: buildProvinceGroupFlex(stores)
+    };
   }
 
   // C. คำสั่งดึงข้อมูลสรุปตามหมวดหมู่ (Retrieval Commands)
@@ -362,13 +512,19 @@ function handleLocalFallbackMode(userMessage) {
       return { text: `🎯 สรุปโอกาสเสนอขายและสินค้าแนะนำ (Upsell/Cross-sell) ของร้าน "${store.store_name}" ค่ะ`, flexMessage: buildStoreSalesOpportunitiesFlex(store) };
     } else { return { text: `ไม่พบข้อมูลโอกาสเสนอขายของร้าน "${storeName}" ค่ะ`, flexMessage: null }; }
   }
-  else if (text.includes('ขอข้อมูลร้าน') || text.includes('ขอข้อมูลพื้นฐาน') || text.includes('ขอข้อมูล')) {
-    const storeName = text.replace(/ขอข้อมูลร้าน|ขอข้อมูลพื้นฐาน|ขอข้อมูล|ร้าน/g, '').trim();
-    const store = db.findStoreByName(storeName);
+  else if (text.includes('ขอข้อมูลร้าน') || text.includes('ขอข้อมูลพื้นฐาน') || text.includes('ขอข้อมูล') || text.includes('ดึงข้อมูลร้าน')) {
+    const rawTarget = text.replace(/ขอข้อมูลร้าน|ขอข้อมูลพื้นฐาน|ขอข้อมูล|ดึงข้อมูลร้าน|ดึงข้อมูล|ร้าน/g, '').trim();
+    const targetStoreName = cleanStoreName(rawTarget) || sessionStore.getLastStore('default');
+    const store = db.findStoreByName(targetStoreName);
     if (store) {
       sessionStore.setLastStore('default', store.store_name);
-      return { text: `🏬 ข้อมูลพื้นฐานร้านค้าของ "${store.store_name}" ค่ะ`, flexMessage: buildStoreGeneralInfoFlex(store) };
-    } else { return { text: `ไม่พบข้อมูลร้าน "${storeName}" ในระบบค่ะ`, flexMessage: null }; }
+      return {
+        text: `🏬 สรุปข้อมูลครบทั้ง 3 หมวดหมู่หลักของร้าน "${store.store_name}" ค่ะ\n(1. ข้อมูลพื้นฐานร้านค้า | 2. ข้อมูลการขาย | 3. โอกาสเสนอขาย)`,
+        flexMessage: buildAll3CategoryFlexCards(store)
+      };
+    } else {
+      return { text: targetStoreName ? `ไม่พบข้อมูลร้าน "${targetStoreName}" ในระบบค่ะ` : `กรุณาระบุชื่อร้านค้าที่ต้องการขอข้อมูลค่ะ\n*(เช่น: ขอข้อมูลร้านสมศักดิ์การค้า)*`, flexMessage: null };
+    }
   }
 
   // A. บันทึกข้อมูลแบบระบุข้อความเต็มบรรทัด
