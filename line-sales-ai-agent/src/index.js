@@ -155,4 +155,14 @@ server.listen(config.port, () => {
   console.log(`📍 Web Chat Simulator: http://localhost:${config.port}`);
   console.log(`🔗 Webhook Endpoint:  http://localhost:${config.port}/webhook`);
   console.log(`=================================================`);
+
+  // Self-Ping Keep Alive to prevent Render free instance from sleeping
+  const renderUrl = process.env.RENDER_EXTERNAL_URL || 'https://line-sales-ai-agent.onrender.com';
+  console.log(`[Keep-Alive]: Self-ping initialized for ${renderUrl}`);
+  setInterval(() => {
+    fetch(`${renderUrl}/health`)
+      .then(r => r.json())
+      .then(d => console.log(`[Keep-Alive Ping OK]: ${d.status}`))
+      .catch(e => console.log(`[Keep-Alive Ping Note]: ${e.message}`));
+  }, 5 * 60 * 1000);
 });
