@@ -267,6 +267,7 @@
     </div>
 
     <div class="quick-chips">
+      <div class="chip" onclick="sendQuick('บันทึกข้อมูล ร้านมิตรภาพการค้า')">📝 ➕ บันทึกข้อมูลร้านใหม่</div>
       <div class="chip" onclick="sendQuick('แบบฟอร์ม')">📝 ขอแบบฟอร์มป้อนข้อมูล</div>
       <div class="chip" onclick="sendQuick('ขอข้อมูลร้านสมศักดิ์การค้า')">🏬 ดึงข้อมูลร้าน</div>
       <div class="chip" onclick="sendQuick('ขอข้อมูลการขายร้านสมศักดิ์การค้า')">📊 ดึงข้อมูลการขาย</div>
@@ -309,7 +310,13 @@
         appendMsg(data.text, 'ai');
 
         if (data.flexMessage) {
-          renderFlexMessage(data.flexMessage);
+          if (Array.isArray(data.flexMessage)) {
+            data.flexMessage.forEach(flex => {
+              if (flex) renderFlexMessage(flex);
+            });
+          } else {
+            renderFlexMessage(data.flexMessage);
+          }
         }
       } catch (err) {
         appendMsg('เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์', 'ai');
@@ -386,17 +393,32 @@
         if (headerTitle.includes('รายละเอียดการขาย') || headerTitle.includes('Sales Performance')) cardClass = 'info-card-blue';
         if (headerTitle.includes('โอกาสเสนอขาย') || headerTitle.includes('Sales Opportunity')) cardClass = 'info-card-orange';
 
-        let bodyHTML = `<h3>${headerTitle}: ${title}</h3>`;
-        
-        contents.body.contents.forEach(box => {
-          if (box.contents) {
-            box.contents.forEach(item => {
-              if (item.text) {
-                bodyHTML += `<p>${item.text.replace(/\n/g, '<br>')}</p>`;
-              }
+        function renderFlexBox(box) {
+          if (!box) return '';
+          let html = '';
+          if (box.type === 'text' && box.text) {
+            let style = '';
+            if (box.weight === 'bold') style += 'font-weight:bold;';
+            if (box.color) style += `color:${box.color};`;
+            if (box.size === 'md') style += 'font-size:15px;';
+            html += `<p style="${style}">${box.text.replace(/\n/g, '<br>')}</p>`;
+          } else if (box.type === 'separator') {
+            html += `<hr style="border:none;border-top:1px solid #e5e7eb;margin:6px 0;">`;
+          } else if (box.type === 'button') {
+            if (box.action && box.action.text) {
+              const bg = box.color || '#3b82f6';
+              html += `<button class="action-btn" style="background:${bg};margin:4px 0;width:100%;" onclick="sendQuick('${box.action.text.replace(/'/g, "\\'")}')">${box.action.label}</button>`;
+            }
+          } else if (box.contents && Array.isArray(box.contents)) {
+            box.contents.forEach(child => {
+              html += renderFlexBox(child);
             });
           }
-        });
+          return html;
+        }
+
+        let bodyHTML = `<h3>${headerTitle}: ${title}</h3>`;
+        bodyHTML += renderFlexBox(contents.body);
 
         // 🔘 แสดงผลปุ่มกดแก้ไขเฉพาะจุด (Action Buttons) ทั้งหมดในรูปแบบตารางปุ่มทางด่วน 2 คอลัมน์
         const allButtons = extractAllButtons(contents.footer);
