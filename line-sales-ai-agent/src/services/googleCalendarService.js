@@ -69,30 +69,47 @@ export function formatGoogleCalendarDate(dateInput) {
 
 /**
  * สร้างลิงก์สำหรับกดเพิ่มลง Google Calendar (Google Calendar Event URL)
+ * ป้องกันข้อผิดพลาด LINE URI length limit (ต้องไม่เกิน 1,000 ตัวอักษร)
  */
 export function generateGoogleCalendarUrl(storeName, opportunityData, generalInfoData = {}) {
   const targetDate = opportunityData?.target_pitch_date || '';
   const dateParam = formatGoogleCalendarDate(targetDate);
 
-  const title = `🎯 เข้าเสนอขายสินค้า: ร้าน${storeName}`;
+  const cleanName = (storeName || 'ร้านค้า').trim();
+  const title = `🎯 เสนอขาย: ร้าน${cleanName}`;
 
   const recommendedStr = Array.isArray(opportunityData?.recommended_products) 
     ? opportunityData.recommended_products.join(', ') 
-    : (opportunityData?.recommended_products || 'ไม่ระบุ');
+    : (opportunityData?.recommended_products || '-');
 
-  const details = `🏬 ร้านค้า: ${storeName}
-📌 สถานะโอกาส: ${opportunityData?.opportunity_status || 'ทั่วไป'}
-💡 เหตุผล/โอกาสทอง: ${opportunityData?.reason || 'ไม่ระบุ'}
-🛍️ สินค้าแนะนำเสนอขาย: ${recommendedStr}
-📞 เบอร์ติดต่อร้าน: ${generalInfoData?.phone || '-'}`;
+  let details = `🏬 ร้าน: ${cleanName}\n📌 สถานะ: ${opportunityData?.opportunity_status || 'ทั่วไป'}\n🛍️ สินค้าแนะนำ: ${recommendedStr}\n📞 เบอร์: ${generalInfoData?.phone || '-'}`;
+  let location = (generalInfoData?.address || cleanName || '').trim();
 
-  const location = `${generalInfoData?.address || ''} ${generalInfoData?.map_url || ''}`.trim() || storeName;
+  // จำกัดความยาวของที่อยู่ให้ไม่เกิน 60 ตัวอักษร
+  if (location.length > 60) location = location.substring(0, 57) + '...';
 
-  const url = `https://calendar.google.com/calendar/render?action=TEMPLATE` +
+  let url = `https://calendar.google.com/calendar/render?action=TEMPLATE` +
     `&text=${encodeURIComponent(title)}` +
     `&dates=${dateParam}` +
     `&details=${encodeURIComponent(details)}` +
     `&location=${encodeURIComponent(location)}`;
+
+  // หากความยาว URL เกิน 950 ตัวอักษร (ข้อจำกัดของ LINE คือไม่เกิน 1000) ให้ตัดย่อ details ลง
+  if (url.length > 950) {
+    const simpleDetails = `🏬 ร้าน: ${cleanName}\n📌 สถานะ: ${opportunityData?.opportunity_status || '-'}\n📞 เบอร์: ${generalInfoData?.phone || '-'}`;
+    url = `https://calendar.google.com/calendar/render?action=TEMPLATE` +
+      `&text=${encodeURIComponent(title)}` +
+      `&dates=${dateParam}` +
+      `&details=${encodeURIComponent(simpleDetails)}` +
+      `&location=${encodeURIComponent(location)}`;
+  }
+
+  // หากยังเกิน 950 ตัวอักษร ให้ตัดรายละเอียดออกเหลือเฉพาะชื่ออีเวนต์และวันที่
+  if (url.length > 950) {
+    url = `https://calendar.google.com/calendar/render?action=TEMPLATE` +
+      `&text=${encodeURIComponent(`🎯 เสนอขาย: ${cleanName}`)}` +
+      `&dates=${dateParam}`;
+  }
 
   return url;
 }
