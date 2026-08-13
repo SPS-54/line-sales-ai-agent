@@ -704,8 +704,8 @@ function handleLocalFallbackMode(userMessage, contextId = 'default', userId = nu
       return { text: `📊 ข้อมูลการขาย 7 หัวข้อหลักของร้าน "${store.store_name}" ค่ะ`, flexMessage: buildStoreSalesDetailsFlex(store) };
     } else { return { text: `ไม่พบข้อมูลการขายของร้าน "${storeName}" ในกลุ่มแชตนี้ค่ะ`, flexMessage: null }; }
   }
-  else if (text.includes('ขอโอกาสเสนอขาย') || text.includes('ขอโอกาสขาย') || text.includes('ขอโอกาส')) {
-    const storeName = text.replace(/ขอโอกาสเสนอขาย|ขอโอกาสขาย|ขอโอกาส|โอกาสเสนอขายร้าน|โอกาสขายร้าน|ร้าน/g, '').trim();
+  else if (text.includes('ขอโอกาสเสนอขาย') || text.includes('ขอข้อมูลโอกาสเสนอขาย') || text.includes('ขอข้อมูลโอกาส') || text.includes('ขอโอกาสขาย') || text.includes('ขอโอกาส')) {
+    const storeName = text.replace(/ขอข้อมูลโอกาสเสนอขาย|ขอข้อมูลโอกาส|ขอโอกาสเสนอขาย|ขอโอกาสขาย|ขอโอกาส|โอกาสเสนอขายร้าน|โอกาสขายร้าน|ร้าน/g, '').trim();
     const store = db.findStoreByName(storeName, contextId);
     if (store) {
       sessionStore.setLastStore(contextId, store.store_name);

@@ -387,12 +387,22 @@ export function buildStoreGeneralInfoFlex(store, isRecordingSession = false, con
   // 4. แผนที่ร้าน
   contactBoxContents.push({ type: 'text', text: `🗺️ แผนที่ร้าน: ${info.map_url || 'ยังไม่มีข้อมูล'}`, size: 'sm', color: info.map_url ? '#3B82F6' : '#333333', wrap: true });
 
-  // 5. จัดส่งโดย
-  const deliveryVal = info.delivery_by || info.delivery_schedule || 'ยังไม่มีข้อมูล';
-  contactBoxContents.push({ type: 'text', text: `🚚 จัดส่งโดย: ${deliveryVal}`, size: 'sm', color: '#333333' });
+  // 5. จัดส่งโดย (Multiple Delivery Channels)
+  const deliveryArr = (info.delivery_by || info.delivery_schedule)
+    ? String(info.delivery_by || info.delivery_schedule).split(/[|,\n]|และ/).map(s => s.trim()).filter(Boolean)
+    : [];
+
+  if (deliveryArr.length > 1) {
+    contactBoxContents.push({ type: 'text', text: `🚚 ช่องทางจัดส่ง (${deliveryArr.length} ช่องทาง):`, size: 'sm', color: '#333333', weight: 'bold', margin: 'md' });
+    deliveryArr.forEach((d, idx) => {
+      contactBoxContents.push({ type: 'text', text: `  ${idx + 1}. 🚚 ${d}`, size: 'sm', color: '#111111', wrap: true });
+    });
+  } else {
+    contactBoxContents.push({ type: 'text', text: `🚚 จัดส่งโดย: ${deliveryArr[0] || 'ยังไม่มีข้อมูล'}`, size: 'sm', color: '#333333', wrap: true, margin: 'md' });
+  }
 
   // 6. เครดิตเทอม
-  contactBoxContents.push({ type: 'text', text: `💳 เครดิตเทอม: ${info.credit_days || 0} วัน`, size: 'sm', color: '#06C755', weight: 'bold' });
+  contactBoxContents.push({ type: 'text', text: `💳 เครดิตเทอม: ${info.credit_days || 0} วัน`, size: 'sm', color: '#06C755', weight: 'bold', margin: 'md' });
 
   // 7. ไลน์ผู้ติดต่อ (Multiple LINE Contacts & 1-Tap Add Friend Links)
   const lineContactsArr = Array.isArray(info.line_contacts) 
@@ -579,15 +589,17 @@ export function buildStoreSalesDetailsFlex(store, isRecordingSession = false, co
   const isSessionActive = isRecordingSession || (activeSession && activeSession.isRecording === true);
   const displayName = store.store_name || (store.general_info && store.general_info.store_name) || store.name || activeStoreName || lastStoreName || 'ร้านค้า';
 
-  const brandsStr = Array.isArray(details.brands_sold) && details.brands_sold.length > 0 
-    ? details.brands_sold.join(', ') 
-    : (details.brands_sold || 'ไม่ระบุ');
-  const orderedItemsStr = Array.isArray(details.ordered_items) && details.ordered_items.length > 0 
-    ? details.ordered_items.join('\n• ') 
-    : 'ไม่มีรายการสั่งซื้อย้อนหลัง';
-  const topSellingStr = Array.isArray(details.top_selling_products) && details.top_selling_products.length > 0
-    ? details.top_selling_products.join('\n• ')
-    : (Array.isArray(details.top_purchased_products) ? details.top_purchased_products.join('\n• ') : 'ไม่มีข้อมูล');
+  const brandsArr = Array.isArray(details.brands_sold) 
+    ? details.brands_sold 
+    : (details.brands_sold ? String(details.brands_sold).split(/[,;\n]|และ/).map(s => s.trim()).filter(Boolean) : []);
+    
+  const orderedItemsArr = Array.isArray(details.ordered_items) && details.ordered_items.length > 0 
+    ? details.ordered_items 
+    : (details.ordered_items ? String(details.ordered_items).split(/[\n,;]|และ/).map(s => s.trim()).filter(Boolean) : []);
+
+  const topSellingArr = Array.isArray(details.top_selling_products) && details.top_selling_products.length > 0
+    ? details.top_selling_products
+    : (details.top_selling_products ? String(details.top_selling_products).split(/[\n,;]|และ/).map(s => s.trim()).filter(Boolean) : []);
 
   const year = details.calendar_year || new Date().getFullYear();
   const buddhistYear = year + 543;
@@ -613,6 +625,37 @@ export function buildStoreSalesDetailsFlex(store, isRecordingSession = false, co
       color: '#1E3A8A',
       weight: 'bold'
     });
+  }
+
+  // 1. Brands Box Contents
+  const brandsContents = [];
+  if (brandsArr.length > 0) {
+    brandsContents.push({ type: 'text', text: `🏷️ รายชื่อแบรนด์ที่ขาย (${brandsArr.length} แบรนด์):`, size: 'sm', color: '#1E40AF', weight: 'bold', margin: 'xs' });
+    brandsArr.forEach((b, idx) => {
+      brandsContents.push({ type: 'text', text: `  ${idx + 1}. 🏷️ ${b}`, size: 'sm', color: '#374151', wrap: true });
+    });
+  } else {
+    brandsContents.push({ type: 'text', text: `🏷️ แบรนด์ที่ขาย: ไม่ระบุ`, size: 'sm', color: '#4B5563', wrap: true });
+  }
+
+  // 2. Ordered Items Contents
+  const orderedItemsContents = [];
+  if (orderedItemsArr.length > 0) {
+    orderedItemsArr.forEach((item, idx) => {
+      orderedItemsContents.push({ type: 'text', text: `  ${idx + 1}. 📦 ${item}`, size: 'sm', color: '#1F2937', wrap: true, margin: 'xs' });
+    });
+  } else {
+    orderedItemsContents.push({ type: 'text', text: 'ไม่มีรายการสั่งซื้อย้อนหลัง', size: 'sm', color: '#6B7280', wrap: true });
+  }
+
+  // 3. Top Selling Contents
+  const topSellingContents = [];
+  if (topSellingArr.length > 0) {
+    topSellingArr.forEach((item, idx) => {
+      topSellingContents.push({ type: 'text', text: `  ${idx + 1}. ⭐ ${item}`, size: 'sm', color: '#D97706', weight: 'bold', wrap: true, margin: 'xs' });
+    });
+  } else {
+    topSellingContents.push({ type: 'text', text: 'ไม่มีข้อมูลสินค้าขายดี', size: 'sm', color: '#6B7280', wrap: true });
   }
 
   const footerButtons = [
@@ -679,7 +722,7 @@ export function buildStoreSalesDetailsFlex(store, isRecordingSession = false, co
           {
             type: 'box', layout: 'vertical', spacing: 'xs', contents: [
               { type: 'text', text: `💳 ประเภทการชำระ: ${details.payment_type || details.payment_status || 'ไม่ระบุ'}`, size: 'sm', color: '#1E40AF', weight: 'bold' },
-              { type: 'text', text: `🏷️ แบรนด์ที่ขาย (ต่อท้ายสะสม): ${brandsStr}`, size: 'sm', color: '#4B5563', wrap: true },
+              ...brandsContents,
               { type: 'text', text: `📅 สั่งซื้อล่าสุด: ${details.last_order_date || '-'}`, size: 'sm', color: '#4B5563' },
               { type: 'text', text: `💵 ยอดขายล่าสุด: ฿${(details.last_order_amount || 0).toLocaleString()}`, size: 'sm', color: '#10B981', weight: 'bold' },
               { type: 'text', text: `📊 ยอดขายสะสมปีปฏิทิน ${year} (พ.ศ. ${buddhistYear}):`, size: 'xs', color: '#2563EB', weight: 'bold', margin: 'xs' },
@@ -697,15 +740,15 @@ export function buildStoreSalesDetailsFlex(store, isRecordingSession = false, co
           { type: 'separator', margin: 'sm' },
           {
             type: 'box', layout: 'vertical', spacing: 'xs', contents: [
-              { type: 'text', text: '📦 สินค้าที่สั่ง (ต่อท้ายสะสมเพิ่มให้อัตโนมัติ):', size: 'xs', color: '#6B7280', weight: 'bold' },
-              { type: 'text', text: orderedItemsStr, size: 'sm', color: '#1F2937', wrap: true, margin: 'xs' }
+              { type: 'text', text: `📦 สินค้าที่สั่ง (${orderedItemsArr.length} รายการ):`, size: 'xs', color: '#6B7280', weight: 'bold' },
+              ...orderedItemsContents
             ]
           },
           { type: 'separator', margin: 'sm' },
           {
             type: 'box', layout: 'vertical', spacing: 'xs', contents: [
-              { type: 'text', text: '⭐ สินค้าขายดีประจำร้าน (ต่อท้ายสะสมเพิ่มให้อัตโนมัติ):', size: 'xs', color: '#6B7280', weight: 'bold' },
-              { type: 'text', text: topSellingStr, size: 'sm', color: '#D97706', weight: 'bold', wrap: true, margin: 'xs' }
+              { type: 'text', text: `⭐ สินค้าขายดีประจำร้าน (${topSellingArr.length} รายการ):`, size: 'xs', color: '#6B7280', weight: 'bold' },
+              ...topSellingContents
             ]
           }
         ]
@@ -733,6 +776,34 @@ export function buildStoreSalesOpportunitiesFlex(store, isRecordingSession = fal
   const displayName = store.store_name || (store.general_info && store.general_info.store_name) || store.name || activeStoreName || lastStoreName || 'ร้านค้า';
 
   const googleCalUrl = generateGoogleCalendarUrl(displayName, opp, info);
+
+  const recProductsArr = Array.isArray(opp.recommended_products)
+    ? opp.recommended_products
+    : (opp.recommended_products ? String(opp.recommended_products).split(/[\n,;]|และ/).map(s => s.trim()).filter(Boolean) : []);
+
+  const recProductsContents = [];
+  if (recProductsArr.length > 0) {
+    recProductsArr.forEach((item, idx) => {
+      recProductsContents.push({
+        type: 'text',
+        text: `  ${idx + 1}. 🛍️ ${item}`,
+        size: 'sm',
+        color: '#059669',
+        weight: 'bold',
+        wrap: true,
+        margin: 'xs'
+      });
+    });
+  } else {
+    recProductsContents.push({
+      type: 'text',
+      text: 'ไม่มีสินค้าแนะนำ',
+      size: 'sm',
+      color: '#6B7280',
+      wrap: true,
+      margin: 'xs'
+    });
+  }
 
   const footerButtons = [
     {
@@ -807,8 +878,8 @@ export function buildStoreSalesOpportunitiesFlex(store, isRecordingSession = fal
           },
           {
             type: 'box', layout: 'vertical', margin: 'sm', contents: [
-              { type: 'text', text: '🛍️ สินค้าแนะนำเสนอขาย (Upsell/Cross-sell):', size: 'xs', color: '#92400E', weight: 'bold' },
-              { type: 'text', text: Array.isArray(opp.recommended_products) && opp.recommended_products.length > 0 ? opp.recommended_products.join('\n• ') : (opp.recommended_products || 'ไม่มี'), size: 'sm', color: '#059669', weight: 'bold', wrap: true, margin: 'xs' }
+              { type: 'text', text: `🛍️ สินค้าแนะนำเสนอขาย (${recProductsArr.length} รายการ):`, size: 'xs', color: '#92400E', weight: 'bold' },
+              ...recProductsContents
             ]
           }
         ]

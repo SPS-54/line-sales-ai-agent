@@ -516,8 +516,11 @@ export const db = {
       const oldOpp = store.sales_opportunities || {};
       let mergedRec = Array.isArray(oldOpp.recommended_products) ? [...oldOpp.recommended_products] : [];
       if (oppData.recommended_products) {
-        oppData.recommended_products.forEach(p => {
-          if (!mergedRec.includes(p)) mergedRec.push(p);
+        const newRecs = Array.isArray(oppData.recommended_products)
+          ? oppData.recommended_products
+          : String(oppData.recommended_products).split(/[,;\n]|และ/).map(s => s.trim()).filter(Boolean);
+        newRecs.forEach(p => {
+          if (p && !mergedRec.includes(p)) mergedRec.push(p);
         });
       }
       store.sales_opportunities = {
