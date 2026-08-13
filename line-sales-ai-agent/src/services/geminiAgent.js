@@ -184,7 +184,7 @@ export async function processUserMessage(userMessage, contextId = 'default', use
 
   // 1. ตรวจสอบสถานะรอรับค่าเฉพาะหัวข้อเดียว (1-Field Prompt Response Handling)
   const pendingField = sessionStore.findActivePendingField(contextId);
-  if (pendingField && !text.includes('ขอเพิ่ม') && !text.includes('ขอเปลี่ยน') && !text.includes('ขอใส่') && !text.includes('ขอเลือกลบ') && !text.includes('ขอข้อมูล') && !text.includes('แบบฟอร์ม')) {
+  if (pendingField && !text.includes('ขอเพิ่ม') && !text.includes('ขอเปลี่ยน') && !text.includes('ขอใส่') && !text.includes('ขอเลือกลบ') && !text.includes('ขอข้อมูล') && !text.includes('แบบฟอร์ม') && !text.includes('จบการบันทึก') && !text.includes('เสร็จสิ้นการบันทึก') && !text.includes('เลิกบันทึก')) {
     return handleSingleFieldPromptResponse(pendingField, userMessage, contextId);
   }
 
@@ -242,6 +242,16 @@ function handleSingleFieldPromptResponse(pendingField, userMessage, contextId = 
     flexMessage = isRecordingSession ? buildAll3CategoryFlexCards(store, true) : buildStoreGeneralInfoFlex(store, false, contextId);
   } else if (field === 'notes') {
     store = db.saveGeneralInfo(storeName, { notes: userMessage.trim() }, 'append', contextId);
+    flexMessage = isRecordingSession ? buildAll3CategoryFlexCards(store, true) : buildStoreGeneralInfoFlex(store, false, contextId);
+  } else if (field === 'line_contact') {
+    const rawInput = userMessage.trim();
+    let lineUrl = rawInput;
+    if (rawInput.startsWith('@')) {
+      lineUrl = `https://line.me/R/ti/p/~${rawInput}`;
+    } else if (rawInput.match(/^[a-zA-Z0-9_\-\.]+$/)) {
+      lineUrl = `https://line.me/R/ti/p/~${rawInput}`;
+    }
+    store = db.saveGeneralInfo(storeName, { line_contact: lineUrl, line_contacts: [lineUrl] }, 'append', contextId);
     flexMessage = isRecordingSession ? buildAll3CategoryFlexCards(store, true) : buildStoreGeneralInfoFlex(store, false, contextId);
   }
   // หมวดข้อมูลการขาย (Sales Details)
@@ -390,6 +400,8 @@ function handleLocalFallbackMode(userMessage, contextId = 'default', userId = nu
     const targetStoreName = activeSession ? activeSession.storeName : (cleanStoreName(rawTarget) || sessionStore.getLastStore(contextId) || 'ร้านค้า');
 
     sessionStore.clearActiveStoreSession(contextId);
+    sessionStore.clearPendingField(contextId);
+    sessionStore.clearPending(contextId);
     const store = db.findStoreByName(targetStoreName, contextId) || { store_name: targetStoreName };
     const displayStoreName = store.store_name || targetStoreName || 'ร้านค้า';
 
