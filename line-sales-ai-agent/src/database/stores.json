@@ -61,8 +61,10 @@
       "top_selling_products": []
     },
     "sales_opportunities": {
-      "recommended_products": []
+      "recommended_products": [
+        "SPS ไม้แขวนเสื้อลวด No.999"
+      ]
     },
-    "updated_at": "2026-08-13T13:58:24.505Z"
+    "updated_at": "2026-08-13T13:59:37.128Z"
   }
 ]
