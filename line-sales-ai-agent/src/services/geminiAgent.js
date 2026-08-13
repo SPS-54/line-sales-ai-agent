@@ -367,7 +367,7 @@ function handleLocalFallbackMode(userMessage, contextId = 'default', userId = nu
 
   // 🎯 0.2 หากกำลังอยู่ในโหมดบันทึกข้อมูลพื้นฐานร้านค้าค้างอยู่ (Active Store Recording Session Fallback)
   const activeSession = sessionStore.getActiveStoreSession(contextId);
-  if (activeSession && activeSession.isRecording && !text.includes('ขอข้อมูล') && !text.includes('ขอรายละเอียด') && !text.includes('แบบฟอร์ม') && !text.includes('การขาย') && !text.includes('โอกาส') && !text.includes('ขอเพิ่ม') && !text.includes('ขอเปลี่ยน') && !text.includes('ขอใส่')) {
+  if (activeSession && activeSession.isRecording && !text.includes('จบการบันทึก') && !text.includes('แสดงรายชื่อ') && !text.includes('รายชื่อ') && !text.includes('ขอข้อมูล') && !text.includes('ขอรายละเอียด') && !text.includes('แบบฟอร์ม') && !text.includes('การขาย') && !text.includes('โอกาส') && !text.includes('ขอเพิ่ม') && !text.includes('ขอเปลี่ยน') && !text.includes('ขอใส่')) {
     const storeName = activeSession.storeName;
     const parsed = parseGeneralInfoText(userMessage);
     const updatedStore = db.saveGeneralInfo(storeName, parsed, 'append', contextId);
@@ -505,13 +505,14 @@ function handleLocalFallbackMode(userMessage, contextId = 'default', userId = nu
     return { text: `🗓️ กรุณาพิมพ์แผนงานวันเข้าเสนอขายใหม่ของร้าน "${storeName}" ส่งมาได้เลยค่ะ:\n*(เช่น: 15 กันยายน 2026 / สัปดาห์หน้า)*`, flexMessage: null };
   }
 
-  // C0. คำสั่งแสดงรายชื่อและที่อยู่ของร้านค้า ( Master Admin รวมข้อมูลทุกกลุ่มแชต / ยูสเซอร์ทั่วไปเห็นเฉพาะกลุ่มตนเอง )
+  // C0. คำสั่งแสดงรายชื่อและที่อยู่ของร้านค้า ( Master Admin รวมข้อมูลทุกกลุ่มแชตเฉพาะในแชตส่วนตัว 1-on-1 เท่านั้น )
   if (text.includes('แสดงรายชื่อ') || text.includes('ขอรายชื่อ') || text.includes('รายชื่อร้าน') || text.includes('รายชื่อร้านค้า') || text.includes('ร้านค้าทั้งหมด')) {
-    const isMaster = db.isMasterAdmin(userId, contextId);
-    const targetCtx = isMaster ? 'all' : contextId;
+    const isPrivateChat = String(contextId || '').trim().toLowerCase() === String(userId || '').trim().toLowerCase();
+    const isMasterGlobalView = isPrivateChat && db.isMasterAdmin(userId, contextId);
+    const targetCtx = isMasterGlobalView ? 'all' : contextId;
     const stores = db.getStores(targetCtx);
 
-    const masterNotice = isMaster ? '👑 [มุมมองผู้ดูแลหลัก - รวมทุกกลุ่มแชต]: ' : '';
+    const masterNotice = isMasterGlobalView ? '👑 [มุมมองผู้ดูแลหลัก - รายชื่อรวมทุกกลุ่มแชต]: ' : '';
 
     // C0.1 หากสั่งดูทั้งหมดในระบบ
     if (text.includes('แสดงรายชื่อทั้งหมด') && !text.includes('จ.') && !text.includes('จังหวัด')) {
@@ -600,8 +601,9 @@ function handleLocalFallbackMode(userMessage, contextId = 'default', userId = nu
   else if (text.includes('ขอข้อมูลร้าน') || text.includes('ขอข้อมูลพื้นฐาน') || text.includes('ขอข้อมูล') || text.includes('ดึงข้อมูลร้าน')) {
     const rawTarget = text.replace(/ขอข้อมูลร้าน|ขอข้อมูลพื้นฐาน|ขอข้อมูล|ดึงข้อมูลร้าน|ดึงข้อมูล|ร้าน/g, '').trim();
     const targetStoreName = cleanStoreName(rawTarget) || sessionStore.getLastStore(contextId);
-    const isMaster = db.isMasterAdmin(userId, contextId);
-    const store = db.findStoreByName(targetStoreName, isMaster ? 'all' : contextId);
+    const isPrivateChat = String(contextId || '').trim().toLowerCase() === String(userId || '').trim().toLowerCase();
+    const isMasterGlobalView = isPrivateChat && db.isMasterAdmin(userId, contextId);
+    const store = db.findStoreByName(targetStoreName, isMasterGlobalView ? 'all' : contextId);
     if (store) {
       sessionStore.setLastStore(contextId, store.store_name);
       return {
