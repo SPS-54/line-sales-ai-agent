@@ -270,7 +270,9 @@ export const db = {
         address: infoData.address !== undefined ? infoData.address : oldInfo.address,
         map_url: mergedMap,
         delivery_by: mergedDelivery,
-        delivery_schedule: mergedDelivery
+        delivery_schedule: mergedDelivery,
+        notes: mergedNotes,
+        credit_days: infoData.credit_days !== undefined ? infoData.credit_days : oldInfo.credit_days
       };
     } else {
       store.general_info = {
