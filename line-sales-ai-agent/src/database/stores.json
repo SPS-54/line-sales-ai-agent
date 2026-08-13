@@ -61,16 +61,8 @@
       "top_selling_products": []
     },
     "sales_opportunities": {
-      "recommended_products": [
-        "SPS ไม้แขวนเสื้อลวด No.999\nSPS ทิชชู่\nSC พลาสติก",
-        "SPS ไม้แขวนเสื้อลวด No.999",
-        "SPS ทิชชู่",
-        "SC พลาสติก ร้านเชียงใหม่ซุปเปอร์ถูก"
-      ],
-      "opportunity_status": null,
-      "reason": null,
-      "target_pitch_date": null
+      "recommended_products": []
     },
-    "updated_at": "2026-08-13T13:58:13.991Z"
+    "updated_at": "2026-08-13T13:58:24.505Z"
   }
 ]
