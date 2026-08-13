@@ -1,0 +1,13 @@
+{
+  "allow_all": false,
+  "master_admin": "U38d0a817340a8b35375641be73a86b5e",
+  "allowed_users": [
+    "default",
+    "U38d0a817340a8b35375641be73a86b5e",
+    "U38d0a817340abb35375641be73a86b5e",
+    "U_NEW_EMPLOYEE_999"
+  ],
+  "allowed_groups": [
+    "default"
+  ]
+}

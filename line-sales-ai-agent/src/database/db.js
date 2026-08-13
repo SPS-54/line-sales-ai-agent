@@ -10,6 +10,7 @@ const storesFilePath = fs.existsSync(path.join(__dirname, 'stores.json'))
 const productsFilePath = fs.existsSync(path.join(__dirname, 'products.json'))
   ? path.join(__dirname, 'products.json')
   : path.join(__dirname, 'initialProducts.json');
+const whitelistFilePath = path.join(__dirname, 'whitelist.json');
 
 export function cleanStoreName(name) {
   if (!name) return '';
@@ -68,6 +69,83 @@ export function parseCalendarYearMonth(dateInput) {
 }
 
 export const db = {
+  getWhitelist() {
+    try {
+      if (!fs.existsSync(whitelistFilePath)) {
+        return { allow_all: false, allowed_users: ['default'], allowed_groups: ['default'] };
+      }
+      const data = fs.readFileSync(whitelistFilePath, 'utf-8');
+      return JSON.parse(data);
+    } catch {
+      return { allow_all: false, allowed_users: ['default'], allowed_groups: ['default'] };
+    }
+  },
+
+  saveWhitelist(wl) {
+    fs.writeFileSync(whitelistFilePath, JSON.stringify(wl, null, 2), 'utf-8');
+  },
+
+  getMasterAdmin() {
+    const wl = this.getWhitelist();
+    return wl.master_admin || 'U38d0a817340a8b35375641be73a86b5e';
+  },
+
+  isMasterAdmin(userId, contextId) {
+    const adminId = String(this.getMasterAdmin()).trim().toLowerCase();
+    const cleanUser = String(userId || '').trim().toLowerCase();
+    const cleanCtx = String(contextId || '').trim().toLowerCase();
+    if (cleanUser === 'default' || cleanCtx === 'default') return true;
+    return cleanUser === adminId || cleanCtx === adminId;
+  },
+
+  isContextAllowed(contextId, userId = null) {
+    const wl = this.getWhitelist();
+    if (wl.allow_all === true) return true;
+
+    const cleanCtx = String(contextId || 'default').trim();
+    const cleanUser = String(userId || contextId || 'default').trim();
+
+    if (cleanCtx === 'default' || cleanUser === 'default') return true;
+
+    const isGroupAllowed = Array.isArray(wl.allowed_groups) && wl.allowed_groups.some(g => String(g).trim() === cleanCtx);
+    const isUserAllowed = Array.isArray(wl.allowed_users) && wl.allowed_users.some(u => String(u).trim() === cleanUser);
+
+    // หากเป็นการคุยในกลุ่มไลน์ (contextId !== userId) -> ตรวจเฉพาะสิทธิ์กลุ่มไลน์
+    if (cleanCtx !== cleanUser) {
+      return isGroupAllowed;
+    }
+
+    // หากเป็นการคุยส่วนตัว 1-on-1 (contextId === userId) -> ตรวจสิทธิ์เฉพาะรายบุคคลเท่านั้น
+    return isUserAllowed;
+  },
+
+  addAllowedContext(contextId, type = 'user') {
+    const wl = this.getWhitelist();
+    const cleanId = String(contextId || 'default').trim();
+    if (type === 'group') {
+      if (!Array.isArray(wl.allowed_groups)) wl.allowed_groups = [];
+      if (!wl.allowed_groups.includes(cleanId)) wl.allowed_groups.push(cleanId);
+    } else {
+      if (!Array.isArray(wl.allowed_users)) wl.allowed_users = [];
+      if (!wl.allowed_users.includes(cleanId)) wl.allowed_users.push(cleanId);
+    }
+    this.saveWhitelist(wl);
+    return wl;
+  },
+
+  removeAllowedContext(contextId) {
+    const wl = this.getWhitelist();
+    const cleanId = String(contextId || 'default').trim();
+    if (Array.isArray(wl.allowed_users)) {
+      wl.allowed_users = wl.allowed_users.filter(u => String(u).trim() !== cleanId);
+    }
+    if (Array.isArray(wl.allowed_groups)) {
+      wl.allowed_groups = wl.allowed_groups.filter(g => String(g).trim() !== cleanId);
+    }
+    this.saveWhitelist(wl);
+    return wl;
+  },
+
   getStores(contextId = null) {
     try {
       const data = fs.readFileSync(storesFilePath, 'utf-8');
