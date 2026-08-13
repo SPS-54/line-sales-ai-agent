@@ -116,7 +116,10 @@ export const db = {
     if (this.isMasterAdmin(userId, contextId)) return true;
 
     const isGroupAllowed = Array.isArray(wl.allowed_groups) && wl.allowed_groups.some(g => String(g).trim().toLowerCase() === cleanCtx);
-    const isUserAllowed = Array.isArray(wl.allowed_users) && wl.allowed_users.some(u => String(u).trim().toLowerCase() === cleanUser);
+    const isUserAllowed = Array.isArray(wl.allowed_users) && wl.allowed_users.some(u => {
+      const cleanU = String(u).trim().toLowerCase();
+      return cleanU === cleanUser || cleanU === cleanCtx;
+    });
 
     // หากเป็นการคุยในกลุ่มไลน์ (contextId !== userId) -> ตรวจสิทธิ์กลุ่มไลน์
     if (cleanCtx !== cleanUser) {
