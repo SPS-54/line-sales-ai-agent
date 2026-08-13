@@ -1,6 +1,7 @@
 import { config } from '../config.js';
 import { db, cleanStoreName } from '../database/db.js';
 import { sessionStore } from './sessionStore.js';
+import { syncWhitelistToGitHub } from './githubService.js';
 import { 
   parseGeneralInfoText, 
   parseSalesDetailsText, 
@@ -42,19 +43,48 @@ export async function processUserMessage(userMessage, contextId = 'default', use
   // 0. ตรวจสอบสิทธิ์การใช้งาน (Security Whitelist Check)
   const isAllowed = db.isContextAllowed(contextId, userId);
 
-  // คำสั่งแอดมินลงทะเบียนสิทธิ์
+  // คำสั่งแอดมินลงทะเบียนสิทธิ์ (เฉพาะเครื่องหลัก Master Admin เท่านั้น)
   if (text.includes('ลงทะเบียนสิทธิ์กลุ่มนี้') || text.includes('ลงทะเบียนกลุ่มนี้') || text.includes('อนุมัติกลุ่มนี้')) {
+    if (!db.isMasterAdmin(userId, contextId)) {
+      return {
+        text: `⛔ ขออภัยค่ะ คำสั่งลงทะเบียนอนุมัติสิทธิ์กลุ่มแชต สามารถทำได้โดยเครื่องผู้ดูแลระบบหลัก (Master Admin) เท่านั้นค่ะ`,
+        flexMessage: null
+      };
+    }
     db.addAllowedContext(contextId, 'group');
+    syncWhitelistToGitHub().catch(() => {});
     return {
-      text: `🔒 ลงทะเบียนอนุมัติสิทธิ์การใช้งานของกลุ่มแชตนี้ (${contextId}) เรียบร้อยแล้วค่ะ!`,
+      text: `🔒 [Master Admin Approved]: ลงทะเบียนอนุมัติสิทธิ์การใช้งานของกลุ่มแชตนี้ (${contextId}) เรียบร้อยแล้วค่ะ!`,
       flexMessage: null
     };
   }
   if (text.includes('ลงทะเบียนสิทธิ์ผู้ใช้') || text.includes('ลงทะเบียนผู้ใช้') || text.includes('อนุมัติผู้ใช้')) {
+    if (!db.isMasterAdmin(userId, contextId)) {
+      return {
+        text: `⛔ ขออภัยค่ะ คำสั่งลงทะเบียนอนุมัติสิทธิ์ผู้ใช้งาน สามารถทำได้โดยเครื่องผู้ดูแลระบบหลัก (Master Admin) เท่านั้นค่ะ`,
+        flexMessage: null
+      };
+    }
     const targetUser = text.replace(/ลงทะเบียนสิทธิ์ผู้ใช้|ลงทะเบียนผู้ใช้|อนุมัติผู้ใช้/g, '').trim() || (userId || contextId);
     db.addAllowedContext(targetUser, 'user');
+    syncWhitelistToGitHub().catch(() => {});
     return {
-      text: `🔒 ลงทะเบียนอนุมัติสิทธิ์ผู้ใช้งาน (${targetUser}) เรียบร้อยแล้วค่ะ!`,
+      text: `🔒 [Master Admin Approved]: ลงทะเบียนอนุมัติสิทธิ์ผู้ใช้งาน (${targetUser}) เรียบร้อยแล้วค่ะ!`,
+      flexMessage: null
+    };
+  }
+  if (text.includes('ยกเลิกสิทธิ์กลุ่ม') || text.includes('ยกเลิกสิทธิ์ผู้ใช้')) {
+    if (!db.isMasterAdmin(userId, contextId)) {
+      return {
+        text: `⛔ ขออภัยค่ะ คำสั่งยกเลิกสิทธิ์ สามารถทำได้โดยเครื่องผู้ดูแลระบบหลัก (Master Admin) เท่านั้นค่ะ`,
+        flexMessage: null
+      };
+    }
+    const targetId = text.replace(/ยกเลิกสิทธิ์กลุ่ม|ยกเลิกสิทธิ์ผู้ใช้/g, '').trim() || contextId;
+    db.removeAllowedContext(targetId);
+    syncWhitelistToGitHub().catch(() => {});
+    return {
+      text: `🔒 [Master Admin Action]: ยกเลิกสิทธิ์การใช้งานของ (${targetId}) เรียบร้อยแล้วค่ะ!`,
       flexMessage: null
     };
   }
@@ -64,15 +94,17 @@ export async function processUserMessage(userMessage, contextId = 'default', use
     const cleanGroups = (wl.allowed_groups || []).filter(g => g !== 'default');
 
     const usersList = cleanUsers.length > 0
-      ? cleanUsers.map((u, i) => `  ${i + 1}. 👤 ${u}`).join('\n')
+      ? cleanUsers.map((u, i) => `  ${i + 1}. 👤 ${u}${u === wl.master_admin ? ' 👑 [Master Admin]' : ''}`).join('\n')
       : '  (ยังไม่มีผู้ใช้เพิ่มเติม)';
 
     const groupsList = cleanGroups.length > 0
       ? cleanGroups.map((g, i) => `  ${i + 1}. 👥 ${g}`).join('\n')
       : '  (ยังไม่มีกลุ่มแชตเพิ่มเติม)';
 
+    const masterAdminNotice = `👑 เครื่องผู้ดูแลหลัก (Master Admin): ${wl.master_admin || 'ยังไม่ได้กำหนด'}`;
+
     return {
-      text: `🛡️ รายการสิทธิ์ที่ได้รับอนุมัติในระบบ (Whitelist Status):\n\n👤 ผู้ใช้ส่วนตัวที่ได้รับอนุมัติ (${cleanUsers.length} คน):\n${usersList}\n\n👥 กลุ่มแชตไลน์ที่ได้รับอนุมัติ (${cleanGroups.length} กลุ่ม):\n${groupsList}\n\n📌 กลุ่ม/แชตปัจจุบันนี้: ${isAllowed ? '✅ ได้รับอนุมัติสิทธิ์แล้ว' : '❌ ยังไม่ได้รับสิทธิ์'}`,
+      text: `🛡️ รายการสิทธิ์ที่ได้รับอนุมัติในระบบ (Whitelist Status):\n${masterAdminNotice}\n\n👤 ผู้ใช้ส่วนตัวที่ได้รับอนุมัติ (${cleanUsers.length} คน):\n${usersList}\n\n👥 กลุ่มแชตไลน์ที่ได้รับอนุมัติ (${cleanGroups.length} กลุ่ม):\n${groupsList}\n\n📌 กลุ่ม/แชตปัจจุบันนี้: ${isAllowed ? '✅ ได้รับอนุมัติสิทธิ์แล้ว' : '❌ ยังไม่ได้รับสิทธิ์'}`,
       flexMessage: null
     };
   }
