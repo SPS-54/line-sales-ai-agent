@@ -1,30 +1,29 @@
 [
   {
-    "id": "STORE-1786626129442",
+    "id": "STORE-1786627573184",
     "context_id": "Cacc76a409026f869d53813bb94cc0c58",
-    "store_name": "เชียงใหม่ซุปเปอร์ถูก",
+    "store_name": "เชียงใหม่ซุปเปอร์ถูก อ.แม่ริม จ.เชียงใหม่",
     "general_info": {
-      "store_name": "เชียงใหม่ซุปเปอร์ถูก",
+      "store_name": "เชียงใหม่ซุปเปอร์ถูก อ.แม่ริม จ.เชียงใหม่",
       "contact_persons": [
-        "เฮียย้ง (เจ้าของร้าน)",
-        "พี่ปี(สั่งของ)"
+        "คุณแบงค์"
       ],
-      "phone": "ร้าน 053298851, มือถือร้าน 0946930597",
+      "phone": "ร้าน 053298851, มือถือร้าน 0819998888",
       "phones": [
         "ร้าน 053298851",
-        "มือถือร้าน 0946930597"
+        "มือถือร้าน 0819998888"
       ],
-      "address": "อ.แม่ริม จ.เชียงใหม่",
-      "map_url": "https://maps.app.goo.gl/K6eHAGC9KjWBmaj57?g_st=ic",
-      "delivery_by": "สหทิพย์ทอง",
-      "delivery_schedule": "สหทิพย์ทอง",
-      "notes": "เวลาทำงาน 09.00-17.00 น. , ไม่รับเซลล์วันอาทิตย์",
-      "credit_days": 30,
+      "address": null,
+      "map_url": "",
+      "delivery_by": "",
+      "delivery_schedule": "",
+      "notes": "",
+      "credit_days": null,
       "line_contact": null,
       "line_contacts": null
     },
     "sales_details": {
-      "payment_type": "โอนเงินเข้าบริษัท",
+      "payment_type": "ไม่ระบุ",
       "brands_sold": [
         "TTI",
         "Triple-P"
@@ -61,6 +60,6 @@
       "top_selling_products": []
     },
     "sales_opportunities": {},
-    "updated_at": "2026-08-13T13:18:59.477Z"
+    "updated_at": "2026-08-13T13:26:13.209Z"
   }
 ]

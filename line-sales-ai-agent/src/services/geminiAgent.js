@@ -30,7 +30,9 @@ import {
   buildFormGuideFlex,
   buildWizardPromptFlex,
   buildMasterSystemOverviewFlex,
-  buildWhitelistStatusFlex
+  buildWhitelistStatusFlex,
+  buildBrandOrderedItemsFlex,
+  getMatchingBrand
 } from './lineFormatter.js';
 
 const SYSTEM_INSTRUCTION = `คุณคือ "SalesAI Assistant" ผู้ช่วยพนักงานขายอัจฉริยะในไลน์
@@ -696,7 +698,28 @@ function handleLocalFallbackMode(userMessage, contextId = 'default', userId = nu
   }
 
   // C. คำสั่งดึงข้อมูลสรุปตามหมวดหมู่ (Retrieval Commands)
-  if (text.includes('ขอข้อมูลการขาย') || text.includes('ขอรายละเอียดการขาย') || text.includes('ขอยอดขาย') || text.includes('ขอประวัติการสั่ง')) {
+  if (text.includes('ดูสินค้าสั่งซื้อ') || text.includes('ขอซูมสินค้า') || text.includes('ดูสินค้าแบรนด์')) {
+    const match = text.match(/(?:ดูสินค้าสั่งซื้อ|ขอซูมสินค้า|ดูสินค้าแบรนด์)\s+([^\s]+)\s*(?:ร้าน)?\s*(.*)/i);
+    let targetBrand = match ? match[1].trim() : null;
+    let rawStoreName = match ? match[2].trim() : null;
+    
+    if (!rawStoreName) rawStoreName = sessionStore.getLastStore(contextId);
+    const store = db.findStoreByName(rawStoreName, contextId);
+
+    if (store && targetBrand) {
+      const details = store.sales_details || {};
+      const brandsArr = Array.isArray(details.brands_sold) ? details.brands_sold : [];
+      const orderedItemsArr = Array.isArray(details.ordered_items) ? details.ordered_items : [];
+      
+      const matchedItems = orderedItemsArr.filter(item => getMatchingBrand(item, [targetBrand, ...brandsArr]) === targetBrand || String(item).toLowerCase().includes(targetBrand.toLowerCase()));
+      
+      return {
+        text: `📦 รายชื่อสินค้าที่สั่งซื้อแบรนด์ "${targetBrand}" ของร้าน "${store.store_name}" ค่ะ (${matchedItems.length > 0 ? matchedItems.length : orderedItemsArr.length} รายการ)`,
+        flexMessage: buildBrandOrderedItemsFlex(store, targetBrand, matchedItems.length > 0 ? matchedItems : orderedItemsArr)
+      };
+    }
+  }
+  else if (text.includes('ขอข้อมูลการขาย') || text.includes('ขอรายละเอียดการขาย') || text.includes('ขอยอดขาย') || text.includes('ขอประวัติการสั่ง')) {
     const storeName = text.replace(/ขอข้อมูลการขาย|ขอรายละเอียดการขาย|ขอประวัติการสั่ง|ขอยอดขายร้าน|ขอยอดขาย|ยอดขายร้าน|ยอดขาย|ร้าน/g, '').trim();
     const store = db.findStoreByName(storeName, contextId);
     if (store) {

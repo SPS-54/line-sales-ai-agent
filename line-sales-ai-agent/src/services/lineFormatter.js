@@ -576,6 +576,38 @@ export function buildStoreGeneralInfoFlex(store, isRecordingSession = false, con
 }
 
 /**
+ * ช่วยแมตช์ชื่อสินค้าว่าตรงหรือใกล้เคียงกับแบรนด์ใดหรือไม่ (Smart Brand Matcher V1.3)
+ */
+export function getMatchingBrand(item, brands) {
+  if (!item || typeof item !== 'string') return null;
+  const cleanItem = item.trim().toUpperCase();
+  if (!Array.isArray(brands) || brands.length === 0) return null;
+
+  for (const brand of brands) {
+    if (!brand) continue;
+    const cleanBrand = String(brand).trim().toUpperCase();
+    if (!cleanBrand) continue;
+
+    // 1. Direct match or prefix
+    if (cleanItem.startsWith(cleanBrand) || cleanItem.includes(` ${cleanBrand} `) || cleanItem.includes(` ${cleanBrand}-`)) {
+      return brand;
+    }
+
+    // 2. PPP <-> Triple-P / Triple P alias
+    if ((cleanBrand.includes('TRIPLE') || cleanBrand.includes('PPP') || cleanBrand.includes('3P')) &&
+        (cleanItem.startsWith('PPP') || cleanItem.startsWith('3P') || cleanItem.includes('PPP') || cleanItem.includes('TRIPLE'))) {
+      return brand;
+    }
+
+    // 3. Substring match
+    if (cleanBrand.length >= 2 && cleanItem.includes(cleanBrand)) {
+      return brand;
+    }
+  }
+  return null;
+}
+
+/**
  * 3. ข้อมูลการขายของร้านค้า (Store Sales Details Flex Card)
  */
 export function buildStoreSalesDetailsFlex(store, isRecordingSession = false, contextId = 'default') {
@@ -638,12 +670,83 @@ export function buildStoreSalesDetailsFlex(store, isRecordingSession = false, co
     brandsContents.push({ type: 'text', text: `🏷️ แบรนด์ที่ขาย: ไม่ระบุ`, size: 'sm', color: '#4B5563', wrap: true });
   }
 
-  // 2. Ordered Items Contents
+  // 2. Ordered Items Contents (Smart Brand Grouping V1.3)
   const orderedItemsContents = [];
+  const brandGroups = {};
+  const ungroupedItems = [];
+
   if (orderedItemsArr.length > 0) {
-    orderedItemsArr.forEach((item, idx) => {
-      orderedItemsContents.push({ type: 'text', text: `  ${idx + 1}. 📦 ${item}`, size: 'sm', color: '#1F2937', wrap: true, margin: 'xs' });
+    orderedItemsArr.forEach(item => {
+      const matchedBrand = getMatchingBrand(item, brandsArr);
+      if (matchedBrand) {
+        if (!brandGroups[matchedBrand]) brandGroups[matchedBrand] = [];
+        brandGroups[matchedBrand].push(item);
+      } else {
+        ungroupedItems.push(item);
+      }
     });
+
+    const groupedBrandNames = Object.keys(brandGroups);
+
+    if (groupedBrandNames.length > 0) {
+      groupedBrandNames.forEach(bName => {
+        const groupItems = brandGroups[bName];
+        orderedItemsContents.push({
+          type: 'text',
+          text: `🏷️ กรุ๊ปแบรนด์ ${bName} (${groupItems.length} รายการ):`,
+          size: 'xs',
+          color: '#1E40AF',
+          weight: 'bold',
+          margin: 'md'
+        });
+
+        groupItems.slice(0, 3).forEach((gItem, idx) => {
+          orderedItemsContents.push({
+            type: 'text',
+            text: `  ${idx + 1}. 📦 ${gItem}`,
+            size: 'sm',
+            color: '#374151',
+            wrap: true
+          });
+        });
+
+        orderedItemsContents.push({
+          type: 'button',
+          style: 'secondary',
+          height: 'sm',
+          margin: 'xs',
+          action: {
+            type: 'message',
+            label: `📦 🔍 ดูสินค้าสั่งซื้อ ${bName} (${groupItems.length} รายการ)`,
+            text: `ดูสินค้าสั่งซื้อ ${bName} ร้าน${displayName}`
+          }
+        });
+      });
+
+      if (ungroupedItems.length > 0) {
+        orderedItemsContents.push({
+          type: 'text',
+          text: `📦 สินค้าที่สั่งอื่นๆ (${ungroupedItems.length} รายการ):`,
+          size: 'xs',
+          color: '#4B5563',
+          weight: 'bold',
+          margin: 'md'
+        });
+        ungroupedItems.forEach((uItem, idx) => {
+          orderedItemsContents.push({
+            type: 'text',
+            text: `  ${idx + 1}. 📦 ${uItem}`,
+            size: 'sm',
+            color: '#1F2937',
+            wrap: true
+          });
+        });
+      }
+    } else {
+      orderedItemsArr.forEach((item, idx) => {
+        orderedItemsContents.push({ type: 'text', text: `  ${idx + 1}. 📦 ${item}`, size: 'sm', color: '#1F2937', wrap: true, margin: 'xs' });
+      });
+    }
   } else {
     orderedItemsContents.push({ type: 'text', text: 'ไม่มีรายการสั่งซื้อย้อนหลัง', size: 'sm', color: '#6B7280', wrap: true });
   }
@@ -1724,6 +1827,53 @@ export function buildMasterSystemOverviewFlex(stores = []) {
           {
             type: 'button', style: 'primary', color: '#06C755', height: 'sm',
             action: { type: 'message', label: '📋 แสดงรายชื่อทั้งหมดในระบบ', text: 'แสดงรายชื่อทั้งหมด' }
+          }
+        ]
+      }
+    }
+  };
+}
+
+/**
+ * 4.2 การ์ดแสดงผลสินค้าที่สั่งซื้อแยกตามกรุ๊ปแบรนด์ (Brand Sub-Group Ordered Items Flex Card V1.3)
+ */
+export function buildBrandOrderedItemsFlex(store, brandName, items = []) {
+  if (!store) return null;
+  const displayName = store.store_name || (store.general_info && store.general_info.store_name) || store.name || 'ร้านค้า';
+
+  const itemContents = items.map((item, idx) => ({
+    type: 'text',
+    text: `${idx + 1}. 📦 ${item}`,
+    size: 'sm',
+    color: '#1F2937',
+    wrap: true,
+    margin: 'xs'
+  }));
+
+  return {
+    type: 'flex',
+    altText: `รายการสินค้าสั่งซื้อแบรนด์ ${brandName}: ${displayName}`,
+    contents: {
+      type: 'bubble',
+      size: 'mega',
+      header: {
+        type: 'box', layout: 'vertical', backgroundColor: '#059669', paddingAll: 'lg',
+        contents: [
+          { type: 'text', text: `📦 สินค้าที่สั่งซื้อแบรนด์: ${brandName}`, color: '#FFFFFF', size: 'lg', weight: 'bold' },
+          { type: 'text', text: `ร้าน: ${displayName} (รวม ${items.length} รายการ)`, color: '#ECFDF5', size: 'xs', margin: 'xs' }
+        ]
+      },
+      body: {
+        type: 'box', layout: 'vertical', spacing: 'xs', contents: [
+          { type: 'text', text: `📋 รายชื่อสินค้าที่สั่งซื้อแบรนด์ ${brandName} ทั้งหมด:`, size: 'xs', color: '#065F46', weight: 'bold' },
+          ...itemContents
+        ]
+      },
+      footer: {
+        type: 'box', layout: 'vertical', spacing: 'xs', contents: [
+          {
+            type: 'button', style: 'primary', height: 'sm', color: '#3B82F6',
+            action: { type: 'message', label: '📊 กลับไปดูข้อมูลการขายทั้งหมด', text: `ขอข้อมูลการขายร้าน${displayName}` }
           }
         ]
       }
