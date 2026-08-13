@@ -262,17 +262,54 @@ export const db = {
         mergedDelivery = mergedDelivery ? `${mergedDelivery} | ${infoData.delivery_by}` : infoData.delivery_by;
       }
 
+      let mergedPhones = Array.isArray(oldInfo.phones) ? [...oldInfo.phones] : [];
+      if (oldInfo.phone && mergedPhones.length === 0) {
+        mergedPhones.push(oldInfo.phone);
+      }
+
+      if (infoData.phones) {
+        const newArr = Array.isArray(infoData.phones) ? infoData.phones : [infoData.phones];
+        newArr.forEach(p => {
+          if (p && !mergedPhones.includes(p)) mergedPhones.push(p);
+        });
+      } else if (infoData.phone) {
+        const splitNew = String(infoData.phone).split(/[,;\n\/]|และ/).map(s => s.trim()).filter(Boolean);
+        splitNew.forEach(p => {
+          if (p && !mergedPhones.includes(p)) mergedPhones.push(p);
+        });
+      }
+
+      let mergedLineContacts = Array.isArray(oldInfo.line_contacts) ? [...oldInfo.line_contacts] : [];
+      if (oldInfo.line_contact && mergedLineContacts.length === 0) {
+        mergedLineContacts.push(oldInfo.line_contact);
+      }
+
+      if (infoData.line_contacts) {
+        const newArr = Array.isArray(infoData.line_contacts) ? infoData.line_contacts : [infoData.line_contacts];
+        newArr.forEach(l => {
+          if (l && !mergedLineContacts.includes(l)) mergedLineContacts.push(l);
+        });
+      } else if (infoData.line_contact) {
+        const splitNew = String(infoData.line_contact).split(/[,;\n]|และ/).map(s => s.trim()).filter(Boolean);
+        splitNew.forEach(l => {
+          if (l && !mergedLineContacts.includes(l)) mergedLineContacts.push(l);
+        });
+      }
+
       store.general_info = {
         ...oldInfo,
         store_name: targetName,
         contact_persons: mergedContacts,
-        phone: infoData.phone !== undefined ? infoData.phone : oldInfo.phone,
+        phone: mergedPhones.length > 0 ? mergedPhones.join(', ') : (infoData.phone !== undefined ? infoData.phone : oldInfo.phone),
+        phones: mergedPhones.length > 0 ? mergedPhones : null,
         address: infoData.address !== undefined ? infoData.address : oldInfo.address,
         map_url: mergedMap,
         delivery_by: mergedDelivery,
         delivery_schedule: mergedDelivery,
         notes: mergedNotes,
-        credit_days: infoData.credit_days !== undefined ? infoData.credit_days : oldInfo.credit_days
+        credit_days: infoData.credit_days !== undefined ? infoData.credit_days : oldInfo.credit_days,
+        line_contact: mergedLineContacts.length > 0 ? mergedLineContacts.join(', ') : null,
+        line_contacts: mergedLineContacts.length > 0 ? mergedLineContacts : null
       };
     } else {
       store.general_info = {

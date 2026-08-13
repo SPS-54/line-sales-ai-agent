@@ -14,6 +14,7 @@ const KEYWORD_MAP = [
   { key: 'delivery_by', regex: /(?:จัดส่งโดย|ช่องทางจัดส่ง|จัดส่ง|ขนส่ง)/i },
   { key: 'credit_days', regex: /(?:เครดิตเทอม|เครดิต)/i },
   { key: 'notes', regex: /(?:โน้ตเพิ่มเติม|หมายเหตุ|โน้ต)/i },
+  { key: 'line_contact', regex: /(?:ไลน์ผู้ติดต่อ|ไลน์ร้าน|ติดต่อไลน์|ไลน์ไอดี|line\s*id|line\s*contact|ไลน์)/i },
   // Sales Details
   { key: 'payment_type', regex: /(?:ประเภทการชำระ|ประเภทชำระ|การชำระเงิน|การชำระ|วิธีชำระ|ชำระเงิน)/i },
   { key: 'brands_sold', regex: /(?:แบรนด์ที่ขาย|แบรนด์|ยี่ห้อ)/i },
@@ -95,17 +96,26 @@ export function parseAllStoreCategories(text) {
   const contactPersons = contactRaw ? contactRaw.split(/[,;\n]|และ/).map(c => cleanValue(c)).filter(Boolean) : [];
   const creditNum = parsedData.credit_days ? parseInt(parsedData.credit_days.replace(/\D/g, '')) : null;
 
+  const phoneRaw = parsedData.phone;
+  const phones = phoneRaw ? phoneRaw.split(/[,;\n\/]|และ/).map(p => cleanValue(p)).filter(Boolean) : [];
+
+  const lineRaw = parsedData.line_contact;
+  const lineContacts = lineRaw ? lineRaw.split(/[,;\n]|และ/).map(l => cleanValue(l)).filter(Boolean) : [];
+
   const general_info = {
     store_name: storeName,
     contact_person: contactPersons.length > 0 ? contactPersons.join(', ') : null,
     contact_persons: contactPersons.length > 0 ? contactPersons : null,
-    phone: parsedData.phone || null,
+    phone: phones.length > 0 ? phones.join(', ') : (parsedData.phone || null),
+    phones: phones.length > 0 ? phones : null,
     address: parsedData.address || null,
     map_url: parsedData.map_url || null,
     delivery_by: parsedData.delivery_by || null,
     delivery_schedule: parsedData.delivery_by || null,
     credit_days: isNaN(creditNum) ? null : creditNum,
-    notes: parsedData.notes || null
+    notes: parsedData.notes || null,
+    line_contact: lineContacts.length > 0 ? lineContacts.join(', ') : null,
+    line_contacts: lineContacts.length > 0 ? lineContacts : null
   };
 
   // 5.2 ข้อมูลการขาย (Sales Details)

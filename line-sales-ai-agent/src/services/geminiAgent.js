@@ -384,10 +384,10 @@ function handleLocalFallbackMode(userMessage, contextId = 'default', userId = nu
     sessionStore.setPendingField(contextId, { storeName, field: 'contact_persons', label: 'รายชื่อผู้ติดต่อ', mode: 'append' });
     return { text: `👥 กรุณาพิมพ์รายชื่อผู้ติดต่อใหม่ของร้าน "${storeName}" ส่งมาได้เลยค่ะ:\n*(เช่น: คุณชัย 086-777-8888)*`, flexMessage: null };
   }
-  else if (text.includes('ขอเปลี่ยนเบอร์ร้าน')) {
-    const storeName = cleanStoreName(userMessage.replace(/ขอเปลี่ยนเบอร์ร้าน/g, '').trim());
-    sessionStore.setPendingField(contextId, { storeName, field: 'phone', label: 'เบอร์โทรศัพท์หลัก', mode: 'replace' });
-    return { text: `📞 กรุณาพิมพ์เบอร์โทรศัพท์หลักใหม่ของร้าน "${storeName}" ส่งมาได้เลยค่ะ:\n*(เช่น: 089-999-8888)*`, flexMessage: null };
+  else if (text.includes('ขอเพิ่มเบอร์ร้าน') || text.includes('ขอเปลี่ยนเบอร์ร้าน')) {
+    const storeName = cleanStoreName(userMessage.replace(/ขอเพิ่มเบอร์ร้าน|ขอเปลี่ยนเบอร์ร้าน/g, '').trim());
+    sessionStore.setPendingField(contextId, { storeName, field: 'phone', label: 'เบอร์โทรศัพท์', mode: 'append' });
+    return { text: `📞 กรุณาพิมพ์เบอร์โทรศัพท์ของร้าน "${storeName}" ส่งมาได้เลยค่ะ (สามารถเพิ่มได้หลายเบอร์ โดยใช้เครื่องหมายจุลภาค , หรือเว้นวรรค):\n*(เช่น: 089-999-8888, 081-222-3333)*`, flexMessage: null };
   }
   else if (text.includes('ขอเปลี่ยนที่อยู่ร้าน')) {
     const storeName = cleanStoreName(userMessage.replace(/ขอเปลี่ยนที่อยู่ร้าน/g, '').trim());
@@ -413,6 +413,11 @@ function handleLocalFallbackMode(userMessage, contextId = 'default', userId = nu
     const storeName = cleanStoreName(userMessage.replace(/ขอเพิ่มโน้ตร้าน/g, '').trim());
     sessionStore.setPendingField(contextId, { storeName, field: 'notes', label: 'โน้ตเพิ่มเติม', mode: 'append' });
     return { text: `📌 กรุณาพิมพ์ข้อความโน้ตเพิ่มเติมของร้าน "${storeName}" ส่งมาได้เลยค่ะ:\n*(เช่น: ให้โทรแจ้งก่อนเข้าส่ง 1 ชั่วโมง)*`, flexMessage: null };
+  }
+  else if (text.includes('ขอเพิ่มไลน์ร้าน') || text.includes('ขอเปลี่ยนไลน์ร้าน') || text.includes('ขอใส่ไลน์ร้าน')) {
+    const storeName = cleanStoreName(userMessage.replace(/ขอเพิ่มไลน์ร้าน|ขอเปลี่ยนไลน์ร้าน|ขอใส่ไลน์ร้าน/g, '').trim());
+    sessionStore.setPendingField(contextId, { storeName, field: 'line_contact', label: 'ไลน์ผู้ติดต่อ', mode: 'replace' });
+    return { text: `💬 กรุณาพิมพ์ LINE ID หรือ ลิ้งค์เพิ่มเพื่อน LINE ของร้าน "${storeName}" ส่งมาได้เลยค่ะ:\n*(เช่น: @store_owner / https://line.me/ti/p/XYZ123)*`, flexMessage: null };
   }
 
   // 🎯 2. คำสั่งกดปุ่ม 1-Tap หมวดข้อมูลการขาย (Sales Details)
@@ -633,7 +638,7 @@ function handleLocalFallbackMode(userMessage, contextId = 'default', userId = nu
   }
 
   // A. บันทึกและสกัดข้อมูลอัตโนมัติตามหัวข้อที่ตรงกัน (Auto-Classify & Save All Matching Topics - Single & Multiline)
-  if (text.includes('ผู้ติดต่อ') || text.includes('เบอร์') || text.includes('โทร') || text.includes('ที่อยู่') || text.includes('แผนที่') || text.includes('จัดส่ง') || text.includes('เครดิต') || text.includes('โน้ต') || text.includes('ชำระ') || text.includes('แบรนด์') || text.includes('สั่งซื้อ') || text.includes('ยอดขาย') || text.includes('ขายดี') || text.includes('สถานะ') || text.includes('แนะนำ') || text.includes('เหตุผล') || text.includes('โอกาสทอง') || text.includes('แผนงาน') || text.includes('เสนอขาย')) {
+  if (text.includes('ผู้ติดต่อ') || text.includes('เบอร์') || text.includes('โทร') || text.includes('ที่อยู่') || text.includes('แผนที่') || text.includes('จัดส่ง') || text.includes('เครดิต') || text.includes('โน้ต') || text.includes('ไลน์') || text.includes('line') || text.includes('ชำระ') || text.includes('แบรนด์') || text.includes('สั่งซื้อ') || text.includes('ยอดขาย') || text.includes('ขายดี') || text.includes('สถานะ') || text.includes('แนะนำ') || text.includes('เหตุผล') || text.includes('โอกาสทอง') || text.includes('แผนงาน') || text.includes('เสนอขาย')) {
     const allParsed = parseAllStoreCategories(userMessage);
 
     let storeName = allParsed.store_name;

@@ -367,8 +367,19 @@ export function buildStoreGeneralInfoFlex(store, isRecordingSession = false, con
     });
   }
 
-  // 2. เบอร์โทรศัพท์หลัก
-  contactBoxContents.push({ type: 'text', text: `📞 เบอร์โทรศัพท์หลัก: ${info.phone || 'ยังไม่มีข้อมูล'}`, size: 'sm', color: '#333333', margin: 'md' });
+  // 2. เบอร์โทรศัพท์หลัก (Multiple Phone Numbers)
+  const phonesArr = Array.isArray(info.phones)
+    ? info.phones
+    : (info.phone ? String(info.phone).split(/[,;\n\/]|และ/).map(s => s.trim()).filter(Boolean) : []);
+
+  if (phonesArr.length > 0) {
+    contactBoxContents.push({ type: 'text', text: `📞 รายชื่อเบอร์โทรศัพท์ (${phonesArr.length} เบอร์):`, size: 'sm', color: '#333333', weight: 'bold', margin: 'md' });
+    phonesArr.forEach((phone, idx) => {
+      contactBoxContents.push({ type: 'text', text: `  ${idx + 1}. 📱 ${phone}`, size: 'sm', color: '#111111' });
+    });
+  } else {
+    contactBoxContents.push({ type: 'text', text: `📞 เบอร์โทรศัพท์หลัก: ยังไม่มีข้อมูล`, size: 'sm', color: '#333333', margin: 'md' });
+  }
 
   // 3. ที่อยู่ร้าน
   contactBoxContents.push({ type: 'text', text: `📍 ที่อยู่ร้าน: ${info.address || 'ยังไม่มีข้อมูล'}`, size: 'sm', color: '#333333', wrap: true });
@@ -382,6 +393,40 @@ export function buildStoreGeneralInfoFlex(store, isRecordingSession = false, con
 
   // 6. เครดิตเทอม
   contactBoxContents.push({ type: 'text', text: `💳 เครดิตเทอม: ${info.credit_days || 0} วัน`, size: 'sm', color: '#06C755', weight: 'bold' });
+
+  // 7. ไลน์ผู้ติดต่อ (Multiple LINE Contacts & 1-Tap Add Friend Links)
+  const lineContactsArr = Array.isArray(info.line_contacts) 
+    ? info.line_contacts 
+    : (info.line_contact ? String(info.line_contact).split(/[,;\n]|และ/).map(s => s.trim()).filter(Boolean) : []);
+
+  if (lineContactsArr.length > 0) {
+    contactBoxContents.push({
+      type: 'text',
+      text: `💬 รายชื่อไลน์ผู้ติดต่อ (${lineContactsArr.length} รายการ):`,
+      size: 'sm',
+      color: '#06C755',
+      weight: 'bold',
+      margin: 'xs'
+    });
+
+    lineContactsArr.forEach((contact, idx) => {
+      contactBoxContents.push({
+        type: 'text',
+        text: `  ${idx + 1}. 🟢 ${contact}`,
+        size: 'sm',
+        color: '#111111',
+        wrap: true
+      });
+    });
+  } else {
+    contactBoxContents.push({
+      type: 'text',
+      text: `💬 ไลน์ผู้ติดต่อ: ยังไม่มีข้อมูล`,
+      size: 'sm',
+      color: '#333333',
+      margin: 'xs'
+    });
+  }
 
   const footerButtons = [
     {
@@ -421,10 +466,44 @@ export function buildStoreGeneralInfoFlex(store, isRecordingSession = false, con
       ]
     },
     {
-      type: 'button', style: 'primary', height: 'sm', color: '#F59E0B',
-      action: { type: 'message', label: '📌 +เพิ่มโน้ตใหม่', text: `ขอเพิ่มโน้ตร้าน${displayName}` }
+      type: 'box', layout: 'horizontal', spacing: 'xs', contents: [
+        {
+          type: 'button', style: 'primary', height: 'sm', color: '#06C755', flex: 1,
+          action: { type: 'message', label: '💬 +เพิ่มไลน์ผู้ติดต่อ', text: `ขอเพิ่มไลน์ร้าน${displayName}` }
+        },
+        {
+          type: 'button', style: 'primary', height: 'sm', color: '#F59E0B', flex: 1,
+          action: { type: 'message', label: '📌 +เพิ่มโน้ตใหม่', text: `ขอเพิ่มโน้ตร้าน${displayName}` }
+        }
+      ]
     }
   ];
+
+  // สร้างปุ่มแอดไลน์ 1-Tap สำหรับทุกไลน์ที่มีในระบบ (สูงสุด 3 รายการแรก)
+  const addFriendButtons = [];
+  lineContactsArr.slice(0, 3).forEach((contact, idx) => {
+    const raw = String(contact).trim();
+    let uri = null;
+    if (raw.startsWith('http://') || raw.startsWith('https://')) {
+      uri = raw;
+    } else if (raw.startsWith('@')) {
+      uri = `https://line.me/R/ti/p/~${raw}`;
+    } else if (raw.match(/^[a-zA-Z0-9_\-\.]+$/)) {
+      uri = `https://line.me/R/ti/p/~${raw}`;
+    }
+
+    if (uri) {
+      const shortLabel = raw.length > 14 ? raw.substring(0, 12) + '..' : raw;
+      addFriendButtons.push({
+        type: 'button', style: 'primary', height: 'sm', color: '#06C755', margin: 'xs',
+        action: { type: 'uri', label: `🟢 ➕ กดแอดไลน์ #${idx + 1} (${shortLabel})`, uri: uri }
+      });
+    }
+  });
+
+  if (addFriendButtons.length > 0) {
+    footerButtons.unshift(...addFriendButtons);
+  }
 
   if (isSessionActive) {
     footerButtons.push({
