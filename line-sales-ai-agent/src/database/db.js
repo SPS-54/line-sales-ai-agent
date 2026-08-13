@@ -87,35 +87,43 @@ export const db = {
 
   getMasterAdmin() {
     const wl = this.getWhitelist();
-    return wl.master_admin || 'U38d0a817340a8b35375641be73a86b5e';
+    return wl.master_admin || ['U38d0a817340abb35375641be73a86b5e', 'U38d0a817340a8b35375641be73a86b5e'];
   },
 
   isMasterAdmin(userId, contextId) {
-    const adminId = String(this.getMasterAdmin()).trim().toLowerCase();
+    const adminSetting = this.getMasterAdmin();
     const cleanUser = String(userId || '').trim().toLowerCase();
     const cleanCtx = String(contextId || '').trim().toLowerCase();
     if (cleanUser === 'default' || cleanCtx === 'default') return true;
-    return cleanUser === adminId || cleanCtx === adminId;
+
+    const admins = Array.isArray(adminSetting) ? adminSetting : [adminSetting];
+    return admins.some(a => {
+      const cleanA = String(a).trim().toLowerCase();
+      return cleanUser === cleanA || cleanCtx === cleanA;
+    });
   },
 
   isContextAllowed(contextId, userId = null) {
     const wl = this.getWhitelist();
     if (wl.allow_all === true) return true;
 
-    const cleanCtx = String(contextId || 'default').trim();
-    const cleanUser = String(userId || contextId || 'default').trim();
+    const cleanCtx = String(contextId || 'default').trim().toLowerCase();
+    const cleanUser = String(userId || contextId || 'default').trim().toLowerCase();
 
     if (cleanCtx === 'default' || cleanUser === 'default') return true;
 
-    const isGroupAllowed = Array.isArray(wl.allowed_groups) && wl.allowed_groups.some(g => String(g).trim() === cleanCtx);
-    const isUserAllowed = Array.isArray(wl.allowed_users) && wl.allowed_users.some(u => String(u).trim() === cleanUser);
+    // Master Admin มีสิทธิ์ใช้งานทุกที่และทุกโหมดแบบ 100%
+    if (this.isMasterAdmin(userId, contextId)) return true;
 
-    // หากเป็นการคุยในกลุ่มไลน์ (contextId !== userId) -> ตรวจเฉพาะสิทธิ์กลุ่มไลน์
+    const isGroupAllowed = Array.isArray(wl.allowed_groups) && wl.allowed_groups.some(g => String(g).trim().toLowerCase() === cleanCtx);
+    const isUserAllowed = Array.isArray(wl.allowed_users) && wl.allowed_users.some(u => String(u).trim().toLowerCase() === cleanUser);
+
+    // หากเป็นการคุยในกลุ่มไลน์ (contextId !== userId) -> ตรวจสิทธิ์กลุ่มไลน์
     if (cleanCtx !== cleanUser) {
       return isGroupAllowed;
     }
 
-    // หากเป็นการคุยส่วนตัว 1-on-1 (contextId === userId) -> ตรวจสิทธิ์เฉพาะรายบุคคลเท่านั้น
+    // หากเป็นการคุยส่วนตัว 1-on-1 (contextId === userId) -> ตรวจสิทธิ์เฉพาะรายบุคคล
     return isUserAllowed;
   },
 
