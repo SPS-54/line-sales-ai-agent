@@ -77,7 +77,12 @@ const server = http.createServer(async (req, res) => {
             const source = event.source || {};
             const contextId = source.groupId || source.roomId || source.userId || 'default';
             console.log(`[User LINE Msg (${contextId})]: ${userText}`);
-            const aiResult = await processUserMessage(userText, contextId);
+            const aiResult = await processUserMessage(userText, contextId, source.userId);
+            
+            if (!aiResult) {
+              console.log(`[LINE Reply Ignored]: Context (${contextId}) / User (${source.userId}) is not registered.`);
+              continue;
+            }
             
             // Reply via LINE Messaging API if Access Token is provided
             if (config.line.channelAccessToken && config.line.channelAccessToken !== 'your_line_channel_access_token_here') {

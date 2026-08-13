@@ -321,12 +321,13 @@ export function buildAddProductGuideFlex() {
 /**
  * 2. ข้อมูลพื้นฐานร้านค้า (Store Profile Flex Card - 7 หัวข้อหลัก)
  */
-export function buildStoreGeneralInfoFlex(store, isRecordingSession = false) {
+export function buildStoreGeneralInfoFlex(store, isRecordingSession = false, contextId = 'default') {
   if (!store) return null;
+  const ctx = store.context_id || contextId || 'default';
   const info = store.general_info || store;
-  const activeSession = sessionStore.getActiveStoreSession('default');
+  const activeSession = sessionStore.getActiveStoreSession(ctx);
   const activeStoreName = activeSession ? activeSession.storeName : null;
-  const lastStoreName = sessionStore.getLastStore('default');
+  const lastStoreName = sessionStore.getLastStore(ctx);
 
   const isSessionActive = isRecordingSession || (activeSession && activeSession.isRecording === true);
 
@@ -469,12 +470,13 @@ export function buildStoreGeneralInfoFlex(store, isRecordingSession = false) {
 /**
  * 3. ข้อมูลการขายของร้านค้า (Store Sales Details Flex Card)
  */
-export function buildStoreSalesDetailsFlex(store, isRecordingSession = false) {
+export function buildStoreSalesDetailsFlex(store, isRecordingSession = false, contextId = 'default') {
   if (!store) return null;
+  const ctx = store.context_id || contextId || 'default';
   const details = store.sales_details || {};
-  const activeSession = sessionStore.getActiveStoreSession('default');
+  const activeSession = sessionStore.getActiveStoreSession(ctx);
   const activeStoreName = activeSession ? activeSession.storeName : null;
-  const lastStoreName = sessionStore.getLastStore('default');
+  const lastStoreName = sessionStore.getLastStore(ctx);
 
   const isSessionActive = isRecordingSession || (activeSession && activeSession.isRecording === true);
   const displayName = store.store_name || (store.general_info && store.general_info.store_name) || store.name || activeStoreName || lastStoreName || 'ร้านค้า';
@@ -620,13 +622,14 @@ export function buildStoreSalesDetailsFlex(store, isRecordingSession = false) {
 /**
  * 4. โอกาสเสนอขายของร้านค้า (Store Sales Opportunities Flex Card)
  */
-export function buildStoreSalesOpportunitiesFlex(store, isRecordingSession = false) {
+export function buildStoreSalesOpportunitiesFlex(store, isRecordingSession = false, contextId = 'default') {
   if (!store) return null;
+  const ctx = store.context_id || contextId || 'default';
   const opp = store.sales_opportunities || {};
   const info = store.general_info || {};
-  const activeSession = sessionStore.getActiveStoreSession('default');
+  const activeSession = sessionStore.getActiveStoreSession(ctx);
   const activeStoreName = activeSession ? activeSession.storeName : null;
-  const lastStoreName = sessionStore.getLastStore('default');
+  const lastStoreName = sessionStore.getLastStore(ctx);
 
   const isSessionActive = isRecordingSession || (activeSession && activeSession.isRecording === true);
   const displayName = store.store_name || (store.general_info && store.general_info.store_name) || store.name || activeStoreName || lastStoreName || 'ร้านค้า';
