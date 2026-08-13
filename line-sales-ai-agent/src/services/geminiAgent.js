@@ -160,14 +160,20 @@ export async function processUserMessage(userMessage, contextId = 'default', use
     const cleanGroups = (wl.allowed_groups || []).filter(g => g !== 'default');
 
     const usersList = cleanUsers.length > 0
-      ? cleanUsers.map((u, i) => `  ${i + 1}. 👤 ${db.getFriendlyName(u)}`).join('\n')
+      ? cleanUsers.map((u, i) => {
+          const isMaster = db.isMasterAdmin(u, u);
+          const icon = isMaster ? '👑' : '👤';
+          return `  ${i + 1}. ${icon} ${db.getFriendlyName(u)}`;
+        }).join('\n')
       : '  (ยังไม่มีผู้ใช้เพิ่มเติม)';
 
     const groupsList = cleanGroups.length > 0
       ? cleanGroups.map((g, i) => `  ${i + 1}. 👥 ${db.getFriendlyName(g)}`).join('\n')
       : '  (ยังไม่มีกลุ่มแชตเพิ่มเติม)';
 
-    const currentCtxLabel = db.getFriendlyName(contextId);
+    const isCurrentMaster = db.isMasterAdmin(userId, contextId);
+    const currentIcon = isCurrentMaster ? '👑' : ((contextId.startsWith('C') || contextId.startsWith('R')) ? '👥' : '👤');
+    const currentCtxLabel = `${currentIcon} ${db.getFriendlyName(contextId)}`;
     const flexCard = buildWhitelistStatusFlex(wl, currentCtxLabel, isAllowed);
 
     return {

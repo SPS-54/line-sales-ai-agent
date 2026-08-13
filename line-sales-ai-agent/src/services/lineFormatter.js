@@ -1483,15 +1483,19 @@ export function buildWhitelistStatusFlex(wl, currentCtxLabel, isAllowed) {
   const cleanUsers = (wl.allowed_users || []).filter(u => u !== 'default');
   const cleanGroups = (wl.allowed_groups || []).filter(g => g !== 'default');
 
-  const userItems = cleanUsers.map((u, i) => ({
-    type: 'box', layout: 'horizontal', margin: 'xs', contents: [
-      { type: 'text', text: `${i + 1}. ${db.getFriendlyName(u)}`, size: 'sm', color: '#1E293B', wrap: true }
-    ]
-  }));
+  const userItems = cleanUsers.map((u, i) => {
+    const isMaster = db.isMasterAdmin(u, u);
+    const icon = isMaster ? '👑' : '👤';
+    return {
+      type: 'box', layout: 'horizontal', margin: 'xs', contents: [
+        { type: 'text', text: `${i + 1}. ${icon} ${db.getFriendlyName(u)}`, size: 'sm', color: '#1E293B', wrap: true }
+      ]
+    };
+  });
 
   const groupItems = cleanGroups.map((g, i) => ({
     type: 'box', layout: 'horizontal', margin: 'xs', contents: [
-      { type: 'text', text: `${i + 1}. ${db.getFriendlyName(g)}`, size: 'sm', color: '#1E293B', wrap: true }
+      { type: 'text', text: `${i + 1}. 👥 ${db.getFriendlyName(g)}`, size: 'sm', color: '#1E293B', wrap: true }
     ]
   }));
 
