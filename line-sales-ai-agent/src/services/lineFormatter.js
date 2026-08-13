@@ -1377,3 +1377,117 @@ export function buildFilteredStoresListFlex(titleLabel, stores = []) {
 export function buildAllStoresListFlex(stores = []) {
   return buildProvinceGroupFlex(stores);
 }
+
+/**
+ * สรุปรายงานผลรวมภาพรวมระบบทั้งหมด (Master System Overview Dashboard Flex Card)
+ * @param {Array} stores - รายการร้านค้าทั้งหมดในระบบ
+ */
+export function buildMasterSystemOverviewFlex(stores = []) {
+  const totalStores = stores.length;
+  let totalSales = 0;
+  let highOppCount = 0;
+  const provinceMap = {};
+  const productMap = {};
+
+  stores.forEach(s => {
+    // Sales Amount
+    const salesAmt = (s.sales_details && s.sales_details.last_order_amount) || s.last_order_amount || 0;
+    totalSales += (typeof salesAmt === 'number' ? salesAmt : 0);
+
+    // High Opportunity Count
+    const status = (s.sales_opportunities && s.sales_opportunities.opportunity_status) || '';
+    if (status.includes('สูง') || status.includes('🔥') || status.includes('High')) {
+      highOppCount++;
+    }
+
+    // Province Breakdown
+    const addr = (s.general_info && s.general_info.address) || s.address || '';
+    const provMatch = addr.match(/(?:จ\.|จังหวัด)\s*([^\s,]+)/);
+    const prov = provMatch ? provMatch[1].trim() : 'ไม่ระบุจังหวัด';
+    provinceMap[prov] = (provinceMap[prov] || 0) + 1;
+
+    // Top Selling Products Breakdown
+    const topProds = (s.sales_details && s.sales_details.top_selling_products) || [];
+    if (Array.isArray(topProds)) {
+      topProds.forEach(p => {
+        if (p) productMap[p] = (productMap[p] || 0) + 1;
+      });
+    }
+  });
+
+  const sortedProvinces = Object.entries(provinceMap).sort((a, b) => b[1] - a[1]);
+  const sortedProducts = Object.entries(productMap).sort((a, b) => b[1] - a[1]).slice(0, 5);
+
+  const provContents = sortedProvinces.slice(0, 6).map(([p, count]) => ({
+    type: 'box', layout: 'horizontal', margin: 'xs', contents: [
+      { type: 'text', text: `📍 จ.${p}`, size: 'sm', color: '#475569', flex: 3 },
+      { type: 'text', text: `${count} ร้าน`, size: 'sm', color: '#0F172A', weight: 'bold', align: 'end', flex: 2 }
+    ]
+  }));
+
+  const prodContents = sortedProducts.map(([p, count], idx) => ({
+    type: 'box', layout: 'horizontal', margin: 'xs', contents: [
+      { type: 'text', text: `${idx + 1}. 🏆 ${p}`, size: 'sm', color: '#475569', flex: 3 },
+      { type: 'text', text: `${count} ร้าน`, size: 'sm', color: '#06C755', weight: 'bold', align: 'end', flex: 2 }
+    ]
+  }));
+
+  return {
+    type: 'flex',
+    altText: `👑 สรุปภาพรวมผลรวมทั้งระบบ (${totalStores} ร้านค้า | ฿${totalSales.toLocaleString()})`,
+    contents: {
+      type: 'bubble',
+      size: 'mega',
+      header: {
+        type: 'box', layout: 'vertical', backgroundColor: '#0F172A', paddingAll: 'lg',
+        contents: [
+          { type: 'text', text: '👑 MASTER SYSTEM DASHBOARD', color: '#F59E0B', size: 'xs', weight: 'bold' },
+          { type: 'text', text: '📊 สรุปผลรวมภาพรวมระบบทั้งหมด', color: '#FFFFFF', size: 'lg', weight: 'bold', margin: 'xs' }
+        ]
+      },
+      body: {
+        type: 'box', layout: 'vertical', spacing: 'md', contents: [
+          // Row 1: Key Performance Stats
+          {
+            type: 'box', layout: 'horizontal', spacing: 'md', contents: [
+              {
+                type: 'box', layout: 'vertical', backgroundColor: '#F1F5F9', paddingAll: 'md', cornerRadius: 'md', flex: 1, contents: [
+                  { type: 'text', text: '🏪 ร้านค้าทั้งหมด', size: 'xs', color: '#64748B' },
+                  { type: 'text', text: `${totalStores.toLocaleString()} ร้าน`, size: 'md', weight: 'bold', color: '#0F172A', margin: 'xs' }
+                ]
+              },
+              {
+                type: 'box', layout: 'vertical', backgroundColor: '#ECFDF5', paddingAll: 'md', cornerRadius: 'md', flex: 1, contents: [
+                  { type: 'text', text: '💰 ยอดขายสะสมรวม', size: 'xs', color: '#047857' },
+                  { type: 'text', text: `${totalSales.toLocaleString()} ฿`, size: 'md', weight: 'bold', color: '#059669', margin: 'xs' }
+                ]
+              }
+            ]
+          },
+          {
+            type: 'box', layout: 'vertical', backgroundColor: '#FEF3C7', paddingAll: 'md', cornerRadius: 'md', contents: [
+              { type: 'text', text: '🔥 ร้านค้าโอกาสทอง / สถานะสูง', size: 'xs', color: '#B45309' },
+              { type: 'text', text: `${highOppCount} ร้านค้า`, size: 'md', weight: 'bold', color: '#D97706', margin: 'xs' }
+            ]
+          },
+          { type: 'separator', margin: 'md' },
+          // Province Breakdown
+          { type: 'text', text: '📍 สรุปจำนวนร้านค้าแยกตามจังหวัด', size: 'sm', weight: 'bold', color: '#0F172A', margin: 'md' },
+          ...provContents,
+          { type: 'separator', margin: 'md' },
+          // Top Products Breakdown
+          { type: 'text', text: '📦 สินค้าขายดีติดอันดับในระบบ', size: 'sm', weight: 'bold', color: '#0F172A', margin: 'md' },
+          ...(prodContents.length > 0 ? prodContents : [{ type: 'text', text: 'ยังไม่มีข้อมูลสินค้าขายดี', size: 'xs', color: '#94A3B8' }])
+        ]
+      },
+      footer: {
+        type: 'box', layout: 'vertical', spacing: 'xs', contents: [
+          {
+            type: 'button', style: 'primary', color: '#06C755', height: 'sm',
+            action: { type: 'message', label: '📋 แสดงรายชื่อทั้งหมดในระบบ', text: 'แสดงรายชื่อทั้งหมด' }
+          }
+        ]
+      }
+    }
+  };
+}

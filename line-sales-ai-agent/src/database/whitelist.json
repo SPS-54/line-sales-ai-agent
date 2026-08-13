@@ -14,6 +14,8 @@
   "allowed_groups": [
     "default",
     "Cacc76a409026f869d53813bb94cc0c58",
-    "C_NEW_UNAPPROVED_GROUP_99"
+    "C_NEW_UNAPPROVED_GROUP_99",
+    "C_GROUP_NORTH_REGION",
+    "C_GROUP_SOUTH_REGION"
   ]
 }

@@ -28,7 +28,8 @@ import {
   buildConfirmationFlex,
   buildCategoryMenuFlex,
   buildFormGuideFlex,
-  buildWizardPromptFlex
+  buildWizardPromptFlex,
+  buildMasterSystemOverviewFlex
 } from './lineFormatter.js';
 
 const SYSTEM_INSTRUCTION = `คุณคือ "SalesAI Assistant" ผู้ช่วยพนักงานขายอัจฉริยะในไลน์
@@ -503,6 +504,22 @@ function handleLocalFallbackMode(userMessage, contextId = 'default', userId = nu
     const storeName = cleanStoreName(userMessage.replace(/ขอเปลี่ยนแผนงานวันเข้าเสนอขายร้าน/g, '').trim());
     sessionStore.setPendingField(contextId, { storeName, field: 'target_pitch_date', label: 'แผนงานวันเข้าเสนอขาย', mode: 'replace' });
     return { text: `🗓️ กรุณาพิมพ์แผนงานวันเข้าเสนอขายใหม่ของร้าน "${storeName}" ส่งมาได้เลยค่ะ:\n*(เช่น: 15 กันยายน 2026 / สัปดาห์หน้า)*`, flexMessage: null };
+  }
+
+  // D0. คำสั่งสรุปผลรวมและภาพรวมระบบทั้งหมด (Master System Overview Dashboard)
+  if (text.includes('ผลรวมทั้งระบบ') || text.includes('ขอดูผลรวมทั้งระบบ') || text.includes('ผลรวมระบบ') || text.includes('สรุปผลรวม') || text.includes('สรุปภาพรวมทั้งระบบ') || text.includes('ภาพรวมทั้งระบบ') || text.includes('สรุปภาพรวมระบบ')) {
+    const isPrivateChat = String(contextId || '').trim().toLowerCase() === String(userId || '').trim().toLowerCase();
+    const isMasterGlobalView = isPrivateChat && db.isMasterAdmin(userId, contextId);
+    
+    const targetCtx = (isMasterGlobalView || db.isMasterAdmin(userId, contextId)) ? 'all' : contextId;
+    const stores = db.getStores(targetCtx);
+
+    const masterNotice = isMasterGlobalView ? '👑 [มุมมองผู้ดูแลหลัก - ผลรวมทั้งระบบ]: ' : '';
+
+    return {
+      text: `${masterNotice}📊 สรุปรายงานผลรวมและภาพรวมระบบทั้งหมด (${stores.length} ร้านค้า) เรียบร้อยแล้วค่ะ!`,
+      flexMessage: buildMasterSystemOverviewFlex(stores)
+    };
   }
 
   // C0. คำสั่งแสดงรายชื่อและที่อยู่ของร้านค้า ( Master Admin รวมข้อมูลทุกกลุ่มแชตเฉพาะในแชตส่วนตัว 1-on-1 เท่านั้น )

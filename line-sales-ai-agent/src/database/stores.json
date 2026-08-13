@@ -1,1 +1,114 @@
-[]
+[
+  {
+    "id": "STORE-1786610909260",
+    "context_id": "C_GROUP_NORTH_REGION",
+    "store_name": "เชียงใหม่การค้า",
+    "general_info": {
+      "store_name": "เชียงใหม่การค้า",
+      "contact_persons": [],
+      "phone": null,
+      "address": "อ.เมือง จ.เชียงใหม่",
+      "map_url": "",
+      "delivery_by": "",
+      "delivery_schedule": "",
+      "notes": "",
+      "credit_days": 60
+    },
+    "sales_details": {
+      "payment_type": "ไม่ระบุ",
+      "brands_sold": [
+        "-"
+      ],
+      "last_order_date": "13/8/2569",
+      "last_order_amount": 50000,
+      "calendar_year": 2069,
+      "calendar_month": 8,
+      "monthly_sales": 50000,
+      "yearly_sales_ytd": 50000,
+      "total_sales_ytd": 50000,
+      "order_history": [
+        {
+          "date": "13/8/2569",
+          "amount": 50000,
+          "year": 2069,
+          "month": 8,
+          "timestamp": 1786610909298
+        }
+      ],
+      "yearly_breakdown": [
+        {
+          "year": 2069,
+          "buddhistYear": 2612,
+          "total": 50000
+        }
+      ],
+      "ordered_items": [],
+      "top_selling_products": [
+        "เสื้อเชิ้ต"
+      ]
+    },
+    "sales_opportunities": {
+      "opportunity_status": null,
+      "recommended_products": [],
+      "reason": "ลูกค้าขยายสาขาใหม่",
+      "target_pitch_date": null
+    },
+    "updated_at": "2026-08-13T08:48:29.302Z"
+  },
+  {
+    "id": "STORE-1786610909318",
+    "context_id": "C_GROUP_SOUTH_REGION",
+    "store_name": "หาดใหญ่เทรดดิ้ง",
+    "general_info": {
+      "store_name": "หาดใหญ่เทรดดิ้ง",
+      "contact_persons": [],
+      "phone": null,
+      "address": "อ.หาดใหญ่ จ.สงขลา",
+      "map_url": "",
+      "delivery_by": "",
+      "delivery_schedule": "",
+      "notes": "",
+      "credit_days": 30
+    },
+    "sales_details": {
+      "payment_type": "ไม่ระบุ",
+      "brands_sold": [
+        "-"
+      ],
+      "last_order_date": "13/8/2569",
+      "last_order_amount": 75000,
+      "calendar_year": 2069,
+      "calendar_month": 8,
+      "monthly_sales": 75000,
+      "yearly_sales_ytd": 75000,
+      "total_sales_ytd": 75000,
+      "order_history": [
+        {
+          "date": "13/8/2569",
+          "amount": 75000,
+          "year": 2069,
+          "month": 8,
+          "timestamp": 1786610909321
+        }
+      ],
+      "yearly_breakdown": [
+        {
+          "year": 2069,
+          "buddhistYear": 2612,
+          "total": 75000
+        }
+      ],
+      "ordered_items": [],
+      "top_selling_products": [
+        "กางเกงยีนส์"
+      ]
+    },
+    "sales_opportunities": {
+      "opportunity_status": null,
+      "recommended_products": [],
+      "reason": "ร้านรีโนเวทใหม่",
+      "target_pitch_date": null
+    },
+    "updated_at": "2026-08-13T08:48:29.324Z"
+  }
+]
