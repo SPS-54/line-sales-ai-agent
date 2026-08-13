@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { syncWhitelistToGitHub, syncStoresToGitHub } from '../services/githubService.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -83,6 +84,12 @@ export const db = {
 
   saveWhitelist(wl) {
     fs.writeFileSync(whitelistFilePath, JSON.stringify(wl, null, 2), 'utf-8');
+    syncWhitelistToGitHub().catch(() => {});
+  },
+
+  saveStores(stores) {
+    fs.writeFileSync(storesFilePath, JSON.stringify(stores, null, 2), 'utf-8');
+    syncStoresToGitHub().catch(() => {});
   },
 
   getMasterAdmin() {
@@ -236,10 +243,6 @@ export const db = {
     } catch {
       return [];
     }
-  },
-
-  saveStores(stores) {
-    fs.writeFileSync(storesFilePath, JSON.stringify(stores, null, 2), 'utf-8');
   },
 
   findStoreByName(name, contextId = null) {
