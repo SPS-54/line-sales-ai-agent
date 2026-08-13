@@ -5,7 +5,8 @@ import { syncWhitelistToGitHub } from './githubService.js';
 import { 
   parseGeneralInfoText, 
   parseSalesDetailsText, 
-  parseSalesOpportunitiesText
+  parseSalesOpportunitiesText,
+  parseAllStoreCategories
 } from '../utils/textParser.js';
 import { 
   getGeneralInfoDeclaration, saveGeneralInfoDeclaration,
@@ -137,7 +138,7 @@ export async function processUserMessage(userMessage, contextId = 'default', use
   }
 
   // 3. ใช้ Local Fallback Mode ประมวลผลคำสั่งตรง
-  return handleLocalFallbackMode(userMessage, contextId);
+  return handleLocalFallbackMode(userMessage, contextId, userId);
 }
 
 // ประมวลผลเมื่อพิมพ์ค่าตอบกลับคำถามเฉพาะหัวข้อเดียว
@@ -313,7 +314,7 @@ function checkConflictAndPrompt(storeName, categoryKey, categoryTitle, parsedDat
   }
 }
 
-function handleLocalFallbackMode(userMessage, contextId = 'default') {
+function handleLocalFallbackMode(userMessage, contextId = 'default', userId = null) {
   const text = userMessage.toLowerCase();
 
   // 🎯 0. คำสั่งจบการบันทึกข้อมูลพื้นฐานร้านค้า (End Store Recording Session)
@@ -504,14 +505,18 @@ function handleLocalFallbackMode(userMessage, contextId = 'default') {
     return { text: `🗓️ กรุณาพิมพ์แผนงานวันเข้าเสนอขายใหม่ของร้าน "${storeName}" ส่งมาได้เลยค่ะ:\n*(เช่น: 15 กันยายน 2026 / สัปดาห์หน้า)*`, flexMessage: null };
   }
 
-  // C0. คำสั่งแสดงรายชื่อและที่อยู่ของทุกร้านค้าที่มีในระบบ (พร้อมจัดกลุ่ม จังหวัด -> อำเภอ)
+  // C0. คำสั่งแสดงรายชื่อและที่อยู่ของร้านค้า ( Master Admin รวมข้อมูลทุกกลุ่มแชต / ยูสเซอร์ทั่วไปเห็นเฉพาะกลุ่มตนเอง )
   if (text.includes('แสดงรายชื่อ') || text.includes('ขอรายชื่อ') || text.includes('รายชื่อร้าน') || text.includes('รายชื่อร้านค้า') || text.includes('ร้านค้าทั้งหมด')) {
-    const stores = db.getStores(contextId);
+    const isMaster = db.isMasterAdmin(userId, contextId);
+    const targetCtx = isMaster ? 'all' : contextId;
+    const stores = db.getStores(targetCtx);
+
+    const masterNotice = isMaster ? '👑 [มุมมองผู้ดูแลหลัก - รวมทุกกลุ่มแชต]: ' : '';
 
     // C0.1 หากสั่งดูทั้งหมดในระบบ
     if (text.includes('แสดงรายชื่อทั้งหมด') && !text.includes('จ.') && !text.includes('จังหวัด')) {
       return {
-        text: `🏪 รายชื่อและที่อยู่ของร้านค้าทั้งหมดในกลุ่มแชตนี้ (${stores.length} ร้าน) ค่ะ:`,
+        text: `${masterNotice}🏪 รายชื่อและที่อยู่ของร้านค้าทั้งหมด (${stores.length} ร้าน) ค่ะ:`,
         flexMessage: buildFilteredStoresListFlex(`ทั้งหมดในระบบ (${stores.length} ร้าน)`, stores)
       };
     }
@@ -525,7 +530,7 @@ function handleLocalFallbackMode(userMessage, contextId = 'default') {
         return loc.province.includes(provName) || provName.includes(loc.province);
       });
       return {
-        text: `🏬 รายชื่อและที่อยู่ของร้านค้าทั้งหมดใน จ.${provName} (${filtered.length} ร้าน) ค่ะ:`,
+        text: `${masterNotice}🏬 รายชื่อและที่อยู่ของร้านค้าทั้งหมดใน จ.${provName} (${filtered.length} ร้าน) ค่ะ:`,
         flexMessage: buildFilteredStoresListFlex(`จ.${provName}`, filtered)
       };
     }
@@ -546,7 +551,7 @@ function handleLocalFallbackMode(userMessage, contextId = 'default') {
       });
 
       return {
-        text: `🏘️ รายชื่อและที่อยู่ของร้านค้าใน ${distName} จ.${provName} (${filtered.length} ร้าน) ค่ะ:`,
+        text: `${masterNotice}🏘️ รายชื่อและที่อยู่ของร้านค้าใน ${distName} จ.${provName} (${filtered.length} ร้าน) ค่ะ:`,
         flexMessage: buildFilteredStoresListFlex(`${distName} จ.${provName}`, filtered)
       };
     }
@@ -563,14 +568,14 @@ function handleLocalFallbackMode(userMessage, contextId = 'default') {
       });
 
       return {
-        text: `📍 พบทั้งหมด ${filtered.length} ร้านค้าใน จ.${provName} ค่ะ กรุณาเลือกกลุ่มย่อยตามอำเภอ/เขต หรือเลือกดูร้านทั้งหมดได้เลยค่ะ:`,
+        text: `${masterNotice}📍 พบทั้งหมด ${filtered.length} ร้านค้าใน จ.${provName} ค่ะ กรุณาเลือกกลุ่มย่อยตามอำเภอ/เขต หรือเลือกดูร้านทั้งหมดได้เลยค่ะ:`,
         flexMessage: buildDistrictGroupFlex(provName, filtered)
       };
     }
 
     // C0.5 คำสั่งเริ่มต้น "แสดงรายชื่อ" -> แสดงกรุ๊ปตามจังหวัด
     return {
-      text: `📍 กรุณาเลือกจังหวัดที่ต้องการดูรายชื่อร้านค้า หรือเลือกดูร้านค้าทั้งหมดได้เลยค่ะ:`,
+      text: `${masterNotice}📍 กรุณาเลือกจังหวัดที่ต้องการดูรายชื่อร้านค้า หรือเลือกดูร้านค้าทั้งหมดได้เลยค่ะ:`,
       flexMessage: buildProvinceGroupFlex(stores)
     };
   }
@@ -595,7 +600,8 @@ function handleLocalFallbackMode(userMessage, contextId = 'default') {
   else if (text.includes('ขอข้อมูลร้าน') || text.includes('ขอข้อมูลพื้นฐาน') || text.includes('ขอข้อมูล') || text.includes('ดึงข้อมูลร้าน')) {
     const rawTarget = text.replace(/ขอข้อมูลร้าน|ขอข้อมูลพื้นฐาน|ขอข้อมูล|ดึงข้อมูลร้าน|ดึงข้อมูล|ร้าน/g, '').trim();
     const targetStoreName = cleanStoreName(rawTarget) || sessionStore.getLastStore(contextId);
-    const store = db.findStoreByName(targetStoreName, contextId);
+    const isMaster = db.isMasterAdmin(userId, contextId);
+    const store = db.findStoreByName(targetStoreName, isMaster ? 'all' : contextId);
     if (store) {
       sessionStore.setLastStore(contextId, store.store_name);
       return {
@@ -607,74 +613,54 @@ function handleLocalFallbackMode(userMessage, contextId = 'default') {
     }
   }
 
-  // A. บันทึกข้อมูลแบบระบุข้อความเต็มบรรทัด
-  // A1. บันทึกโอกาสเสนอขาย
-  if (text.includes('โอกาส') || text.includes('เสนอขาย') || text.includes('แนะนำ')) {
-    let storeName = null;
-    let rawDetails = userMessage;
+  // A. บันทึกและสกัดข้อมูลอัตโนมัติตามหัวข้อที่ตรงกัน (Auto-Classify & Save All Matching Topics - Single & Multiline)
+  if (text.includes('ผู้ติดต่อ') || text.includes('เบอร์') || text.includes('โทร') || text.includes('ที่อยู่') || text.includes('แผนที่') || text.includes('จัดส่ง') || text.includes('เครดิต') || text.includes('โน้ต') || text.includes('ชำระ') || text.includes('แบรนด์') || text.includes('สั่งซื้อ') || text.includes('ยอดขาย') || text.includes('ขายดี') || text.includes('สถานะ') || text.includes('แนะนำ') || text.includes('เหตุผล') || text.includes('โอกาสทอง') || text.includes('แผนงาน') || text.includes('เสนอขาย')) {
+    const allParsed = parseAllStoreCategories(userMessage);
 
-    if (userMessage.includes(':')) {
-      const parts = userMessage.split(':');
-      storeName = parts[0].replace(/บันทึกโอกาสเสนอขาย|บันทึกโอกาส|โอกาสเสนอขายร้าน|โอกาสเสนอขาย|ร้าน/g, '').trim();
-      rawDetails = parts.slice(1).join(':') || parts[0];
-    }
-
-    const parsed = parseSalesOpportunitiesText(rawDetails);
-    if (!storeName && parsed.store_name) {
-      storeName = parsed.store_name;
-    }
+    let storeName = allParsed.store_name;
     if (!storeName) {
-      const firstWord = userMessage.split(/\s+/)[0];
-      storeName = firstWord.replace(/บันทึกโอกาส|บันทึก|โอกาส/g, '').trim();
+      if (userMessage.includes(':')) {
+        storeName = userMessage.split(':')[0].replace(/บันทึกข้อมูลร้าน|บันทึกข้อมูล|บันทึกร้าน|อัปเดตข้อมูลร้าน|ร้านค้า|ร้าน/g, '').trim();
+      } else {
+        const activeSession = sessionStore.getActiveStoreSession(contextId);
+        storeName = activeSession ? activeSession.storeName : (sessionStore.getLastStore(contextId) || null);
+      }
     }
+    storeName = cleanStoreName(storeName);
 
-    return checkConflictAndPrompt(storeName, 'sales_opportunities', 'โอกาสเสนอขาย', parsed, () => db.saveSalesOpportunities(storeName, parsed, 'replace', contextId), contextId);
-  }
+    if (storeName) {
+      let savedStore = db.findStoreByName(storeName, contextId);
+      let updatedCount = 0;
 
-  // A2. บันทึกข้อมูลการขาย
-  if (text.includes('การชำระ') || text.includes('สั่งซื้อล่าสุด') || text.includes('ยอดขายล่าสุด') || text.includes('สินค้าขายดี')) {
-    let storeName = null;
-    let rawDetails = userMessage;
+      // บันทึกหมวด 1: ข้อมูลพื้นฐานร้านค้า
+      if (allParsed.general_info && Object.values(allParsed.general_info).some(v => v !== null && v !== undefined && v !== '' && !(Array.isArray(v) && v.length === 0))) {
+        savedStore = db.saveGeneralInfo(storeName, allParsed.general_info, 'append', contextId);
+        updatedCount++;
+      }
 
-    if (userMessage.includes(':')) {
-      const parts = userMessage.split(':');
-      storeName = parts[0].replace(/บันทึกข้อมูลการขาย|บันทึกการขาย|ข้อมูลการขายร้าน|ข้อมูลการขาย|ร้าน/g, '').trim();
-      rawDetails = parts.slice(1).join(':') || parts[0];
+      // บันทึกหมวด 2: ข้อมูลการขาย
+      if (allParsed.sales_details && Object.values(allParsed.sales_details).some(v => v !== null && v !== undefined && v !== '' && !(Array.isArray(v) && v.length === 0))) {
+        savedStore = db.saveSalesDetails(storeName, allParsed.sales_details, 'append', contextId);
+        updatedCount++;
+      }
+
+      // บันทึกหมวด 3: โอกาสเสนอขาย
+      if (allParsed.sales_opportunities && Object.values(allParsed.sales_opportunities).some(v => v !== null && v !== undefined && v !== '' && !(Array.isArray(v) && v.length === 0))) {
+        savedStore = db.saveSalesOpportunities(storeName, allParsed.sales_opportunities, 'append', contextId);
+        updatedCount++;
+      }
+
+      if (savedStore && updatedCount > 0) {
+        sessionStore.setLastStore(contextId, savedStore.store_name);
+        const activeSession = sessionStore.getActiveStoreSession(contextId);
+        const isRecordingSession = activeSession && activeSession.isRecording;
+
+        return {
+          text: `✅ สกัดและแยกแยะบันทึกข้อมูลจัดเข้าตามหัวข้อของร้าน "${savedStore.store_name}" เรียบร้อยแล้วค่ะ!`,
+          flexMessage: buildAll3CategoryFlexCards(savedStore, isRecordingSession)
+        };
+      }
     }
-
-    const parsed = parseSalesDetailsText(rawDetails);
-    if (!storeName && parsed.store_name) {
-      storeName = parsed.store_name;
-    }
-    if (!storeName) {
-      const firstWord = userMessage.split(/\s+/)[0];
-      storeName = firstWord.replace(/บันทึกการขาย|บันทึก/g, '').trim();
-    }
-
-    return checkConflictAndPrompt(storeName, 'sales_details', 'ข้อมูลการขาย', parsed, () => db.saveSalesDetails(storeName, parsed, 'append', contextId), contextId);
-  }
-
-  // A3. บันทึกข้อมูลพื้นฐานร้านค้า
-  if (text.includes('ผู้ติดต่อ') || text.includes('เบอร์') || text.includes('โทร') || text.includes('ที่อยู่') || text.includes('แผนที่') || text.includes('จัดส่ง') || text.includes('เครดิต') || text.includes('โน้ต')) {
-    let storeName = null;
-    let rawDetails = userMessage;
-
-    if (userMessage.includes(':')) {
-      const parts = userMessage.split(':');
-      storeName = parts[0].replace(/บันทึกข้อมูลร้าน|บันทึกร้าน|อัปเดตข้อมูลร้าน/g, '').trim();
-      rawDetails = parts.slice(1).join(':') || parts[0];
-    }
-
-    const parsed = parseGeneralInfoText(rawDetails);
-    if (!storeName && parsed.store_name) {
-      storeName = parsed.store_name;
-    }
-    if (!storeName) {
-      const firstWord = userMessage.split(/\s+/)[0];
-      storeName = firstWord.replace(/บันทึกร้าน|บันทึก/g, '').trim();
-    }
-
-    return checkConflictAndPrompt(storeName, 'general_info', 'ข้อมูลพื้นฐานร้านค้า', parsed, () => db.saveGeneralInfo(storeName, parsed, 'append', contextId), contextId);
   }
 
   // B. คำสั่งขอคู่มือ / แบบฟอร์มป้อนข้อมูล (Form Guide & Help)
