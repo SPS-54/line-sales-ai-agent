@@ -1,5 +1,6 @@
 {
   "allow_all": false,
+  "auto_approve_groups": false,
   "master_admin": [
     "U38d0a817340abb35375641be73a86b5e",
     "U38d0a817340a8b35375641be73a86b5e"
@@ -12,6 +13,7 @@
   ],
   "allowed_groups": [
     "default",
-    "C_NEW_LINE_GROUP_BANGKOK_BRANCH"
+    "Cacc76a409026f869d53813bb94cc0c58",
+    "C_NEW_UNAPPROVED_GROUP_99"
   ]
 }

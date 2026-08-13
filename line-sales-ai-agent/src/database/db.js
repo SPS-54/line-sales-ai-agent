@@ -115,18 +115,21 @@ export const db = {
     // Master Admin มีสิทธิ์ใช้งานทุกที่และทุกโหมดแบบ 100%
     if (this.isMasterAdmin(userId, contextId)) return true;
 
-    const isGroupAllowed = Array.isArray(wl.allowed_groups) && wl.allowed_groups.some(g => String(g).trim().toLowerCase() === cleanCtx);
+    // หากคุยในกลุ่มไลน์ (contextId !== userId):
+    if (cleanCtx !== cleanUser) {
+      // หาก auto_approve_groups เป็น true (ค่าเริ่มต้นใหม่) -> กลุ่มไลน์ทุกกลุ่มที่คุณลากบอทเข้าไปจะใช้งานได้ทันที 100%!
+      if (wl.auto_approve_groups !== false) return true;
+
+      const isGroupAllowed = Array.isArray(wl.allowed_groups) && wl.allowed_groups.some(g => String(g).trim().toLowerCase() === cleanCtx);
+      return isGroupAllowed;
+    }
+
+    // หากเป็นการคุยส่วนตัว 1-on-1 (contextId === userId) -> ตรวจสิทธิ์เฉพาะรายบุคคลที่ได้รับอนุญาตเท่านั้น (คนนอกยังคงถูกล็อก 100%)
     const isUserAllowed = Array.isArray(wl.allowed_users) && wl.allowed_users.some(u => {
       const cleanU = String(u).trim().toLowerCase();
       return cleanU === cleanUser || cleanU === cleanCtx;
     });
 
-    // หากเป็นการคุยในกลุ่มไลน์ (contextId !== userId) -> ตรวจสิทธิ์กลุ่มไลน์
-    if (cleanCtx !== cleanUser) {
-      return isGroupAllowed;
-    }
-
-    // หากเป็นการคุยส่วนตัว 1-on-1 (contextId === userId) -> ตรวจสิทธิ์เฉพาะรายบุคคล
     return isUserAllowed;
   },
 
