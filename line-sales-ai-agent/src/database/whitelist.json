@@ -11,6 +11,7 @@
     "Ufdbc2cb193c2ffbe0e72dcef599b09a2"
   ],
   "allowed_groups": [
-    "default"
+    "default",
+    "C_NEW_LINE_GROUP_BANGKOK_BRANCH"
   ]
 }
