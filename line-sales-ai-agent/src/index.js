@@ -3,7 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { config } from './config.js';
-import { processUserMessage } from './services/geminiAgent.js';
+import { processUserMessage, processContactMessage } from './services/geminiAgent.js';
 
 import { getLineUserProfile, getLineGroupSummary } from './services/lineProfileService.js';
 
@@ -126,6 +126,49 @@ const server = http.createServer(async (req, res) => {
               }
             } else {
               console.log('[Mock LINE Reply]:', aiResult.text);
+            }
+          }
+          // B. การแชร์การ์ดเพื่อนในไลน์จากมือถือ (Contact Sharing Message Event)
+          else if (event.type === 'message' && event.message && event.message.type === 'contact') {
+            const contactMsg = event.message;
+            const source = event.source || {};
+            const contextId = source.groupId || source.roomId || source.userId || 'default';
+            const contactName = contactMsg.displayName || 'เพื่อนในไลน์';
+            const contactUserId = contactMsg.userId || '';
+            const lineUrl = contactUserId ? `https://line.me/R/ti/p/~${contactUserId}` : contactName;
+
+            console.log(`[LINE Contact Shared (${contextId})]: ${contactName} (${contactUserId})`);
+
+            const aiResult = await processContactMessage(contactName, contactUserId, lineUrl, contextId, source.userId);
+            if (!aiResult) {
+              console.log(`[LINE Reply Ignored]: Context (${contextId}) / User (${source.userId}) is not registered.`);
+              continue;
+            }
+
+            if (config.line.channelAccessToken && config.line.channelAccessToken !== 'your_line_channel_access_token_here') {
+              const messagesToSend = [];
+              if (aiResult.text) messagesToSend.push({ type: 'text', text: aiResult.text });
+              if (aiResult.flexMessage) {
+                if (Array.isArray(aiResult.flexMessage)) {
+                  aiResult.flexMessage.filter(Boolean).forEach(flex => messagesToSend.push(flex));
+                } else {
+                  messagesToSend.push(aiResult.flexMessage);
+                }
+              }
+
+              await fetch('https://api.line.me/v2/bot/message/reply', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${config.line.channelAccessToken}`
+                },
+                body: JSON.stringify({
+                  replyToken: event.replyToken,
+                  messages: messagesToSend
+                })
+              }).catch(err => console.error('[LINE Reply Contact Error]:', err.message));
+            } else {
+              console.log('[Mock LINE Contact Reply]:', aiResult.text);
             }
           }
         }

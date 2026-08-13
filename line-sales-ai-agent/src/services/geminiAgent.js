@@ -783,3 +783,45 @@ function handleLocalFallbackMode(userMessage, contextId = 'default', userId = nu
     flexMessage: null
   };
 }
+
+/**
+ * ประมวลผลเมื่อพนักงานขายส่ง/แชร์การ์ดเพื่อนในไลน์ (LINE Contact Sharing Message Event)
+ */
+export async function processContactMessage(contactName, contactUserId, lineUrl, contextId = 'default', userId = 'default') {
+  if (!db.isContextAllowed(contextId, userId)) return null;
+
+  const activeSession = sessionStore.getActiveStoreSession(contextId);
+  const pendingField = sessionStore.getPendingField(contextId);
+  let targetStoreName = (pendingField ? pendingField.storeName : null) || 
+                        (activeSession ? activeSession.storeName : null) || 
+                        sessionStore.getLastStore(contextId);
+
+  if (targetStoreName) {
+    const updatedStore = db.saveGeneralInfo(targetStoreName, {
+      line_contact: lineUrl,
+      line_contacts: [lineUrl],
+      contact_persons: [contactName]
+    }, 'append', contextId);
+
+    sessionStore.clearPendingField(contextId);
+
+    const flexCard = buildStoreGeneralInfoFlex(updatedStore, false, contextId);
+
+    return {
+      text: `✅ ได้รับการแชร์เพื่อนในไลน์ "${contactName}" และบันทึกเข้าเป็นไลน์ผู้ติดต่อของร้าน "${updatedStore.store_name}" เรียบร้อยแล้วค่ะ!\n*(ผู้ดูแลระบบสามารถกดปุ่ม [🟢 ➕ กดแอดไลน์] บนการ์ดเพื่อกดแอดเพื่อนได้ทันที)*`,
+      flexMessage: flexCard
+    };
+  } else {
+    sessionStore.setPendingField(contextId, {
+      field: 'line_contact',
+      lineUrl: lineUrl,
+      contactName: contactName,
+      label: 'ไลน์ผู้ติดต่อจากการแชร์เพื่อน'
+    });
+
+    return {
+      text: `🟢 ได้รับข้อมูลแชร์เพื่อนในไลน์ "${contactName}" เรียบร้อยแล้วค่ะ!\n\n📌 กรุณาพิมพ์บอกชื่อร้านค้าที่ต้องการบันทึกไลน์ผู้ติดต่อนี้ลงไปได้เลยค่ะ:\n*(เช่น: บันทึกร้านสมศักดิ์การค้า)*`,
+      flexMessage: null
+    };
+  }
+}
