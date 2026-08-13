@@ -1,6 +1,6 @@
 {
   "allow_all": false,
-  "auto_approve_groups": true,
+  "auto_approve_groups": false,
   "master_admin": [
     "U38d0a817340abb35375641be73a86b5e",
     "U38d0a817340a8b35375641be73a86b5e"
@@ -12,21 +12,10 @@
   ],
   "allowed_groups": [
     "default",
-    "Cacc76a409026f869d53813bb94cc0c58",
-    "Cc95f4836b81ac0fbe191b2bc0e51a792"
+    "Cacc76a409026f869d53813bb94cc0c58"
   ],
-  "allowed_groups_details": {
-    "Cacc76a409026f869d53813bb94cc0c58": {
-      "name": "กลุ่มงานขายหลัก (Sales Team)",
-      "type": "group"
-    },
-    "Cc95f4836b81ac0fbe191b2bc0e51a792": "ข้อมูลร้านค้า น้องบี"
-  },
+  "allowed_groups_details": {},
   "allowed_users_details": {
-    "U38d0a817340abb35375641be73a86b5e": {
-      "name": "👑 แบงค์ (ผู้ดูแลหลัก)",
-      "type": "user"
-    },
     "U38d0a817340a8b35375641be73a86b5e": "แบงค์"
   }
 }
