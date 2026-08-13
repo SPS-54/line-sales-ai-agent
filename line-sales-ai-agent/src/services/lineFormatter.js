@@ -367,15 +367,15 @@ export function buildStoreGeneralInfoFlex(store, isRecordingSession = false, con
     });
   }
 
-  // 2. เบอร์โทรศัพท์หลัก (Multiple Phone Numbers)
+  // 2. เบอร์โทรศัพท์หลัก (Multiple Phone Numbers with Thai/English Names)
   const phonesArr = Array.isArray(info.phones)
     ? info.phones
-    : (info.phone ? String(info.phone).split(/[,;\n\/]|และ/).map(s => s.trim()).filter(Boolean) : []);
+    : (info.phone ? String(info.phone).split(/[,;\n]|และ/).map(s => s.trim()).filter(Boolean) : []);
 
   if (phonesArr.length > 0) {
     contactBoxContents.push({ type: 'text', text: `📞 รายชื่อเบอร์โทรศัพท์ (${phonesArr.length} เบอร์):`, size: 'sm', color: '#333333', weight: 'bold', margin: 'md' });
     phonesArr.forEach((phone, idx) => {
-      contactBoxContents.push({ type: 'text', text: `  ${idx + 1}. 📱 ${phone}`, size: 'sm', color: '#111111' });
+      contactBoxContents.push({ type: 'text', text: `  ${idx + 1}. 📱 ${phone}`, size: 'sm', color: '#111111', wrap: true });
     });
   } else {
     contactBoxContents.push({ type: 'text', text: `📞 เบอร์โทรศัพท์หลัก: ยังไม่มีข้อมูล`, size: 'sm', color: '#333333', margin: 'md' });
@@ -500,6 +500,25 @@ export function buildStoreGeneralInfoFlex(store, isRecordingSession = false, con
       });
     }
   });
+
+  // สร้างปุ่มกดโทร 1-Tap Call ปุ่มละ 1 เบอร์ (สูงสุด 2 เบอร์แรก)
+  const callButtons = [];
+  phonesArr.slice(0, 2).forEach((phone, idx) => {
+    const cleanNum = phone.replace(/\D/g, '');
+    if (cleanNum.length >= 9) {
+      const shortLabel = phone.length > 14 ? phone.substring(0, 12) + '..' : phone;
+      callButtons.push({
+        type: 'button', style: 'secondary', height: 'sm', flex: 1,
+        action: { type: 'uri', label: `📞 โทร #${idx + 1} (${shortLabel})`, uri: `tel:${cleanNum}` }
+      });
+    }
+  });
+
+  if (callButtons.length > 0) {
+    footerButtons.unshift({
+      type: 'box', layout: 'horizontal', spacing: 'xs', contents: callButtons
+    });
+  }
 
   if (addFriendButtons.length > 0) {
     footerButtons.unshift(...addFriendButtons);

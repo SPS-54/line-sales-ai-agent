@@ -327,7 +327,7 @@ export const db = {
           if (p && !mergedPhones.includes(p)) mergedPhones.push(p);
         });
       } else if (infoData.phone) {
-        const splitNew = String(infoData.phone).split(/[,;\n\/]|และ/).map(s => s.trim()).filter(Boolean);
+        const splitNew = String(infoData.phone).split(/[,;\n]|และ/).map(s => s.trim()).filter(Boolean);
         splitNew.forEach(p => {
           if (p && !mergedPhones.includes(p)) mergedPhones.push(p);
         });

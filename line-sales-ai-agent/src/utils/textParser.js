@@ -97,7 +97,7 @@ export function parseAllStoreCategories(text) {
   const creditNum = parsedData.credit_days ? parseInt(parsedData.credit_days.replace(/\D/g, '')) : null;
 
   const phoneRaw = parsedData.phone;
-  const phones = phoneRaw ? phoneRaw.split(/[,;\n\/]|และ/).map(p => cleanValue(p)).filter(Boolean) : [];
+  const phones = phoneRaw ? phoneRaw.split(/[,;\n]|และ/).map(p => cleanValue(p)).filter(p => p.replace(/\D/g, '').length >= 9) : [];
 
   const lineRaw = parsedData.line_contact;
   const lineContacts = lineRaw ? lineRaw.split(/[,;\n]|และ/).map(l => cleanValue(l)).filter(Boolean) : [];
