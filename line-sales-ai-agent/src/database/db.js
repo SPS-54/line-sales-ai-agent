@@ -366,10 +366,16 @@ export const db = {
         line_contacts: mergedLineContacts.length > 0 ? mergedLineContacts : null
       };
     } else {
+      const newPhones = infoData.phones 
+        ? (Array.isArray(infoData.phones) ? infoData.phones : [infoData.phones])
+        : (infoData.phone ? String(infoData.phone).split(/[,;\n]|และ/).map(s => s.trim()).filter(Boolean) : store.general_info?.phones);
+
       store.general_info = {
         ...store.general_info,
         ...infoData,
-        contact_persons: infoData.contact_persons || (infoData.contact_person ? [infoData.contact_person] : store.general_info?.contact_persons)
+        contact_persons: infoData.contact_persons || (infoData.contact_person ? [infoData.contact_person] : store.general_info?.contact_persons),
+        phones: newPhones,
+        phone: newPhones && newPhones.length > 0 ? newPhones.join(', ') : infoData.phone
       };
     }
 

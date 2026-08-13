@@ -230,7 +230,11 @@ function handleSingleFieldPromptResponse(pendingField, userMessage, contextId = 
     store = db.saveGeneralInfo(storeName, parsed, mode || 'append', contextId);
     flexMessage = isRecordingSession ? buildAll3CategoryFlexCards(store, true) : buildStoreGeneralInfoFlex(store, false, contextId);
   } else if (field === 'phone') {
-    store = db.saveGeneralInfo(storeName, { phone: userMessage.trim() }, 'replace', contextId);
+    const parsed = parseGeneralInfoText(`เบอร์ ${userMessage}`);
+    const newPhones = (parsed.phones && parsed.phones.length > 0)
+      ? parsed.phones
+      : (userMessage.includes(',') || userMessage.includes('\n') ? userMessage.split(/[,;\n]|และ/).map(s => s.trim()).filter(Boolean) : [userMessage.trim()]);
+    store = db.saveGeneralInfo(storeName, { phone: newPhones.join(', '), phones: newPhones }, mode || 'append', contextId);
     flexMessage = isRecordingSession ? buildAll3CategoryFlexCards(store, true) : buildStoreGeneralInfoFlex(store, false, contextId);
   } else if (field === 'address') {
     store = db.saveGeneralInfo(storeName, { address: userMessage.trim() }, 'replace', contextId);
@@ -467,10 +471,15 @@ function handleLocalFallbackMode(userMessage, contextId = 'default', userId = nu
     sessionStore.setPendingField(contextId, { storeName, field: 'contact_persons', label: 'รายชื่อผู้ติดต่อ', mode: 'append' });
     return { text: `👥 กรุณาพิมพ์รายชื่อผู้ติดต่อใหม่ของร้าน "${storeName}" ส่งมาได้เลยค่ะ:\n*(เช่น: คุณชัย 086-777-8888)*`, flexMessage: null };
   }
-  else if (text.includes('ขอเพิ่มเบอร์ร้าน') || text.includes('ขอเปลี่ยนเบอร์ร้าน')) {
-    const storeName = cleanStoreName(userMessage.replace(/ขอเพิ่มเบอร์ร้าน|ขอเปลี่ยนเบอร์ร้าน/g, '').trim());
+  else if (text.includes('ขอเพิ่มเบอร์ร้าน')) {
+    const storeName = cleanStoreName(userMessage.replace(/ขอเพิ่มเบอร์ร้าน/g, '').trim());
     sessionStore.setPendingField(contextId, { storeName, field: 'phone', label: 'เบอร์โทรศัพท์', mode: 'append' });
-    return { text: `📞 กรุณาพิมพ์เบอร์โทรศัพท์ของร้าน "${storeName}" ส่งมาได้เลยค่ะ (สามารถเพิ่มได้หลายเบอร์ โดยใช้เครื่องหมายจุลภาค , หรือเว้นวรรค):\n*(เช่น: 089-999-8888, 081-222-3333)*`, flexMessage: null };
+    return { text: `📞 กรุณาพิมพ์เบอร์โทรศัพท์เพิ่มเติมของร้าน "${storeName}" ส่งมาได้เลยค่ะ (สามารถพิมพ์เพิ่มหลายเบอร์ได้ เช่น เบอร์ร้าน 053298851, เบอร์มือถือ 0946930597):\n*(สามารถใส่ข้อความนำหน้าภาษาไทย/อังกฤษคู่กับเบอร์โทรได้)*`, flexMessage: null };
+  }
+  else if (text.includes('ขอเปลี่ยนเบอร์ร้าน')) {
+    const storeName = cleanStoreName(userMessage.replace(/ขอเปลี่ยนเบอร์ร้าน/g, '').trim());
+    sessionStore.setPendingField(contextId, { storeName, field: 'phone', label: 'เบอร์โทรศัพท์', mode: 'replace' });
+    return { text: `✏️ กรุณาพิมพ์เบอร์โทรศัพท์ใหม่ที่จะใช้แทนที่เบอร์เดิมของร้าน "${storeName}" ส่งมาได้เลยค่ะ:\n*(เช่น: เบอร์ร้าน 053298851, เบอร์มือถือร้าน 0946930597)*`, flexMessage: null };
   }
   else if (text.includes('ขอเปลี่ยนที่อยู่ร้าน')) {
     const storeName = cleanStoreName(userMessage.replace(/ขอเปลี่ยนที่อยู่ร้าน/g, '').trim());

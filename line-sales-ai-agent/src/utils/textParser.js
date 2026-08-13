@@ -80,8 +80,14 @@ export function parseAllStoreCategories(text) {
     const rawVal = text.substring(valStart, valEnd);
     const cleaned = cleanValue(rawVal);
 
-    if (cleaned && !parsedData[curr.key]) {
-      parsedData[curr.key] = cleaned;
+    if (cleaned) {
+      if (parsedData[curr.key]) {
+        if (['phone', 'contact_persons', 'line_contact', 'notes', 'brands_sold', 'ordered_items', 'top_selling_products', 'recommended_products'].includes(curr.key)) {
+          parsedData[curr.key] += ` , ${cleaned}`;
+        }
+      } else {
+        parsedData[curr.key] = cleaned;
+      }
     }
   }
 
@@ -97,7 +103,16 @@ export function parseAllStoreCategories(text) {
   const creditNum = parsedData.credit_days ? parseInt(parsedData.credit_days.replace(/\D/g, '')) : null;
 
   const phoneRaw = parsedData.phone;
-  const phones = phoneRaw ? phoneRaw.split(/[,;\n]|และ/).map(p => cleanValue(p)).filter(p => p.replace(/\D/g, '').length >= 9) : [];
+  let phones = [];
+  if (phoneRaw) {
+    phones = phoneRaw.split(/[,;\n]|และ/).map(p => cleanValue(p)).filter(p => p.replace(/\D/g, '').length >= 9);
+    if (phones.length <= 1) {
+      const numberMatches = phoneRaw.match(/(?:[^\d\n,]*?\d[\d\s\-]{7,}\d)/g);
+      if (numberMatches && numberMatches.length > 1) {
+        phones = numberMatches.map(p => cleanValue(p)).filter(p => p.replace(/\D/g, '').length >= 9);
+      }
+    }
+  }
 
   const lineRaw = parsedData.line_contact;
   const lineContacts = lineRaw ? lineRaw.split(/[,;\n]|และ/).map(l => cleanValue(l)).filter(Boolean) : [];
