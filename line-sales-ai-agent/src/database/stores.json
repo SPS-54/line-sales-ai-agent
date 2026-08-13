@@ -18,7 +18,7 @@
       "map_url": "https://maps.app.goo.gl/K6eHAGC9KjWBmaj57?g_st=ic",
       "delivery_by": "สหทิพย์ทอง",
       "delivery_schedule": "สหทิพย์ทอง",
-      "notes": "เวลาทำงาน 09.00-17.00 น. , ไม่รับเซลล์วันอาทิตย์",
+      "notes": "เวลาทำงาน 09.00-17.00 น. , ไม่รับเซลล์วันอาทิตย์\n• จดออเดอร์แล้วขออนุมัติในกลุ่มก่อนส่ง",
       "credit_days": 30,
       "line_contact": null,
       "line_contacts": null
@@ -67,6 +67,6 @@
         "SC"
       ]
     },
-    "updated_at": "2026-08-13T14:01:00.547Z"
+    "updated_at": "2026-08-13T14:03:56.573Z"
   }
 ]
