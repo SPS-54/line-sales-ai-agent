@@ -38,10 +38,29 @@
       "total_sales_ytd": 0,
       "order_history": [],
       "yearly_breakdown": [],
-      "ordered_items": [],
+      "ordered_items": [
+        "TTI GW020-9",
+        "TTI BX2505-1",
+        "TTI BK0855",
+        "TTI GL9034-6",
+        "TTI GW019-7",
+        "TTI GW020-6",
+        "TTI GW020-8 3สี",
+        "TTI BT1107 3เกลอ",
+        "TTI GW35-8",
+        "TTI GW40-8",
+        "TTI GW45-8",
+        "TTI CB7113-5",
+        "TTI CB7113-4",
+        "TTI BK4006",
+        "PPP 1299",
+        "PPP 1299-2",
+        "PPP SF-11",
+        "PPP 118-3"
+      ],
       "top_selling_products": []
     },
     "sales_opportunities": {},
-    "updated_at": "2026-08-13T13:46:38.650Z"
+    "updated_at": "2026-08-13T13:47:29.012Z"
   }
 ]
