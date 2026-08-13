@@ -12,8 +12,13 @@
   ],
   "allowed_groups": [
     "default",
-    "Cacc76a409026f869d53813bb94cc0c58"
+    "Cacc76a409026f869d53813bb94cc0c58",
+    "Cc95f4836b81ac0fbe191b2bc0e51a792"
   ],
-  "allowed_groups_details": {},
-  "allowed_users_details": {}
+  "allowed_groups_details": {
+    "Cc95f4836b81ac0fbe191b2bc0e51a792": "ข้อมูลร้านค้า น้องบี"
+  },
+  "allowed_users_details": {
+    "U38d0a817340a8b35375641be73a86b5e": "แบงค์"
+  }
 }
