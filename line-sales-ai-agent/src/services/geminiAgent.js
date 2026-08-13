@@ -35,9 +35,53 @@ const SYSTEM_INSTRUCTION = `คุณคือ "SalesAI Assistant" ผู้ช�
 2. "ข้อมูลการขาย": บันทึก/ดึงข้อมูลการขาย (ประเภทการชำระ, แบรนด์ที่ขาย, สั่งซื้อล่าสุด, ยอดขายล่าสุด, ยอดขายสะสม เดือน/ปี, ยอดขายรายปี, สินค้าที่สั่ง, สินค้าขายดี) (ใช้ get_store_sales_details / save_store_sales_details)
 3. "โอกาสเสนอขาย": บันทึก/ดึงโอกาสเสนอขาย (สถานะโอกาส, สินค้าแนะนำ, เหตุผล, แผนงานวันเข้าเสนอขาย) (ใช้ get_store_sales_opportunities / save_store_sales_opportunities)`;
 
-export async function processUserMessage(userMessage, contextId = 'default') {
+export async function processUserMessage(userMessage, contextId = 'default', userId = null) {
   const text = (userMessage || '').trim();
   const lowerText = text.toLowerCase();
+
+  // 0. ตรวจสอบสิทธิ์การใช้งาน (Security Whitelist Check)
+  const isAllowed = db.isContextAllowed(contextId, userId);
+
+  // คำสั่งแอดมินลงทะเบียนสิทธิ์
+  if (text.includes('ลงทะเบียนสิทธิ์กลุ่มนี้') || text.includes('ลงทะเบียนกลุ่มนี้') || text.includes('อนุมัติกลุ่มนี้')) {
+    db.addAllowedContext(contextId, 'group');
+    return {
+      text: `🔒 ลงทะเบียนอนุมัติสิทธิ์การใช้งานของกลุ่มแชตนี้ (${contextId}) เรียบร้อยแล้วค่ะ!`,
+      flexMessage: null
+    };
+  }
+  if (text.includes('ลงทะเบียนสิทธิ์ผู้ใช้') || text.includes('ลงทะเบียนผู้ใช้') || text.includes('อนุมัติผู้ใช้')) {
+    const targetUser = text.replace(/ลงทะเบียนสิทธิ์ผู้ใช้|ลงทะเบียนผู้ใช้|อนุมัติผู้ใช้/g, '').trim() || (userId || contextId);
+    db.addAllowedContext(targetUser, 'user');
+    return {
+      text: `🔒 ลงทะเบียนอนุมัติสิทธิ์ผู้ใช้งาน (${targetUser}) เรียบร้อยแล้วค่ะ!`,
+      flexMessage: null
+    };
+  }
+  if (text.includes('เช็คสิทธิ์') || text.includes('ดูสิทธิ์') || text.includes('สถานะสิทธิ์')) {
+    const wl = db.getWhitelist();
+    const cleanUsers = (wl.allowed_users || []).filter(u => u !== 'default');
+    const cleanGroups = (wl.allowed_groups || []).filter(g => g !== 'default');
+
+    const usersList = cleanUsers.length > 0
+      ? cleanUsers.map((u, i) => `  ${i + 1}. 👤 ${u}`).join('\n')
+      : '  (ยังไม่มีผู้ใช้เพิ่มเติม)';
+
+    const groupsList = cleanGroups.length > 0
+      ? cleanGroups.map((g, i) => `  ${i + 1}. 👥 ${g}`).join('\n')
+      : '  (ยังไม่มีกลุ่มแชตเพิ่มเติม)';
+
+    return {
+      text: `🛡️ รายการสิทธิ์ที่ได้รับอนุมัติในระบบ (Whitelist Status):\n\n👤 ผู้ใช้ส่วนตัวที่ได้รับอนุมัติ (${cleanUsers.length} คน):\n${usersList}\n\n👥 กลุ่มแชตไลน์ที่ได้รับอนุมัติ (${cleanGroups.length} กลุ่ม):\n${groupsList}\n\n📌 กลุ่ม/แชตปัจจุบันนี้: ${isAllowed ? '✅ ได้รับอนุมัติสิทธิ์แล้ว' : '❌ ยังไม่ได้รับสิทธิ์'}`,
+      flexMessage: null
+    };
+  }
+
+  // หากไม่มีสิทธิ์ใช้งาน (Unregistered Outsider) -> ไม่ตอบกลับ (Silent Rejection / Ignore)
+  if (!isAllowed) {
+    console.log(`[Security Whitelist Rejected]: Context (${contextId}) / User (${userId}) is not registered.`);
+    return null;
+  }
 
   // 1. ตรวจสอบสถานะรอรับค่าเฉพาะหัวข้อเดียว (1-Field Prompt Response Handling)
   const pendingField = sessionStore.findActivePendingField(contextId);
@@ -65,11 +109,11 @@ export async function processUserMessage(userMessage, contextId = 'default') {
 }
 
 // ประมวลผลเมื่อพิมพ์ค่าตอบกลับคำถามเฉพาะหัวข้อเดียว
-function handleSingleFieldPromptResponse(pendingField, userMessage) {
+function handleSingleFieldPromptResponse(pendingField, userMessage, contextId = 'default') {
   const { storeName, field, label, mode } = pendingField;
-  sessionStore.clearPendingField(pendingField.key);
+  sessionStore.clearPendingField(contextId);
 
-  const activeSession = sessionStore.getActiveStoreSession('default');
+  const activeSession = sessionStore.getActiveStoreSession(contextId);
   const isRecordingSession = activeSession && activeSession.isRecording;
 
   let store;
@@ -78,70 +122,70 @@ function handleSingleFieldPromptResponse(pendingField, userMessage) {
   // หมวดข้อมูลร้านค้า (General Info)
   if (field === 'contact_persons') {
     const parsed = parseGeneralInfoText(`ผู้ติดต่อ ${userMessage}`);
-    store = db.saveGeneralInfo(storeName, parsed, mode || 'append');
+    store = db.saveGeneralInfo(storeName, parsed, mode || 'append', contextId);
     flexMessage = isRecordingSession ? buildAll3CategoryFlexCards(store, true) : buildStoreGeneralInfoFlex(store, false);
   } else if (field === 'phone') {
-    store = db.saveGeneralInfo(storeName, { phone: userMessage.trim() }, 'replace');
+    store = db.saveGeneralInfo(storeName, { phone: userMessage.trim() }, 'replace', contextId);
     flexMessage = isRecordingSession ? buildAll3CategoryFlexCards(store, true) : buildStoreGeneralInfoFlex(store, false);
   } else if (field === 'address') {
-    store = db.saveGeneralInfo(storeName, { address: userMessage.trim() }, 'replace');
+    store = db.saveGeneralInfo(storeName, { address: userMessage.trim() }, 'replace', contextId);
     flexMessage = isRecordingSession ? buildAll3CategoryFlexCards(store, true) : buildStoreGeneralInfoFlex(store, false);
   } else if (field === 'map_url') {
-    store = db.saveGeneralInfo(storeName, { map_url: userMessage.trim() }, 'replace');
+    store = db.saveGeneralInfo(storeName, { map_url: userMessage.trim() }, 'replace', contextId);
     flexMessage = isRecordingSession ? buildAll3CategoryFlexCards(store, true) : buildStoreGeneralInfoFlex(store, false);
   } else if (field === 'delivery_by') {
-    store = db.saveGeneralInfo(storeName, { delivery_by: userMessage.trim(), delivery_schedule: userMessage.trim() }, 'replace');
+    store = db.saveGeneralInfo(storeName, { delivery_by: userMessage.trim(), delivery_schedule: userMessage.trim() }, 'replace', contextId);
     flexMessage = isRecordingSession ? buildAll3CategoryFlexCards(store, true) : buildStoreGeneralInfoFlex(store, false);
   } else if (field === 'credit_days') {
     const match = userMessage.match(/\d+/);
     const days = match ? parseInt(match[0]) : 0;
-    store = db.saveGeneralInfo(storeName, { credit_days: days }, 'replace');
+    store = db.saveGeneralInfo(storeName, { credit_days: days }, 'replace', contextId);
     flexMessage = isRecordingSession ? buildAll3CategoryFlexCards(store, true) : buildStoreGeneralInfoFlex(store, false);
   } else if (field === 'notes') {
-    store = db.saveGeneralInfo(storeName, { notes: userMessage.trim() }, 'append');
+    store = db.saveGeneralInfo(storeName, { notes: userMessage.trim() }, 'append', contextId);
     flexMessage = isRecordingSession ? buildAll3CategoryFlexCards(store, true) : buildStoreGeneralInfoFlex(store, false);
   }
   // หมวดข้อมูลการขาย (Sales Details)
   else if (field === 'payment_type') {
-    store = db.saveSalesDetails(storeName, { payment_type: userMessage.trim() }, 'replace');
+    store = db.saveSalesDetails(storeName, { payment_type: userMessage.trim() }, 'replace', contextId);
     flexMessage = isRecordingSession ? buildAll3CategoryFlexCards(store, true) : buildStoreSalesDetailsFlex(store);
   } else if (field === 'brands_sold') {
     const brands = userMessage.split(/[,;\n]|และ/).map(b => b.trim()).filter(Boolean);
-    store = db.saveSalesDetails(storeName, { brands_sold: brands }, 'append');
+    store = db.saveSalesDetails(storeName, { brands_sold: brands }, 'append', contextId);
     flexMessage = isRecordingSession ? buildAll3CategoryFlexCards(store, true) : buildStoreSalesDetailsFlex(store);
   } else if (field === 'last_order_date') {
-    store = db.saveSalesDetails(storeName, { last_order_date: userMessage.trim() }, 'replace');
+    store = db.saveSalesDetails(storeName, { last_order_date: userMessage.trim() }, 'replace', contextId);
     flexMessage = isRecordingSession ? buildAll3CategoryFlexCards(store, true) : buildStoreSalesDetailsFlex(store);
   } else if (field === 'last_order_amount') {
     const match = userMessage.match(/\d+/);
     const amt = match ? parseInt(match[0]) : 0;
-    store = db.saveSalesDetails(storeName, { last_order_amount: amt }, 'append');
+    store = db.saveSalesDetails(storeName, { last_order_amount: amt }, 'append', contextId);
     flexMessage = isRecordingSession ? buildAll3CategoryFlexCards(store, true) : buildStoreSalesDetailsFlex(store);
   } else if (field === 'ordered_items') {
     const items = userMessage.split(/[,;\n]|และ/).map(i => i.trim()).filter(Boolean);
-    store = db.saveSalesDetails(storeName, { ordered_items: items }, 'append');
+    store = db.saveSalesDetails(storeName, { ordered_items: items }, 'append', contextId);
     flexMessage = isRecordingSession ? buildAll3CategoryFlexCards(store, true) : buildStoreSalesDetailsFlex(store);
   } else if (field === 'top_selling_products') {
     const top = userMessage.split(/[,;\n]|และ/).map(t => t.trim()).filter(Boolean);
-    store = db.saveSalesDetails(storeName, { top_selling_products: top }, 'append');
+    store = db.saveSalesDetails(storeName, { top_selling_products: top }, 'append', contextId);
     flexMessage = isRecordingSession ? buildAll3CategoryFlexCards(store, true) : buildStoreSalesDetailsFlex(store);
   }
   // หมวดโอกาสเสนอขาย (Sales Opportunities)
   else if (field === 'opportunity_status') {
-    store = db.saveSalesOpportunities(storeName, { opportunity_status: userMessage.trim() }, 'replace');
-    flexMessage = buildStoreSalesOpportunitiesFlex(store);
+    store = db.saveSalesOpportunities(storeName, { opportunity_status: userMessage.trim() }, 'replace', contextId);
+    flexMessage = isRecordingSession ? buildAll3CategoryFlexCards(store, true) : buildStoreSalesOpportunitiesFlex(store);
   } else if (field === 'recommended_products') {
-    store = db.saveSalesOpportunities(storeName, { recommended_products: [userMessage.trim()] }, mode || 'append');
-    flexMessage = buildStoreSalesOpportunitiesFlex(store);
+    store = db.saveSalesOpportunities(storeName, { recommended_products: [userMessage.trim()] }, mode || 'append', contextId);
+    flexMessage = isRecordingSession ? buildAll3CategoryFlexCards(store, true) : buildStoreSalesOpportunitiesFlex(store);
   } else if (field === 'reason') {
-    store = db.saveSalesOpportunities(storeName, { reason: userMessage.trim() }, 'replace');
-    flexMessage = buildStoreSalesOpportunitiesFlex(store);
+    store = db.saveSalesOpportunities(storeName, { reason: userMessage.trim() }, 'replace', contextId);
+    flexMessage = isRecordingSession ? buildAll3CategoryFlexCards(store, true) : buildStoreSalesOpportunitiesFlex(store);
   } else if (field === 'target_pitch_date') {
-    store = db.saveSalesOpportunities(storeName, { target_pitch_date: userMessage.trim() }, 'replace');
-    flexMessage = buildStoreSalesOpportunitiesFlex(store);
+    store = db.saveSalesOpportunities(storeName, { target_pitch_date: userMessage.trim() }, 'replace', contextId);
+    flexMessage = isRecordingSession ? buildAll3CategoryFlexCards(store, true) : buildStoreSalesOpportunitiesFlex(store);
   } else {
-    store = db.saveGeneralInfo(storeName, { notes: userMessage.trim() }, 'append');
-    flexMessage = buildStoreGeneralInfoFlex(store, isRecordingSession);
+    store = db.saveGeneralInfo(storeName, { notes: userMessage.trim() }, 'append', contextId);
+    flexMessage = isRecordingSession ? buildAll3CategoryFlexCards(store, true) : buildStoreGeneralInfoFlex(store, isRecordingSession);
   }
 
   const sessionNotice = isRecordingSession ? ' (ยังอยู่ในโหมดบันทึกข้อมูลร้านนี้ กดปุ่ม [✅ จบการบันทึกข้อมูลพื้นฐานร้านค้า] เมื่อบันทึกเสร็จนะคะ)' : '';
