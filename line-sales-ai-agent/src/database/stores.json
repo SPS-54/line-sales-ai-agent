@@ -52,11 +52,15 @@
         "TTI GW45-8",
         "TTI CB7113-5",
         "TTI CB7113-4",
-        "TTI BK4006"
+        "TTI BK4006",
+        "PPP 1299",
+        "PPP 1299-2",
+        "PPP SF-11",
+        "PPP 118-3"
       ],
       "top_selling_products": []
     },
     "sales_opportunities": {},
-    "updated_at": "2026-08-13T13:17:51.766Z"
+    "updated_at": "2026-08-13T13:18:59.477Z"
   }
 ]
