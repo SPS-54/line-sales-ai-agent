@@ -124,6 +124,36 @@ export async function processUserMessage(userMessage, contextId = 'default', use
       flexMessage: null
     };
   }
+  if (text.includes('ตั้งชื่อไลน์') || text.includes('ตั้งชื่อสิทธิ์') || text.includes('ตั้งชื่อโปรไฟล์')) {
+    if (!db.isMasterAdmin(userId, contextId)) {
+      return {
+        text: `⛔ ขออภัยค่ะ คำสั่งตั้งชื่อแสดงผลสิทธิ์ สามารถทำได้โดยเครื่องผู้ดูแลระบบหลัก (Master Admin) เท่านั้นค่ะ`,
+        flexMessage: null
+      };
+    }
+    const rawInput = userMessage.replace(/ตั้งชื่อไลน์|ตั้งชื่อสิทธิ์|ตั้งชื่อโปรไฟล์/gi, '').trim();
+    const parts = rawInput.split(/\s+/);
+    if (parts.length >= 2) {
+      const targetId = parts[0];
+      const customName = parts.slice(1).join(' ');
+      const type = (targetId.startsWith('C') || targetId.startsWith('R')) ? 'group' : 'user';
+      db.saveProfileName(targetId, type, customName);
+      syncWhitelistToGitHub().catch(() => {});
+      return {
+        text: `✏️ [Master Admin Action]: อัปเดตตั้งชื่อแสดงผลของ (${targetId}) เป็น "${customName}" เรียบร้อยแล้วค่ะ!`,
+        flexMessage: null
+      };
+    } else if (rawInput) {
+      const target = (userId && contextId === userId) ? userId : contextId;
+      const type = (target.startsWith('C') || target.startsWith('R')) ? 'group' : 'user';
+      db.saveProfileName(target, type, rawInput);
+      syncWhitelistToGitHub().catch(() => {});
+      return {
+        text: `✏️ [Master Admin Action]: อัปเดตตั้งชื่อแสดงผลของแชตนี้เป็น "${rawInput}" เรียบร้อยแล้วค่ะ!`,
+        flexMessage: null
+      };
+    }
+  }
   if (text.includes('เช็คสิทธิ์') || text.includes('ดูสิทธิ์') || text.includes('สถานะสิทธิ์')) {
     const wl = db.getWhitelist();
     const cleanUsers = (wl.allowed_users || []).filter(u => u !== 'default');

@@ -5,6 +5,8 @@ import { fileURLToPath } from 'url';
 import { config } from './config.js';
 import { processUserMessage } from './services/geminiAgent.js';
 
+import { getLineUserProfile, getLineGroupSummary } from './services/lineProfileService.js';
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const publicDir = path.join(__dirname, '../public');
@@ -76,6 +78,15 @@ const server = http.createServer(async (req, res) => {
             const userText = event.message.text;
             const source = event.source || {};
             const contextId = source.groupId || source.roomId || source.userId || 'default';
+
+            // 🟢 ดึงและสะสมชื่อโปรไฟล์ไลน์ (LINE Display Name) และชื่อกลุ่มจาก LINE API อัตโนมัติ
+            if (source.userId) {
+              getLineUserProfile(source.userId, source.groupId).catch(() => {});
+            }
+            if (source.groupId) {
+              getLineGroupSummary(source.groupId).catch(() => {});
+            }
+
             console.log(`[User LINE Msg (${contextId})]: ${userText}`);
             const aiResult = await processUserMessage(userText, contextId, source.userId);
             

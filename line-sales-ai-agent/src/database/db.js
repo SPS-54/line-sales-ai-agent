@@ -151,27 +151,51 @@ export const db = {
     return wl;
   },
 
+  saveProfileName(id, type = 'user', name = null) {
+    if (!id || !name) return;
+    const wl = this.getWhitelist();
+    const cleanId = String(id).trim();
+
+    if (type === 'group' || cleanId.startsWith('C') || cleanId.startsWith('R')) {
+      if (!wl.allowed_groups_details) wl.allowed_groups_details = {};
+      wl.allowed_groups_details[cleanId] = name;
+    } else {
+      if (!wl.allowed_users_details) wl.allowed_users_details = {};
+      wl.allowed_users_details[cleanId] = name;
+    }
+    this.saveWhitelist(wl);
+  },
+
   getFriendlyName(id) {
     if (!id || id === 'default') return 'แชตเริ่มต้น';
     const wl = this.getWhitelist();
     const cleanId = String(id).trim();
 
-    if (cleanId === 'U38d0a817340abb35375641be73a86b5e') return '👑 ผู้ดูแลระบบหลัก (Master Admin เครื่องที่ 1)';
-    if (cleanId === 'U38d0a817340a8b35375641be73a86b5e') return '👑 ผู้ดูแลระบบหลัก (Master Admin เครื่องที่ 2)';
+    const isMaster = this.isMasterAdmin(cleanId, cleanId);
+
+    // 1. Check saved whitelist details (Captured from LINE Profile API or Admin setting)
+    if (cleanId.startsWith('C') || cleanId.startsWith('R')) {
+      if (wl.allowed_groups_details && wl.allowed_groups_details[cleanId]) {
+        return `👥 ${wl.allowed_groups_details[cleanId]}`;
+      }
+    } else {
+      if (wl.allowed_users_details && wl.allowed_users_details[cleanId]) {
+        const profileName = wl.allowed_users_details[cleanId];
+        return isMaster ? `👑 ${profileName} (Master Admin)` : `👤 ${profileName}`;
+      }
+    }
+
+    // 2. Default Master Admin labels if LINE API name hasn't been fetched yet
+    if (cleanId === 'U38d0a817340abb35375641be73a86b5e') return '👑 เครื่องผู้ดูแลหลัก 1 (Master Admin)';
+    if (cleanId === 'U38d0a817340a8b35375641be73a86b5e') return '👑 เครื่องผู้ดูแลหลัก 2 (Master Admin)';
     if (cleanId === 'Ufdbc2cb193c2ffbe0e72dcef599b09a2') return '👤 คุณอนุมัติสิทธิ์แล้ว (Approved Admin)';
 
-    if (wl.allowed_groups_details && wl.allowed_groups_details[cleanId]) {
-      return wl.allowed_groups_details[cleanId];
-    }
-    if (wl.allowed_users_details && wl.allowed_users_details[cleanId]) {
-      return wl.allowed_users_details[cleanId];
-    }
-
+    // 3. Fallback Clean ID
     if (cleanId.startsWith('C') || cleanId.startsWith('R')) {
-      return `กลุ่มไลน์แชต (${cleanId.substring(0, 6)}...${cleanId.substring(cleanId.length - 4)})`;
+      return `👥 กลุ่มไลน์ (${cleanId.substring(0, 6)}...${cleanId.substring(cleanId.length - 4)})`;
     }
     if (cleanId.startsWith('U')) {
-      return `ยูสเซอร์ไลน์ (${cleanId.substring(0, 6)}...${cleanId.substring(cleanId.length - 4)})`;
+      return `👤 ยูสเซอร์ไลน์ (${cleanId.substring(0, 6)}...${cleanId.substring(cleanId.length - 4)})`;
     }
 
     return cleanId;
