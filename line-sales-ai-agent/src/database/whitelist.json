@@ -12,8 +12,13 @@
   ],
   "allowed_groups": [
     "default",
-    "Cacc76a409026f869d53813bb94cc0c58"
+    "Cacc76a409026f869d53813bb94cc0c58",
+    "Cacc76a409026f869d53813bb94cc0c11",
+    "Cacc76a409026f869d53813bb94cc0c22"
   ],
-  "allowed_groups_details": {},
+  "allowed_groups_details": {
+    "Cacc76a409026f869d53813bb94cc0c11": "กลุ่มภาคเหนือ",
+    "Cacc76a409026f869d53813bb94cc0c22": "กลุ่มภาคใต้"
+  },
   "allowed_users_details": {}
 }

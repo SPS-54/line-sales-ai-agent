@@ -1417,6 +1417,8 @@ export function buildFilteredStoresListFlex(titleLabel, stores = []) {
       storeBoxes.push({ type: 'separator', margin: 'md' });
     }
 
+    const groupLabel = s.context_id && s.context_id !== 'default' ? ` (${db.getFriendlyName(s.context_id)})` : '';
+
     storeBoxes.push({
       type: 'box',
       layout: 'vertical',
@@ -1425,7 +1427,7 @@ export function buildFilteredStoresListFlex(titleLabel, stores = []) {
       contents: [
         {
           type: 'text',
-          text: `${idx + 1}. 🏪 ร้าน ${storeName}`,
+          text: `${idx + 1}. 🏪 ร้าน ${storeName}${groupLabel}`,
           size: 'md',
           color: '#1E1B4B',
           weight: 'bold',
