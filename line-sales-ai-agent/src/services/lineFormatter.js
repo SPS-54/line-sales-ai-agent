@@ -1,7 +1,7 @@
 import { config } from '../config.js';
 import { generateGoogleCalendarUrl } from './googleCalendarService.js';
 import { sessionStore } from './sessionStore.js';
-import { cleanStoreName } from '../database/db.js';
+import { cleanStoreName, db } from '../database/db.js';
 
 /**
  * 1. รูปสินค้า (Product Carousel Flex Message)
@@ -1455,6 +1455,70 @@ export function buildFilteredStoresListFlex(titleLabel, stores = []) {
 
 export function buildAllStoresListFlex(stores = []) {
   return buildProvinceGroupFlex(stores);
+}
+
+/**
+ * การ์ดแสดงสถานะรายการสิทธิ์อนุมัติ (Whitelist Status Flex Card)
+ */
+export function buildWhitelistStatusFlex(wl, currentCtxLabel, isAllowed) {
+  const cleanUsers = (wl.allowed_users || []).filter(u => u !== 'default');
+  const cleanGroups = (wl.allowed_groups || []).filter(g => g !== 'default');
+
+  const userItems = cleanUsers.map((u, i) => ({
+    type: 'box', layout: 'horizontal', margin: 'xs', contents: [
+      { type: 'text', text: `${i + 1}. ${db.getFriendlyName(u)}`, size: 'sm', color: '#1E293B', wrap: true }
+    ]
+  }));
+
+  const groupItems = cleanGroups.map((g, i) => ({
+    type: 'box', layout: 'horizontal', margin: 'xs', contents: [
+      { type: 'text', text: `${i + 1}. ${db.getFriendlyName(g)}`, size: 'sm', color: '#1E293B', wrap: true }
+    ]
+  }));
+
+  return {
+    type: 'flex',
+    altText: `🛡️ รายการสิทธิ์ที่ได้รับอนุมัติในระบบ (Whitelist Status)`,
+    contents: {
+      type: 'bubble',
+      size: 'mega',
+      header: {
+        type: 'box', layout: 'vertical', backgroundColor: '#0F172A', paddingAll: 'lg',
+        contents: [
+          { type: 'text', text: '🛡️ SECURITY & WHITELIST STATUS', color: '#38BDF8', size: 'xs', weight: 'bold' },
+          { type: 'text', text: '🔒 รายชื่อสิทธิ์ที่ได้รับอนุมัติในระบบ', color: '#FFFFFF', size: 'lg', weight: 'bold', margin: 'xs' }
+        ]
+      },
+      body: {
+        type: 'box', layout: 'vertical', spacing: 'md', contents: [
+          // Master Admins Box
+          {
+            type: 'box', layout: 'vertical', backgroundColor: '#FEF3C7', paddingAll: 'md', cornerRadius: 'md', contents: [
+              { type: 'text', text: '👑 เครื่องผู้ดูแลหลัก (Master Admin - 2 เครื่อง):', size: 'xs', color: '#B45309', weight: 'bold' },
+              { type: 'text', text: '• 👑 ผู้ดูแลระบบหลัก (Master Admin เครื่องที่ 1)', size: 'sm', color: '#78350F', margin: 'xs' },
+              { type: 'text', text: '• 👑 ผู้ดูแลระบบหลัก (Master Admin เครื่องที่ 2)', size: 'sm', color: '#78350F', margin: 'xs' }
+            ]
+          },
+          { type: 'separator', margin: 'md' },
+          // Users
+          { type: 'text', text: `👤 ผู้ใช้งานที่ได้รับอนุมัติ (${cleanUsers.length} รายการ):`, size: 'sm', weight: 'bold', color: '#0F172A', margin: 'xs' },
+          ...(userItems.length > 0 ? userItems : [{ type: 'text', text: '  (ยังไม่มีผู้ใช้เพิ่มเติม)', size: 'xs', color: '#64748B' }]),
+          { type: 'separator', margin: 'md' },
+          // Groups
+          { type: 'text', text: `👥 กลุ่มแชตไลน์ที่ได้รับอนุมัติ (${cleanGroups.length} กลุ่ม):`, size: 'sm', weight: 'bold', color: '#0F172A', margin: 'xs' },
+          ...(groupItems.length > 0 ? groupItems : [{ type: 'text', text: '  (ยังไม่มีกลุ่มแชตเพิ่มเติม)', size: 'xs', color: '#64748B' }]),
+          { type: 'separator', margin: 'md' },
+          // Current Status
+          {
+            type: 'box', layout: 'vertical', backgroundColor: isAllowed ? '#ECFDF5' : '#FEF2F2', paddingAll: 'md', cornerRadius: 'md', contents: [
+              { type: 'text', text: `📌 แชตปัจจุบัน: ${currentCtxLabel}`, size: 'xs', color: isAllowed ? '#047857' : '#991B1B' },
+              { type: 'text', text: isAllowed ? '✅ ได้รับอนุมัติสิทธิ์เรียบร้อยแล้ว' : '❌ ยังไม่ได้รับอนุมัติสิทธิ์', size: 'sm', weight: 'bold', color: isAllowed ? '#059669' : '#DC2626', margin: 'xs' }
+            ]
+          }
+        ]
+      }
+    }
+  };
 }
 
 /**

@@ -29,7 +29,8 @@ import {
   buildCategoryMenuFlex,
   buildFormGuideFlex,
   buildWizardPromptFlex,
-  buildMasterSystemOverviewFlex
+  buildMasterSystemOverviewFlex,
+  buildWhitelistStatusFlex
 } from './lineFormatter.js';
 
 const SYSTEM_INSTRUCTION = `คุณคือ "SalesAI Assistant" ผู้ช่วยพนักงานขายอัจฉริยะในไลน์
@@ -46,17 +47,35 @@ export async function processUserMessage(userMessage, contextId = 'default', use
   const isAllowed = db.isContextAllowed(contextId, userId);
 
   // คำสั่งแอดมินลงทะเบียนสิทธิ์ (เฉพาะเครื่องหลัก Master Admin เท่านั้น)
-  if (text.includes('ลงทะเบียนสิทธิ์กลุ่มนี้') || text.includes('ลงทะเบียนกลุ่มนี้') || text.includes('อนุมัติกลุ่มนี้')) {
+  if (text.includes('ลงทะเบียนสิทธิ์กลุ่ม') || text.includes('ลงทะเบียนกลุ่ม') || text.includes('อนุมัติกลุ่ม')) {
     if (!db.isMasterAdmin(userId, contextId)) {
       return {
         text: `⛔ ขออภัยค่ะ คำสั่งลงทะเบียนอนุมัติสิทธิ์กลุ่มแชต สามารถทำได้โดยเครื่องผู้ดูแลระบบหลัก (Master Admin) เท่านั้นค่ะ`,
         flexMessage: null
       };
     }
-    db.addAllowedContext(contextId, 'group');
+
+    let targetGroup = contextId;
+    let groupName = null;
+
+    const rawInput = userMessage.replace(/ลงทะเบียนสิทธิ์กลุ่มนี้|ลงทะเบียนสิทธิ์กลุ่ม|ลงทะเบียนกลุ่มนี้|ลงทะเบียนกลุ่ม|อนุมัติกลุ่มนี้|อนุมัติกลุ่ม/gi, '').trim();
+    if (rawInput) {
+      const parts = rawInput.split(/\s+/);
+      if (parts[0].startsWith('C') || parts[0].startsWith('R')) {
+        targetGroup = parts[0];
+        if (parts[1]) groupName = parts.slice(1).join(' ');
+      } else {
+        groupName = rawInput;
+      }
+    }
+
+    db.addAllowedContext(targetGroup, 'group', groupName);
     syncWhitelistToGitHub().catch(() => {});
+
+    const friendlyLabel = groupName ? `กลุ่ม "${groupName}"` : db.getFriendlyName(targetGroup);
+
     return {
-      text: `🔒 [Master Admin Approved]: ลงทะเบียนอนุมัติสิทธิ์การใช้งานของกลุ่มแชตนี้ (${contextId}) เรียบร้อยแล้วค่ะ!`,
+      text: `🔒 [Master Admin Approved]: ลงทะเบียนอนุมัติสิทธิ์การใช้งานของ ${friendlyLabel} เรียบร้อยแล้วค่ะ!`,
       flexMessage: null
     };
   }
@@ -67,11 +86,25 @@ export async function processUserMessage(userMessage, contextId = 'default', use
         flexMessage: null
       };
     }
-    const targetUser = text.replace(/ลงทะเบียนสิทธิ์ผู้ใช้|ลงทะเบียนผู้ใช้|อนุมัติผู้ใช้/g, '').trim() || (userId || contextId);
-    db.addAllowedContext(targetUser, 'user');
+    let targetUser = (userId || contextId);
+    let userName = null;
+    const rawInput = userMessage.replace(/ลงทะเบียนสิทธิ์ผู้ใช้|ลงทะเบียนผู้ใช้|อนุมัติผู้ใช้/gi, '').trim();
+    if (rawInput) {
+      const parts = rawInput.split(/\s+/);
+      if (parts[0].startsWith('U')) {
+        targetUser = parts[0];
+        if (parts[1]) userName = parts.slice(1).join(' ');
+      } else {
+        userName = rawInput;
+      }
+    }
+    db.addAllowedContext(targetUser, 'user', userName);
     syncWhitelistToGitHub().catch(() => {});
+
+    const friendlyLabel = userName ? `ผู้ใช้งาน "${userName}"` : db.getFriendlyName(targetUser);
+
     return {
-      text: `🔒 [Master Admin Approved]: ลงทะเบียนอนุมัติสิทธิ์ผู้ใช้งาน (${targetUser}) เรียบร้อยแล้วค่ะ!`,
+      text: `🔒 [Master Admin Approved]: ลงทะเบียนอนุมัติสิทธิ์ผู้ใช้งาน ${friendlyLabel} เรียบร้อยแล้วค่ะ!`,
       flexMessage: null
     };
   }
@@ -82,11 +115,12 @@ export async function processUserMessage(userMessage, contextId = 'default', use
         flexMessage: null
       };
     }
-    const targetId = text.replace(/ยกเลิกสิทธิ์กลุ่ม|ยกเลิกสิทธิ์ผู้ใช้/g, '').trim() || contextId;
+    const targetId = userMessage.replace(/ยกเลิกสิทธิ์กลุ่ม|ยกเลิกสิทธิ์ผู้ใช้/gi, '').trim() || contextId;
+    const friendlyLabel = db.getFriendlyName(targetId);
     db.removeAllowedContext(targetId);
     syncWhitelistToGitHub().catch(() => {});
     return {
-      text: `🔒 [Master Admin Action]: ยกเลิกสิทธิ์การใช้งานของ (${targetId}) เรียบร้อยแล้วค่ะ!`,
+      text: `🔒 [Master Admin Action]: ยกเลิกสิทธิ์การใช้งานของ (${friendlyLabel}) เรียบร้อยแล้วค่ะ!`,
       flexMessage: null
     };
   }
@@ -96,18 +130,19 @@ export async function processUserMessage(userMessage, contextId = 'default', use
     const cleanGroups = (wl.allowed_groups || []).filter(g => g !== 'default');
 
     const usersList = cleanUsers.length > 0
-      ? cleanUsers.map((u, i) => `  ${i + 1}. 👤 ${u}${u === wl.master_admin ? ' 👑 [Master Admin]' : ''}`).join('\n')
+      ? cleanUsers.map((u, i) => `  ${i + 1}. 👤 ${db.getFriendlyName(u)}`).join('\n')
       : '  (ยังไม่มีผู้ใช้เพิ่มเติม)';
 
     const groupsList = cleanGroups.length > 0
-      ? cleanGroups.map((g, i) => `  ${i + 1}. 👥 ${g}`).join('\n')
+      ? cleanGroups.map((g, i) => `  ${i + 1}. 👥 ${db.getFriendlyName(g)}`).join('\n')
       : '  (ยังไม่มีกลุ่มแชตเพิ่มเติม)';
 
-    const masterAdminNotice = `👑 เครื่องผู้ดูแลหลัก (Master Admin): ${wl.master_admin || 'ยังไม่ได้กำหนด'}`;
+    const currentCtxLabel = db.getFriendlyName(contextId);
+    const flexCard = buildWhitelistStatusFlex(wl, currentCtxLabel, isAllowed);
 
     return {
-      text: `🛡️ รายการสิทธิ์ที่ได้รับอนุมัติในระบบ (Whitelist Status):\n${masterAdminNotice}\n\n👤 ผู้ใช้ส่วนตัวที่ได้รับอนุมัติ (${cleanUsers.length} คน):\n${usersList}\n\n👥 กลุ่มแชตไลน์ที่ได้รับอนุมัติ (${cleanGroups.length} กลุ่ม):\n${groupsList}\n\n📌 กลุ่ม/แชตปัจจุบันนี้: ${isAllowed ? '✅ ได้รับอนุมัติสิทธิ์แล้ว' : '❌ ยังไม่ได้รับสิทธิ์'}`,
-      flexMessage: null
+      text: `🛡️ รายการสิทธิ์ที่ได้รับอนุมัติในระบบ (Whitelist Status):\n\n👑 เครื่องผู้ดูแลหลัก (Master Admin - 2 เครื่อง):\n  • 👑 ผู้ดูแลระบบหลัก (Master Admin เครื่องที่ 1)\n  • 👑 ผู้ดูแลระบบหลัก (Master Admin เครื่องที่ 2)\n\n👤 ผู้ใช้ส่วนตัวที่ได้รับอนุมัติ (${cleanUsers.length} คน):\n${usersList}\n\n👥 กลุ่มแชตไลน์ที่ได้รับอนุมัติ (${cleanGroups.length} กลุ่ม):\n${groupsList}\n\n📌 แชตปัจจุบัน (${currentCtxLabel}): ${isAllowed ? '✅ ได้รับอนุมัติสิทธิ์แล้ว' : '❌ ยังไม่ได้รับสิทธิ์'}`,
+      flexMessage: flexCard
     };
   }
 

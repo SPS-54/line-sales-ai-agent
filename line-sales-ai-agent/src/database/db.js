@@ -133,18 +133,48 @@ export const db = {
     return isUserAllowed;
   },
 
-  addAllowedContext(contextId, type = 'user') {
+  addAllowedContext(contextId, type = 'user', name = null) {
     const wl = this.getWhitelist();
     const cleanId = String(contextId || 'default').trim();
     if (type === 'group') {
       if (!Array.isArray(wl.allowed_groups)) wl.allowed_groups = [];
       if (!wl.allowed_groups.includes(cleanId)) wl.allowed_groups.push(cleanId);
+      if (!wl.allowed_groups_details) wl.allowed_groups_details = {};
+      if (name) wl.allowed_groups_details[cleanId] = name;
     } else {
       if (!Array.isArray(wl.allowed_users)) wl.allowed_users = [];
       if (!wl.allowed_users.includes(cleanId)) wl.allowed_users.push(cleanId);
+      if (!wl.allowed_users_details) wl.allowed_users_details = {};
+      if (name) wl.allowed_users_details[cleanId] = name;
     }
     this.saveWhitelist(wl);
     return wl;
+  },
+
+  getFriendlyName(id) {
+    if (!id || id === 'default') return 'แชตเริ่มต้น';
+    const wl = this.getWhitelist();
+    const cleanId = String(id).trim();
+
+    if (cleanId === 'U38d0a817340abb35375641be73a86b5e') return '👑 ผู้ดูแลระบบหลัก (Master Admin เครื่องที่ 1)';
+    if (cleanId === 'U38d0a817340a8b35375641be73a86b5e') return '👑 ผู้ดูแลระบบหลัก (Master Admin เครื่องที่ 2)';
+    if (cleanId === 'Ufdbc2cb193c2ffbe0e72dcef599b09a2') return '👤 คุณอนุมัติสิทธิ์แล้ว (Approved Admin)';
+
+    if (wl.allowed_groups_details && wl.allowed_groups_details[cleanId]) {
+      return wl.allowed_groups_details[cleanId];
+    }
+    if (wl.allowed_users_details && wl.allowed_users_details[cleanId]) {
+      return wl.allowed_users_details[cleanId];
+    }
+
+    if (cleanId.startsWith('C') || cleanId.startsWith('R')) {
+      return `กลุ่มไลน์แชต (${cleanId.substring(0, 6)}...${cleanId.substring(cleanId.length - 4)})`;
+    }
+    if (cleanId.startsWith('U')) {
+      return `ยูสเซอร์ไลน์ (${cleanId.substring(0, 6)}...${cleanId.substring(cleanId.length - 4)})`;
+    }
+
+    return cleanId;
   },
 
   removeAllowedContext(contextId) {
