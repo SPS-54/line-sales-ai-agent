@@ -155,69 +155,69 @@ function handleSingleFieldPromptResponse(pendingField, userMessage, contextId = 
   if (field === 'contact_persons') {
     const parsed = parseGeneralInfoText(`ผู้ติดต่อ ${userMessage}`);
     store = db.saveGeneralInfo(storeName, parsed, mode || 'append', contextId);
-    flexMessage = isRecordingSession ? buildAll3CategoryFlexCards(store, true) : buildStoreGeneralInfoFlex(store, false);
+    flexMessage = isRecordingSession ? buildAll3CategoryFlexCards(store, true) : buildStoreGeneralInfoFlex(store, false, contextId);
   } else if (field === 'phone') {
     store = db.saveGeneralInfo(storeName, { phone: userMessage.trim() }, 'replace', contextId);
-    flexMessage = isRecordingSession ? buildAll3CategoryFlexCards(store, true) : buildStoreGeneralInfoFlex(store, false);
+    flexMessage = isRecordingSession ? buildAll3CategoryFlexCards(store, true) : buildStoreGeneralInfoFlex(store, false, contextId);
   } else if (field === 'address') {
     store = db.saveGeneralInfo(storeName, { address: userMessage.trim() }, 'replace', contextId);
-    flexMessage = isRecordingSession ? buildAll3CategoryFlexCards(store, true) : buildStoreGeneralInfoFlex(store, false);
+    flexMessage = isRecordingSession ? buildAll3CategoryFlexCards(store, true) : buildStoreGeneralInfoFlex(store, false, contextId);
   } else if (field === 'map_url') {
     store = db.saveGeneralInfo(storeName, { map_url: userMessage.trim() }, 'replace', contextId);
-    flexMessage = isRecordingSession ? buildAll3CategoryFlexCards(store, true) : buildStoreGeneralInfoFlex(store, false);
+    flexMessage = isRecordingSession ? buildAll3CategoryFlexCards(store, true) : buildStoreGeneralInfoFlex(store, false, contextId);
   } else if (field === 'delivery_by') {
     store = db.saveGeneralInfo(storeName, { delivery_by: userMessage.trim(), delivery_schedule: userMessage.trim() }, 'replace', contextId);
-    flexMessage = isRecordingSession ? buildAll3CategoryFlexCards(store, true) : buildStoreGeneralInfoFlex(store, false);
+    flexMessage = isRecordingSession ? buildAll3CategoryFlexCards(store, true) : buildStoreGeneralInfoFlex(store, false, contextId);
   } else if (field === 'credit_days') {
     const match = userMessage.match(/\d+/);
     const days = match ? parseInt(match[0]) : 0;
     store = db.saveGeneralInfo(storeName, { credit_days: days }, 'replace', contextId);
-    flexMessage = isRecordingSession ? buildAll3CategoryFlexCards(store, true) : buildStoreGeneralInfoFlex(store, false);
+    flexMessage = isRecordingSession ? buildAll3CategoryFlexCards(store, true) : buildStoreGeneralInfoFlex(store, false, contextId);
   } else if (field === 'notes') {
     store = db.saveGeneralInfo(storeName, { notes: userMessage.trim() }, 'append', contextId);
-    flexMessage = isRecordingSession ? buildAll3CategoryFlexCards(store, true) : buildStoreGeneralInfoFlex(store, false);
+    flexMessage = isRecordingSession ? buildAll3CategoryFlexCards(store, true) : buildStoreGeneralInfoFlex(store, false, contextId);
   }
   // หมวดข้อมูลการขาย (Sales Details)
   else if (field === 'payment_type') {
     store = db.saveSalesDetails(storeName, { payment_type: userMessage.trim() }, 'replace', contextId);
-    flexMessage = isRecordingSession ? buildAll3CategoryFlexCards(store, true) : buildStoreSalesDetailsFlex(store);
+    flexMessage = isRecordingSession ? buildAll3CategoryFlexCards(store, true) : buildStoreSalesDetailsFlex(store, false, contextId);
   } else if (field === 'brands_sold') {
     const brands = userMessage.split(/[,;\n]|และ/).map(b => b.trim()).filter(Boolean);
     store = db.saveSalesDetails(storeName, { brands_sold: brands }, 'append', contextId);
-    flexMessage = isRecordingSession ? buildAll3CategoryFlexCards(store, true) : buildStoreSalesDetailsFlex(store);
+    flexMessage = isRecordingSession ? buildAll3CategoryFlexCards(store, true) : buildStoreSalesDetailsFlex(store, false, contextId);
   } else if (field === 'last_order_date') {
     store = db.saveSalesDetails(storeName, { last_order_date: userMessage.trim() }, 'replace', contextId);
-    flexMessage = isRecordingSession ? buildAll3CategoryFlexCards(store, true) : buildStoreSalesDetailsFlex(store);
+    flexMessage = isRecordingSession ? buildAll3CategoryFlexCards(store, true) : buildStoreSalesDetailsFlex(store, false, contextId);
   } else if (field === 'last_order_amount') {
     const match = userMessage.match(/\d+/);
     const amt = match ? parseInt(match[0]) : 0;
     store = db.saveSalesDetails(storeName, { last_order_amount: amt }, 'append', contextId);
-    flexMessage = isRecordingSession ? buildAll3CategoryFlexCards(store, true) : buildStoreSalesDetailsFlex(store);
+    flexMessage = isRecordingSession ? buildAll3CategoryFlexCards(store, true) : buildStoreSalesDetailsFlex(store, false, contextId);
   } else if (field === 'ordered_items') {
     const items = userMessage.split(/[,;\n]|และ/).map(i => i.trim()).filter(Boolean);
     store = db.saveSalesDetails(storeName, { ordered_items: items }, 'append', contextId);
-    flexMessage = isRecordingSession ? buildAll3CategoryFlexCards(store, true) : buildStoreSalesDetailsFlex(store);
+    flexMessage = isRecordingSession ? buildAll3CategoryFlexCards(store, true) : buildStoreSalesDetailsFlex(store, false, contextId);
   } else if (field === 'top_selling_products') {
     const top = userMessage.split(/[,;\n]|และ/).map(t => t.trim()).filter(Boolean);
     store = db.saveSalesDetails(storeName, { top_selling_products: top }, 'append', contextId);
-    flexMessage = isRecordingSession ? buildAll3CategoryFlexCards(store, true) : buildStoreSalesDetailsFlex(store);
+    flexMessage = isRecordingSession ? buildAll3CategoryFlexCards(store, true) : buildStoreSalesDetailsFlex(store, false, contextId);
   }
   // หมวดโอกาสเสนอขาย (Sales Opportunities)
   else if (field === 'opportunity_status') {
     store = db.saveSalesOpportunities(storeName, { opportunity_status: userMessage.trim() }, 'replace', contextId);
-    flexMessage = isRecordingSession ? buildAll3CategoryFlexCards(store, true) : buildStoreSalesOpportunitiesFlex(store);
+    flexMessage = isRecordingSession ? buildAll3CategoryFlexCards(store, true) : buildStoreSalesOpportunitiesFlex(store, false, contextId);
   } else if (field === 'recommended_products') {
     store = db.saveSalesOpportunities(storeName, { recommended_products: [userMessage.trim()] }, mode || 'append', contextId);
-    flexMessage = isRecordingSession ? buildAll3CategoryFlexCards(store, true) : buildStoreSalesOpportunitiesFlex(store);
+    flexMessage = isRecordingSession ? buildAll3CategoryFlexCards(store, true) : buildStoreSalesOpportunitiesFlex(store, false, contextId);
   } else if (field === 'reason') {
     store = db.saveSalesOpportunities(storeName, { reason: userMessage.trim() }, 'replace', contextId);
-    flexMessage = isRecordingSession ? buildAll3CategoryFlexCards(store, true) : buildStoreSalesOpportunitiesFlex(store);
+    flexMessage = isRecordingSession ? buildAll3CategoryFlexCards(store, true) : buildStoreSalesOpportunitiesFlex(store, false, contextId);
   } else if (field === 'target_pitch_date') {
     store = db.saveSalesOpportunities(storeName, { target_pitch_date: userMessage.trim() }, 'replace', contextId);
-    flexMessage = isRecordingSession ? buildAll3CategoryFlexCards(store, true) : buildStoreSalesOpportunitiesFlex(store);
+    flexMessage = isRecordingSession ? buildAll3CategoryFlexCards(store, true) : buildStoreSalesOpportunitiesFlex(store, false, contextId);
   } else {
     store = db.saveGeneralInfo(storeName, { notes: userMessage.trim() }, 'append', contextId);
-    flexMessage = isRecordingSession ? buildAll3CategoryFlexCards(store, true) : buildStoreGeneralInfoFlex(store, isRecordingSession);
+    flexMessage = isRecordingSession ? buildAll3CategoryFlexCards(store, true) : buildStoreGeneralInfoFlex(store, isRecordingSession, contextId);
   }
 
   const sessionNotice = isRecordingSession ? ' (ยังอยู่ในโหมดบันทึกข้อมูลร้านนี้ กดปุ่ม [✅ จบการบันทึกข้อมูลพื้นฐานร้านค้า] เมื่อบันทึกเสร็จนะคะ)' : '';
@@ -298,13 +298,13 @@ function checkConflictAndPrompt(storeName, categoryKey, categoryTitle, parsedDat
     };
   } else {
     const savedStore = defaultSaveFn();
-    const activeSession = sessionStore.getActiveStoreSession('default');
+    const activeSession = sessionStore.getActiveStoreSession(contextId);
     const isRecording = activeSession && activeSession.isRecording;
 
     let flex;
-    if (categoryKey === 'general_info') flex = buildStoreGeneralInfoFlex(savedStore, isRecording);
-    if (categoryKey === 'sales_details') flex = buildStoreSalesDetailsFlex(savedStore);
-    if (categoryKey === 'sales_opportunities') flex = buildStoreSalesOpportunitiesFlex(savedStore);
+    if (categoryKey === 'general_info') flex = buildStoreGeneralInfoFlex(savedStore, isRecording, contextId);
+    if (categoryKey === 'sales_details') flex = buildStoreSalesDetailsFlex(savedStore, false, contextId);
+    if (categoryKey === 'sales_opportunities') flex = buildStoreSalesOpportunitiesFlex(savedStore, false, contextId);
 
     return {
       text: `บันทึกและจัดหมวดหมู่ข้อมูล [${categoryTitle}] ของร้าน "${savedStore.store_name}" เข้าสู่หัวข้อต่างๆ เรียบร้อยแล้วค่ะ!`,
@@ -328,14 +328,21 @@ function handleLocalFallbackMode(userMessage, contextId = 'default') {
 
     return {
       text: `✅ จบการบันทึกข้อมูลพื้นฐานร้านค้า "${displayStoreName}" เรียบร้อยแล้วค่ะ ข้อมูลถูกจัดเก็บสมบูรณ์ในระบบแล้วค่ะ!`,
-      flexMessage: buildStoreGeneralInfoFlex(store, false)
+      flexMessage: buildStoreGeneralInfoFlex(store, false, contextId)
     };
   }
 
-  // 🎯 0.1 คำสั่งเริ่มบันทึกข้อมูลพื้นฐานร้านค้าใหม่ (Start Store Recording Session)
+  // 🎯 0.1 คำสั่งเริ่มบันทึกข้อมูลพื้นฐานร้านค้าใหม่ (Start Store Recording Session or Save Full General Info)
   if ((text.includes('บันทึกข้อมูล') || text.includes('ขอลงทะเบียนร้าน') || text.includes('เพิ่มร้าน')) && !text.includes('การขาย') && !text.includes('โอกาส') && !text.includes('สินค้า')) {
-    const rawStore = userMessage.replace(/ขอแบบฟอร์มบันทึกข้อมูล|บันทึกข้อมูลร้าน|บันทึกข้อมูล|ขอลงทะเบียนร้านค้า|ขอลงทะเบียนร้าน|เพิ่มร้านใหม่|เพิ่มร้าน|ร้าน/g, '').trim();
-    const storeName = cleanStoreName(rawStore);
+    const parsed = parseGeneralInfoText(userMessage);
+    
+    let rawStore = userMessage.replace(/ขอแบบฟอร์มบันทึกข้อมูล|บันทึกข้อมูลร้าน|บันทึกข้อมูล|ขอลงทะเบียนร้านค้า|ขอลงทะเบียนร้าน|เพิ่มร้านใหม่|เพิ่มร้าน/g, '').trim();
+    if (rawStore.startsWith('ร้าน')) {
+      rawStore = rawStore.replace(/^ร้าน\s*/, '').trim();
+    }
+    
+    let storeName = parsed.store_name || rawStore.split(/[\s,:\n]/)[0].trim();
+    storeName = cleanStoreName(storeName);
 
     if (!storeName || storeName === 'ใหม่') {
       return {
@@ -345,17 +352,14 @@ function handleLocalFallbackMode(userMessage, contextId = 'default') {
     }
 
     sessionStore.setActiveStoreSession(contextId, storeName);
-    let store = db.findStoreByName(storeName, contextId);
-    if (!store) {
-      store = db.saveGeneralInfo(storeName, {}, 'append', contextId);
-    }
+    const savedStore = db.saveGeneralInfo(storeName, parsed, 'append', contextId);
 
     return {
       text: `🔄 เริ่มโหมดบันทึกข้อมูลร้านค้า "${storeName}" เรียบร้อยแล้วค่ะ!\n\nระบบจัดเตรียมแบบฟอร์มการ์ดครบทั้ง 3 หมวดหลัก (1. ข้อมูลพื้นฐานร้านค้า, 2. ข้อมูลการขาย, 3. โอกาสเสนอขาย) ให้คุณเลือกกดปุ่ม 1-Tap หรือพิมพ์ป้อนข้อมูลต่อได้ทันทีค่ะ!`,
       flexMessage: [
-        buildStoreGeneralInfoFlex(store, true),
-        buildStoreSalesDetailsFlex(store),
-        buildStoreSalesOpportunitiesFlex(store)
+        buildStoreGeneralInfoFlex(savedStore, true, contextId),
+        buildStoreSalesDetailsFlex(savedStore, false, contextId),
+        buildStoreSalesOpportunitiesFlex(savedStore, false, contextId)
       ]
     };
   }
