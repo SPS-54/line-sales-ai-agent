@@ -8,17 +8,11 @@
   "allowed_users": [
     "default",
     "U38d0a817340abb35375641be73a86b5e",
-    "U38d0a817340a8b35375641be73a86b5e",
-    "Ufdbc2cb193c2ffbe0e72dcef599b09a2"
+    "U38d0a817340a8b35375641be73a86b5e"
   ],
   "allowed_groups": [
-    "default",
-    "Cacc76a409026f869d53813bb94cc0c58",
-    "C_NEW_UNAPPROVED_GROUP_99",
-    "C_GROUP_NORTH_REGION",
-    "C_GROUP_SOUTH_REGION"
+    "default"
   ],
-  "allowed_groups_details": {
-    "Cacc76a409026f869d53813bb94cc0c58": "กลุ่มขายภาคเหนือ"
-  }
+  "allowed_groups_details": {},
+  "allowed_users_details": {}
 }
