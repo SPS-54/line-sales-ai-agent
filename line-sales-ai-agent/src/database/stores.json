@@ -186,8 +186,26 @@
       "line_contact": null,
       "line_contacts": null
     },
-    "sales_details": {},
+    "sales_details": {
+      "payment_type": "ไม่ระบุ",
+      "brands_sold": [
+        "-"
+      ],
+      "last_order_date": "15/8/2569",
+      "last_order_amount": 0,
+      "calendar_year": 2069,
+      "calendar_month": 8,
+      "monthly_sales": 0,
+      "yearly_sales_ytd": 0,
+      "total_sales_ytd": 0,
+      "order_history": [],
+      "yearly_breakdown": [],
+      "ordered_items": [
+        "SPS ไม้แขวนลวด No.999"
+      ],
+      "top_selling_products": []
+    },
     "sales_opportunities": {},
-    "updated_at": "2026-08-15T05:12:13.205Z"
+    "updated_at": "2026-08-15T05:13:15.067Z"
   }
 ]
