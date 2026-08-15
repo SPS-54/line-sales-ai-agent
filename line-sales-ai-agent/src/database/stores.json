@@ -97,12 +97,12 @@
         "TTI"
       ],
       "last_order_date": "29/7/69",
-      "last_order_amount": 15595,
+      "last_order_amount": 2295,
       "calendar_year": 2026,
       "calendar_month": 8,
-      "monthly_sales": 20185,
-      "yearly_sales_ytd": 20185,
-      "total_sales_ytd": 20185,
+      "monthly_sales": 22480,
+      "yearly_sales_ytd": 22480,
+      "total_sales_ytd": 22480,
       "order_history": [
         {
           "date": "16/7/69",
@@ -138,19 +138,26 @@
           "year": 2026,
           "month": 8,
           "timestamp": 1786768643273
+        },
+        {
+          "date": "29/7/69",
+          "amount": 2295,
+          "year": 2026,
+          "month": 8,
+          "timestamp": 1786768710315
         }
       ],
       "yearly_breakdown": [
         {
           "year": 2026,
           "buddhistYear": 2569,
-          "total": 20185
+          "total": 22480
         }
       ],
       "ordered_items": [],
       "top_selling_products": []
     },
     "sales_opportunities": {},
-    "updated_at": "2026-08-15T04:37:23.274Z"
+    "updated_at": "2026-08-15T04:38:30.315Z"
   }
 ]
