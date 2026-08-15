@@ -96,9 +96,9 @@
       "brands_sold": [
         "TTI"
       ],
-      "last_order_date": "15/8/2569",
+      "last_order_date": "16/7/69",
       "last_order_amount": 0,
-      "calendar_year": 2069,
+      "calendar_year": 2026,
       "calendar_month": 8,
       "monthly_sales": 0,
       "yearly_sales_ytd": 0,
@@ -109,6 +109,6 @@
       "top_selling_products": []
     },
     "sales_opportunities": {},
-    "updated_at": "2026-08-15T04:32:22.872Z"
+    "updated_at": "2026-08-15T04:35:08.321Z"
   }
 ]
