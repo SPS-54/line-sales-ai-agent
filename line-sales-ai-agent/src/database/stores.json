@@ -68,5 +68,47 @@
       ]
     },
     "updated_at": "2026-08-13T14:03:56.573Z"
+  },
+  {
+    "id": "STORE-1786768289059",
+    "context_id": "Cacc76a409026f869d53813bb94cc0c58",
+    "store_name": "ปัวเครื่องครัว",
+    "general_info": {
+      "store_name": "ปัวเครื่องครัว",
+      "contact_persons": [
+        "เฮียชัช (เจ้าของร้าน)"
+      ],
+      "phone": "เฮีย 0801230890",
+      "phones": [
+        "เฮีย 0801230890"
+      ],
+      "address": "อ.ปัว จ.น่าน",
+      "map_url": "",
+      "delivery_by": "เป็นหนึ่งทรานสปอร์ต",
+      "delivery_schedule": "เป็นหนึ่งทรานสปอร์ต",
+      "notes": "ไม่รับเซลล์วันอาทิตย์,TTIลด2%",
+      "credit_days": 30,
+      "line_contact": null,
+      "line_contacts": null
+    },
+    "sales_details": {
+      "payment_type": "โอนเงินเข้าส่วนตัว",
+      "brands_sold": [
+        "TTI"
+      ],
+      "last_order_date": "15/8/2569",
+      "last_order_amount": 0,
+      "calendar_year": 2069,
+      "calendar_month": 8,
+      "monthly_sales": 0,
+      "yearly_sales_ytd": 0,
+      "total_sales_ytd": 0,
+      "order_history": [],
+      "yearly_breakdown": [],
+      "ordered_items": [],
+      "top_selling_products": []
+    },
+    "sales_opportunities": {},
+    "updated_at": "2026-08-15T04:31:29.082Z"
   }
 ]
