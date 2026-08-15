@@ -100,9 +100,9 @@
       "last_order_amount": 2280,
       "calendar_year": 2026,
       "calendar_month": 8,
-      "monthly_sales": 2310,
-      "yearly_sales_ytd": 2310,
-      "total_sales_ytd": 2310,
+      "monthly_sales": 4590,
+      "yearly_sales_ytd": 4590,
+      "total_sales_ytd": 4590,
       "order_history": [
         {
           "date": "16/7/69",
@@ -124,19 +124,26 @@
           "year": 2026,
           "month": 8,
           "timestamp": 1786768580187
+        },
+        {
+          "date": "29/7/69",
+          "amount": 2280,
+          "year": 2026,
+          "month": 8,
+          "timestamp": 1786768636292
         }
       ],
       "yearly_breakdown": [
         {
           "year": 2026,
           "buddhistYear": 2569,
-          "total": 2310
+          "total": 4590
         }
       ],
       "ordered_items": [],
       "top_selling_products": []
     },
     "sales_opportunities": {},
-    "updated_at": "2026-08-15T04:36:20.187Z"
+    "updated_at": "2026-08-15T04:37:16.293Z"
   }
 ]
