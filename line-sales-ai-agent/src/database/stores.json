@@ -207,5 +207,48 @@
     },
     "sales_opportunities": {},
     "updated_at": "2026-08-15T05:16:20.978Z"
+  },
+  {
+    "id": "STORE-1786773056617",
+    "context_id": "Cc95f4836b81ac0fbe191b2bc0e51a792",
+    "store_name": "ดวงพร",
+    "general_info": {
+      "store_name": "ดวงพร",
+      "contact_persons": [
+        "น้าป้อม (เจ้าของร้าน)",
+        "พี่เบิร์ด(สั่งของ)"
+      ],
+      "phone": "น้าป้อม 0815575375",
+      "phones": [
+        "น้าป้อม 0815575375"
+      ],
+      "address": "อ.บางคล้า จ.ฉะเชิงเทรา",
+      "map_url": "",
+      "delivery_by": "มงคลทรานสปอร์ต",
+      "delivery_schedule": "มงคลทรานสปอร์ต",
+      "notes": "เวลาทำงาน 09.00-16.00 น. , ไม่รับเซลล์วันจันทร์",
+      "credit_days": 30,
+      "line_contact": null,
+      "line_contacts": null
+    },
+    "sales_details": {
+      "payment_type": "เก็บเงินสด,โอนเข้าบริษัท",
+      "brands_sold": [
+        "TTI"
+      ],
+      "last_order_date": "15/8/2569",
+      "last_order_amount": 0,
+      "calendar_year": 2069,
+      "calendar_month": 8,
+      "monthly_sales": 0,
+      "yearly_sales_ytd": 0,
+      "total_sales_ytd": 0,
+      "order_history": [],
+      "yearly_breakdown": [],
+      "ordered_items": [],
+      "top_selling_products": []
+    },
+    "sales_opportunities": {},
+    "updated_at": "2026-08-15T05:50:56.723Z"
   }
 ]
