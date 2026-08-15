@@ -245,10 +245,13 @@
       "total_sales_ytd": 0,
       "order_history": [],
       "yearly_breakdown": [],
-      "ordered_items": [],
+      "ordered_items": [
+        "TTI ขัน 20 ใส",
+        "TTI ขันด้าม 019 ใส"
+      ],
       "top_selling_products": []
     },
     "sales_opportunities": {},
-    "updated_at": "2026-08-15T05:50:56.723Z"
+    "updated_at": "2026-08-15T05:54:37.769Z"
   }
 ]
