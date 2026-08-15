@@ -96,13 +96,13 @@
       "brands_sold": [
         "TTI"
       ],
-      "last_order_date": "16/7/69",
+      "last_order_date": "29/7/69",
       "last_order_amount": 15,
       "calendar_year": 2026,
       "calendar_month": 8,
-      "monthly_sales": 15,
-      "yearly_sales_ytd": 15,
-      "total_sales_ytd": 15,
+      "monthly_sales": 30,
+      "yearly_sales_ytd": 30,
+      "total_sales_ytd": 30,
       "order_history": [
         {
           "date": "16/7/69",
@@ -110,19 +110,26 @@
           "year": 2026,
           "month": 8,
           "timestamp": 1786768522033
+        },
+        {
+          "date": "29/7/69",
+          "amount": 15,
+          "year": 2026,
+          "month": 8,
+          "timestamp": 1786768571809
         }
       ],
       "yearly_breakdown": [
         {
           "year": 2026,
           "buddhistYear": 2569,
-          "total": 15
+          "total": 30
         }
       ],
       "ordered_items": [],
       "top_selling_products": []
     },
     "sales_opportunities": {},
-    "updated_at": "2026-08-15T04:35:22.033Z"
+    "updated_at": "2026-08-15T04:36:11.809Z"
   }
 ]
