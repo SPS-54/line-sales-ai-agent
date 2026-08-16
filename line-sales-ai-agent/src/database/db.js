@@ -91,6 +91,18 @@ export const db = {
     syncWhitelistToGitHub().catch(() => {});
   },
 
+  getRequireGroupTag() {
+    const wl = this.getWhitelist();
+    return wl.require_group_tag !== false; // ค่าเริ่มต้นคือ true (ต้องแท็กเรียกเท่านั้น)
+  },
+
+  setRequireGroupTag(enabled) {
+    const wl = this.getWhitelist();
+    wl.require_group_tag = !!enabled;
+    this.saveWhitelist(wl);
+    return wl.require_group_tag;
+  },
+
   saveStores(stores) {
     fs.writeFileSync(storesFilePath, JSON.stringify(stores, null, 2), 'utf-8');
     syncStoresToGitHub().catch(() => {});

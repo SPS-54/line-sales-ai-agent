@@ -41,12 +41,45 @@ const SYSTEM_INSTRUCTION = `คุณคือ "SalesAI Assistant" ผู้ช�
 2. "ข้อมูลการขาย": บันทึก/ดึงข้อมูลการขาย (ประเภทการชำระ, แบรนด์ที่ขาย, สั่งซื้อล่าสุด, ยอดขายล่าสุด, ยอดขายสะสม เดือน/ปี, ยอดขายรายปี, สินค้าที่สั่ง, สินค้าขายดี) (ใช้ get_store_sales_details / save_store_sales_details)
 3. "โอกาสเสนอขาย": บันทึก/ดึงโอกาสเสนอขาย (สถานะโอกาส, สินค้าแนะนำ, เหตุผล, แผนงานวันเข้าเสนอขาย) (ใช้ get_store_sales_opportunities / save_store_sales_opportunities)`;
 
-export async function processUserMessage(userMessage, contextId = 'default', userId = null) {
-  const text = (userMessage || '').trim();
+export async function processUserMessage(rawUserMessage, contextId = 'default', userId = null) {
+  const rawText = (rawUserMessage || '').trim();
+  if (!rawText) return null;
+
+  const lowerRaw = rawText.toLowerCase();
+  const isGroupChat = contextId.startsWith('C') || contextId.startsWith('R');
+  const hasMention = rawText.includes('@') || /^(?:บอท|bot|salesai)\b/i.test(rawText);
+  const isSystemCommand = /^(?:ขอข้อมูล|ดึงข้อมูล|ขอโอกาส|ขอรูป|แสดงรายชื่อ|บันทึกข้อมูล|จบการบันทึก|เสร็จสิ้นการบันทึก|เลิกบันทึก|ขอเพิ่ม|ขอเปลี่ยน|ขอใส่|ขอเลือกลบ|ดูสินค้า|แบบฟอร์ม|คู่มือ|เช็คสิทธิ์|ลงทะเบียน|ยกเลิกสิทธิ์|ตั้งชื่อ|ตั้งค่า)/i.test(rawText);
+
+  // 🏷️ ระบบตรวจสอบการแท็กเรียกในกลุ่มแชต (Tag Requirement Check in Group Chat)
+  const requireGroupTag = db.getRequireGroupTag();
+  if (isGroupChat && requireGroupTag && !hasMention && !isSystemCommand) {
+    // สมาชิกคุยเรื่องทั่วไปในกลุ่มโดยไม่แท็กบอท -> เงียบไม่ตอบแทรก 100%
+    return null;
+  }
+
+  // ถอดแท็กนำหน้าออกให้อัตโนมัติ (เช่น "@SalesAI ขอข้อมูลร้านเชียงใหม่ซุปเปอร์ถูก" -> "ขอข้อมูลร้านเชียงใหม่ซุปเปอร์ถูก")
+  let cleanedMessage = rawText.replace(/^@\S+\s*/, '').replace(/^(?:บอท|bot|salesai)\s*/gi, '').trim();
+  if (!cleanedMessage) cleanedMessage = rawText;
+
+  const userMessage = cleanedMessage;
+  const text = userMessage;
   const lowerText = text.toLowerCase();
 
   // 0. ตรวจสอบสิทธิ์การใช้งาน (Security Whitelist Check)
   const isAllowed = db.isContextAllowed(contextId, userId);
+
+  // คำสั่งแอดมินตั้งค่าระบบแท็กเรียกในกลุ่ม (เฉพาะเครื่องหลัก Master Admin เท่านั้น)
+  if (text.includes('ตั้งค่าแท็กในกลุ่ม') || text.includes('เปิดระบบแท็ก') || text.includes('ปิดระบบแท็ก')) {
+    if (!db.isMasterAdmin(userId, contextId)) {
+      return { text: `⛔ ขออภัยค่ะ คำสั่งตั้งค่าระบบแท็กในกลุ่ม สามารถทำได้โดยเครื่องผู้ดูแลระบบหลัก (Master Admin) เท่านั้นค่ะ`, flexMessage: null };
+    }
+    const isEnable = text.includes('เปิด') || text.includes('เปิดใช้งาน') || text.includes('แท็กเรียก');
+    const newState = db.setRequireGroupTag(isEnable);
+    return {
+      text: `🏷️ [Master Admin Setting]: อัปเดตตั้งค่าระบบ "รับคำสั่งเฉพาะเมื่อแท็กเรียกบอทในกลุ่ม (@Tag)" เป็น: ${newState ? '🟢 เปิดใช้งาน (ต้องแท็กเรียกเท่านั้น)' : '🔴 ปิดใช้งาน (พิมพ์คำสั่งตรงได้)'} เรียบร้อยแล้วค่ะ!`,
+      flexMessage: null
+    };
+  }
 
   // คำสั่งแอดมินลงทะเบียนสิทธิ์ (เฉพาะเครื่องหลัก Master Admin เท่านั้น)
   if (text.includes('ลงทะเบียนสิทธิ์กลุ่ม') || text.includes('ลงทะเบียนกลุ่ม') || text.includes('อนุมัติกลุ่ม')) {
