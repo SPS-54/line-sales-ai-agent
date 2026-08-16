@@ -472,13 +472,13 @@ export function buildStoreGeneralInfoFlex(store, isRecordingSession = false, con
   const footerButtons = [
     {
       type: 'button', style: 'primary', height: 'sm', color: '#4285F4', margin: 'xs',
-      action: { type: 'uri', label: '🗺️ 📌 เปิดแผนที่นำทาง Google Maps', uri: mapsUrl }
+      action: { type: 'uri', label: '📍 เปิดแผนที่ Google', uri: mapsUrl }
     },
     {
       type: 'box', layout: 'horizontal', spacing: 'xs', contents: [
         {
           type: 'button', style: 'primary', height: 'sm', color: '#06C755', flex: 1,
-          action: { type: 'message', label: '👥 +เพิ่มผู้ติดต่อ', text: `ขอเพิ่มผู้ติดต่อร้าน${displayName}` }
+          action: { type: 'message', label: '👥 +ผู้ติดต่อ', text: `ขอเพิ่มผู้ติดต่อร้าน${displayName}` }
         },
         {
           type: 'button', style: 'primary', height: 'sm', color: '#3B82F6', flex: 1,
@@ -514,7 +514,7 @@ export function buildStoreGeneralInfoFlex(store, isRecordingSession = false, con
       type: 'box', layout: 'horizontal', spacing: 'xs', contents: [
         {
           type: 'button', style: 'primary', height: 'sm', color: '#06C755', flex: 1,
-          action: { type: 'message', label: '💬 +เพิ่มไลน์ผู้ติดต่อ', text: `ขอเพิ่มไลน์ร้าน${displayName}` }
+          action: { type: 'message', label: '💬 +เพิ่มไลน์', text: `ขอเพิ่มไลน์ร้าน${displayName}` }
         },
         {
           type: 'button', style: 'primary', height: 'sm', color: '#F59E0B', flex: 1,
@@ -538,32 +538,12 @@ export function buildStoreGeneralInfoFlex(store, isRecordingSession = false, con
     }
 
     if (uri) {
-      const shortLabel = raw.length > 14 ? raw.substring(0, 12) + '..' : raw;
       addFriendButtons.push({
         type: 'button', style: 'primary', height: 'sm', color: '#06C755', margin: 'xs',
-        action: { type: 'uri', label: `🟢 ➕ กดแอดไลน์ #${idx + 1} (${shortLabel})`, uri: uri }
+        action: { type: 'uri', label: `🟢 แอดไลน์ #${idx + 1}`, uri: uri }
       });
     }
   });
-
-  // สร้างปุ่มกดโทร 1-Tap Call ปุ่มละ 1 เบอร์ (สูงสุด 2 เบอร์แรก)
-  const callButtons = [];
-  phonesArr.slice(0, 2).forEach((phone, idx) => {
-    const cleanNum = phone.replace(/\D/g, '');
-    if (cleanNum.length >= 9) {
-      const shortLabel = phone.length > 14 ? phone.substring(0, 12) + '..' : phone;
-      callButtons.push({
-        type: 'button', style: 'secondary', height: 'sm', flex: 1,
-        action: { type: 'uri', label: `📞 โทร #${idx + 1} (${shortLabel})`, uri: `tel:${cleanNum}` }
-      });
-    }
-  });
-
-  if (callButtons.length > 0) {
-    footerButtons.unshift({
-      type: 'box', layout: 'horizontal', spacing: 'xs', contents: callButtons
-    });
-  }
 
   if (addFriendButtons.length > 0) {
     footerButtons.unshift(...addFriendButtons);
@@ -572,7 +552,7 @@ export function buildStoreGeneralInfoFlex(store, isRecordingSession = false, con
   if (isSessionActive) {
     footerButtons.push({
       type: 'button', style: 'primary', height: 'sm', color: '#10B981', margin: 'md',
-      action: { type: 'message', label: '✅ จบการบันทึกข้อมูลพื้นฐานร้านค้า', text: `จบการบันทึกข้อมูลร้าน ${displayName}` }
+      action: { type: 'message', label: '✅ จบการบันทึก', text: `จบการบันทึกข้อมูลร้าน ${displayName}` }
     });
   }
 
@@ -752,7 +732,7 @@ export function buildStoreSalesDetailsFlex(store, isRecordingSession = false, co
           margin: 'xs',
           action: {
             type: 'message',
-            label: `📦 🔍 ดูสินค้าสั่งซื้อ ${bName} (${groupItems.length} รายการ)`,
+            label: `📦 ดูสินค้า ${bName}`,
             text: `ดูสินค้าสั่งซื้อ ${bName} ร้าน${displayName}`
           }
         });
@@ -805,7 +785,7 @@ export function buildStoreSalesDetailsFlex(store, isRecordingSession = false, co
         },
         {
           type: 'button', style: 'primary', height: 'sm', color: '#10B981', flex: 1,
-          action: { type: 'message', label: '🏷️ +เพิ่มแบรนด์ที่ขาย', text: `ขอเปลี่ยนแบรนด์ร้าน${displayName}` }
+          action: { type: 'message', label: '🏷️ +เพิ่มแบรนด์', text: `ขอเปลี่ยนแบรนด์ร้าน${displayName}` }
         }
       ]
     },
@@ -825,7 +805,7 @@ export function buildStoreSalesDetailsFlex(store, isRecordingSession = false, co
       type: 'box', layout: 'horizontal', spacing: 'xs', contents: [
         {
           type: 'button', style: 'primary', height: 'sm', color: '#059669', flex: 1,
-          action: { type: 'message', label: '📦 +เพิ่มสินค้าที่สั่ง', text: `ขอเพิ่มสินค้าที่สั่งร้าน${displayName}` }
+          action: { type: 'message', label: '📦 +เพิ่มสินค้าสั่ง', text: `ขอเพิ่มสินค้าที่สั่งร้าน${displayName}` }
         },
         {
           type: 'button', style: 'primary', height: 'sm', color: '#F59E0B', flex: 1,
@@ -838,7 +818,7 @@ export function buildStoreSalesDetailsFlex(store, isRecordingSession = false, co
   if (isSessionActive) {
     footerButtons.push({
       type: 'button', style: 'primary', height: 'sm', color: '#10B981', margin: 'md',
-      action: { type: 'message', label: '✅ จบการบันทึกข้อมูลร้านค้า', text: `จบการบันทึกข้อมูลร้าน ${displayName}` }
+      action: { type: 'message', label: '✅ จบการบันทึก', text: `จบการบันทึกข้อมูลร้าน ${displayName}` }
     });
   }
 
@@ -966,7 +946,7 @@ export function buildStoreSalesOpportunitiesFlex(store, isRecordingSession = fal
       type: 'button', style: 'primary', height: 'sm', color: '#4285F4',
       action: {
         type: 'uri',
-        label: pitchDate ? `📅 ➕ เพิ่มนัดหมาย (${pitchDate}) ลง Google Calendar` : '📅 ➕ เพิ่มนัดหมายลง Google Calendar',
+        label: '📅 ซิงก์ลงปฏิทิน',
         uri: googleCalUrl
       }
     },
@@ -978,23 +958,23 @@ export function buildStoreSalesOpportunitiesFlex(store, isRecordingSession = fal
         },
         {
           type: 'button', style: 'primary', height: 'sm', color: '#059669', flex: 1,
-          action: { type: 'message', label: '🛍️ +เพิ่มสินค้าแนะนำ', text: `ขอเพิ่มสินค้าแนะนำร้าน${displayName}` }
+          action: { type: 'message', label: '🛍️ +สินค้าแนะนำ', text: `ขอเพิ่มสินค้าแนะนำร้าน${displayName}` }
         }
       ]
     },
     {
       type: 'button', style: 'primary', height: 'sm', color: '#D97706',
-      action: { type: 'message', label: '💡 +เพิ่มเหตุผล/โอกาสทอง', text: `ขอเพิ่มเหตุผลโอกาสทองร้าน${displayName}` }
+      action: { type: 'message', label: '💡 +เหตุผล/โอกาส', text: `ขอเพิ่มเหตุผลโอกาสทองร้าน${displayName}` }
     },
     {
       type: 'box', layout: 'horizontal', spacing: 'xs', contents: [
         {
           type: 'button', style: 'secondary', height: 'sm', flex: 1,
-          action: { type: 'message', label: '🗑️ เลือกลบสินค้าแนะนำ', text: `ขอเลือกลบสินค้าแนะนำร้าน${displayName}` }
+          action: { type: 'message', label: '🗑️ ลบสินค้าแนะนำ', text: `ขอเลือกลบสินค้าแนะนำร้าน${displayName}` }
         },
         {
           type: 'button', style: 'secondary', height: 'sm', flex: 1,
-          action: { type: 'message', label: '🗓️ เปลี่ยนแผนงานเสนอขาย', text: `ขอเปลี่ยนแผนงานวันเข้าเสนอขายร้าน${displayName}` }
+          action: { type: 'message', label: '🗓️ เปลี่ยนวันขาย', text: `ขอเปลี่ยนแผนงานวันเข้าเสนอขายร้าน${displayName}` }
         }
       ]
     }
@@ -1003,7 +983,7 @@ export function buildStoreSalesOpportunitiesFlex(store, isRecordingSession = fal
   if (isSessionActive) {
     footerButtons.push({
       type: 'button', style: 'primary', height: 'sm', color: '#10B981', margin: 'md',
-      action: { type: 'message', label: '✅ จบการบันทึกข้อมูลร้านค้า', text: `จบการบันทึกข้อมูลร้าน ${displayName}` }
+      action: { type: 'message', label: '✅ จบการบันทึก', text: `จบการบันทึกข้อมูลร้าน ${displayName}` }
     });
   }
 
@@ -1646,6 +1626,7 @@ export function buildFilteredStoresListFlex(titleLabel, stores = []) {
 
     const groupLabel = s.context_id && s.context_id !== 'default' ? ` (${db.getFriendlyName(s.context_id)})` : '';
 
+    const shortBtnName = storeName.length > 10 ? storeName.substring(0, 8) + '..' : storeName;
     storeBoxes.push({
       type: 'box',
       layout: 'vertical',
@@ -1667,7 +1648,7 @@ export function buildFilteredStoresListFlex(titleLabel, stores = []) {
           style: 'secondary',
           height: 'sm',
           color: '#3B82F6',
-          action: { type: 'message', label: `🏬 ขอข้อมูลร้าน ${storeName}`, text: `ขอข้อมูลร้าน${storeName}` }
+          action: { type: 'message', label: `🏬 ขอข้อมูล ${shortBtnName}`, text: `ขอข้อมูลร้าน${storeName}` }
         }
       ]
     });
