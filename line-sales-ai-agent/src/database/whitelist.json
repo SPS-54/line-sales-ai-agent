@@ -14,7 +14,9 @@
     "default",
     "Cacc76a409026f869d53813bb94cc0c58"
   ],
-  "allowed_groups_details": {},
+  "allowed_groups_details": {
+    "Cacc76a409026f869d53813bb94cc0c58": "ข้อมูลร้านค้า แบงค์"
+  },
   "allowed_users_details": {
     "U38d0a817340a8b35375641be73a86b5e": "แบงค์"
   }
