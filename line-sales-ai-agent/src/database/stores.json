@@ -1479,11 +1479,11 @@
     "updated_at": "2026-08-16T16:40:48.294Z"
   },
   {
-    "id": "STORE-1786898486466",
+    "id": "STORE-1786898470186",
     "context_id": "Cc95f4836b81ac0fbe191b2bc0e51a792",
-    "store_name": "งี่เซ่งฮวด",
+    "store_name": "จุฑารัตน์",
     "general_info": {
-      "store_name": "งี่เซ่งฮวด",
+      "store_name": "จุฑารัตน์",
       "contact_persons": [],
       "phone": null,
       "phones": null,
@@ -1498,14 +1498,14 @@
     },
     "sales_details": {},
     "sales_opportunities": {},
-    "updated_at": "2026-08-16T16:41:26.465Z"
+    "updated_at": "2026-08-16T16:41:10.186Z"
   },
   {
-    "id": "STORE-1786898529028",
+    "id": "STORE-1786898509456",
     "context_id": "Cc95f4836b81ac0fbe191b2bc0e51a792",
-    "store_name": "เอพีพลาสติก",
+    "store_name": "ไข่มุก20",
     "general_info": {
-      "store_name": "เอพีพลาสติก",
+      "store_name": "ไข่มุก20",
       "contact_persons": [],
       "phone": null,
       "phones": null,
@@ -1520,18 +1520,18 @@
     },
     "sales_details": {},
     "sales_opportunities": {},
-    "updated_at": "2026-08-16T16:42:09.028Z"
+    "updated_at": "2026-08-16T16:41:49.456Z"
   },
   {
-    "id": "STORE-1786898556556",
+    "id": "STORE-1786898631722",
     "context_id": "Cc95f4836b81ac0fbe191b2bc0e51a792",
-    "store_name": "เพอเฟค",
+    "store_name": "หจก.เมืองปราจีน",
     "general_info": {
-      "store_name": "เพอเฟค",
+      "store_name": "หจก.เมืองปราจีน",
       "contact_persons": [],
       "phone": null,
       "phones": null,
-      "address": "อ.วังน้ำเย็น จ.สระแก้ว",
+      "address": "อ.เมือง จ.ปราจีนบุรี",
       "map_url": "",
       "delivery_by": "",
       "delivery_schedule": "",
@@ -1542,6 +1542,6 @@
     },
     "sales_details": {},
     "sales_opportunities": {},
-    "updated_at": "2026-08-16T16:42:36.556Z"
+    "updated_at": "2026-08-16T16:43:51.722Z"
   }
 ]
