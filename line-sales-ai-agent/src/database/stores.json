@@ -421,5 +421,49 @@
     "sales_details": {},
     "sales_opportunities": {},
     "updated_at": "2026-08-16T15:29:13.253Z"
+  },
+  {
+    "id": "STORE-1786894211858",
+    "context_id": "Cacc76a409026f869d53813bb94cc0c58",
+    "store_name": "คิทเช่นดีโป้",
+    "general_info": {
+      "store_name": "คิทเช่นดีโป้",
+      "contact_persons": [],
+      "phone": null,
+      "phones": null,
+      "address": "อ.เมือง จ.เชียงราย",
+      "map_url": "",
+      "delivery_by": "",
+      "delivery_schedule": "",
+      "notes": "",
+      "credit_days": null,
+      "line_contact": null,
+      "line_contacts": null
+    },
+    "sales_details": {},
+    "sales_opportunities": {},
+    "updated_at": "2026-08-16T15:30:11.858Z"
+  },
+  {
+    "id": "STORE-1786894315478",
+    "context_id": "Cacc76a409026f869d53813bb94cc0c58",
+    "store_name": "คุณาทรัพย์",
+    "general_info": {
+      "store_name": "คุณาทรัพย์",
+      "contact_persons": [],
+      "phone": null,
+      "phones": null,
+      "address": "อ.เมือง จ.เชียงราย",
+      "map_url": "",
+      "delivery_by": "",
+      "delivery_schedule": "",
+      "notes": "",
+      "credit_days": null,
+      "line_contact": null,
+      "line_contacts": null
+    },
+    "sales_details": {},
+    "sales_opportunities": {},
+    "updated_at": "2026-08-16T15:31:55.478Z"
   }
 ]
