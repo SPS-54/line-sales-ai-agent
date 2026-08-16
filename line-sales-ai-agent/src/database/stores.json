@@ -1059,5 +1059,27 @@
     "sales_details": {},
     "sales_opportunities": {},
     "updated_at": "2026-08-16T16:08:55.616Z"
+  },
+  {
+    "id": "STORE-1786896556561",
+    "context_id": "Cacc76a409026f869d53813bb94cc0c58",
+    "store_name": "ชัยนาม",
+    "general_info": {
+      "store_name": "ชัยนาม",
+      "contact_persons": [],
+      "phone": null,
+      "phones": null,
+      "address": "อ.เมือง จ.กำแพงเพชร",
+      "map_url": "",
+      "delivery_by": "",
+      "delivery_schedule": "",
+      "notes": "",
+      "credit_days": null,
+      "line_contact": null,
+      "line_contacts": null
+    },
+    "sales_details": {},
+    "sales_opportunities": {},
+    "updated_at": "2026-08-16T16:09:16.561Z"
   }
 ]
