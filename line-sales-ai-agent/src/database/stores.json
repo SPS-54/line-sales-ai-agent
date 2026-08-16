@@ -1565,5 +1565,27 @@
     "sales_details": {},
     "sales_opportunities": {},
     "updated_at": "2026-08-16T16:44:20.749Z"
+  },
+  {
+    "id": "STORE-1786898679003",
+    "context_id": "Cc95f4836b81ac0fbe191b2bc0e51a792",
+    "store_name": "นิตยา",
+    "general_info": {
+      "store_name": "นิตยา",
+      "contact_persons": [],
+      "phone": null,
+      "phones": null,
+      "address": "อ.เมือง จ.นครนายก",
+      "map_url": "",
+      "delivery_by": "",
+      "delivery_schedule": "",
+      "notes": "",
+      "credit_days": null,
+      "line_contact": null,
+      "line_contacts": null
+    },
+    "sales_details": {},
+    "sales_opportunities": {},
+    "updated_at": "2026-08-16T16:44:39.003Z"
   }
 ]
