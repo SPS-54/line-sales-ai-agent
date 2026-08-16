@@ -752,6 +752,16 @@ function handleLocalFallbackMode(userMessage, contextId = 'default', userId = nu
     }
   }
 
+  // C0. Direct Store Name Lookup (e.g., User types "เชียงใหม่ซุปเปอร์ถูก" or "ร้านเชียงใหม่ซุปเปอร์ถูก")
+  const directStore = db.findStoreByName(userMessage, contextId);
+  if (directStore && (text.length <= 40 || text.startsWith('ร้าน'))) {
+    sessionStore.setLastStore(contextId, directStore.store_name);
+    return {
+      text: `🏬 สรุปข้อมูลครบทั้ง 3 หมวดหมู่หลักของร้าน "${directStore.store_name}" ค่ะ\n(1. ข้อมูลพื้นฐานร้านค้า | 2. ข้อมูลการขาย | 3. โอกาสเสนอขาย)`,
+      flexMessage: buildAll3CategoryFlexCards(directStore)
+    };
+  }
+
   // A. บันทึกและสกัดข้อมูลอัตโนมัติตามหัวข้อที่ตรงกัน (Auto-Classify & Save All Matching Topics - Single & Multiline)
   if (text.includes('ผู้ติดต่อ') || text.includes('เบอร์') || text.includes('โทร') || text.includes('ที่อยู่') || text.includes('แผนที่') || text.includes('จัดส่ง') || text.includes('เครดิต') || text.includes('โน้ต') || text.includes('ไลน์') || text.includes('line') || text.includes('ชำระ') || text.includes('แบรนด์') || text.includes('สั่งซื้อ') || text.includes('ยอดขาย') || text.includes('ขายดี') || text.includes('สถานะ') || text.includes('แนะนำ') || text.includes('เหตุผล') || text.includes('โอกาสทอง') || text.includes('แผนงาน') || text.includes('เสนอขาย')) {
     const allParsed = parseAllStoreCategories(userMessage);
