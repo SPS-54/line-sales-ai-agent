@@ -861,5 +861,49 @@
     "sales_details": {},
     "sales_opportunities": {},
     "updated_at": "2026-08-16T15:57:56.052Z"
+  },
+  {
+    "id": "STORE-1786895913503",
+    "context_id": "Cacc76a409026f869d53813bb94cc0c58",
+    "store_name": "พงษ์ทนา",
+    "general_info": {
+      "store_name": "พงษ์ทนา",
+      "contact_persons": [],
+      "phone": null,
+      "phones": null,
+      "address": "อ.เมือง จ.สุโขทัย",
+      "map_url": "",
+      "delivery_by": "",
+      "delivery_schedule": "",
+      "notes": "",
+      "credit_days": null,
+      "line_contact": null,
+      "line_contacts": null
+    },
+    "sales_details": {},
+    "sales_opportunities": {},
+    "updated_at": "2026-08-16T15:58:33.503Z"
+  },
+  {
+    "id": "STORE-1786896017407",
+    "context_id": "Cacc76a409026f869d53813bb94cc0c58",
+    "store_name": "ไทยทอยส์พลัส",
+    "general_info": {
+      "store_name": "ไทยทอยส์พลัส",
+      "contact_persons": [],
+      "phone": null,
+      "phones": null,
+      "address": "อ.เมือง จ.สุโขทัย",
+      "map_url": "",
+      "delivery_by": "",
+      "delivery_schedule": "",
+      "notes": "",
+      "credit_days": null,
+      "line_contact": null,
+      "line_contacts": null
+    },
+    "sales_details": {},
+    "sales_opportunities": {},
+    "updated_at": "2026-08-16T16:00:17.407Z"
   }
 ]
