@@ -1,1 +1,259 @@
-[]
+[
+  {
+    "id": "STORE-1786625360294",
+    "context_id": "Cacc76a409026f869d53813bb94cc0c58",
+    "store_name": "เชียงใหม่ซุปเปอร์ถูก",
+    "general_info": {
+      "store_name": "เชียงใหม่ซุปเปอร์ถูก",
+      "contact_persons": [
+        "เฮียย้ง (เจ้าของร้าน)",
+        "พี่ปี(สั่งของ)"
+      ],
+      "phone": "ร้าน 053298851, มือถือร้าน 0946930597",
+      "phones": [
+        "ร้าน 053298851",
+        "มือถือร้าน 0946930597"
+      ],
+      "address": "อ.แม่ริม จ.เชียงใหม่",
+      "map_url": "https://maps.app.goo.gl/K6eHAGC9KjWBmaj57?g_st=ic",
+      "delivery_by": "สหทิพย์ทอง",
+      "delivery_schedule": "สหทิพย์ทอง",
+      "notes": "เวลาทำงาน 09.00-17.00 น. , ไม่รับเซลล์วันอาทิตย์\n• จดออเดอร์แล้วขออนุมัติในกลุ่มก่อนส่ง",
+      "credit_days": 30,
+      "line_contact": null,
+      "line_contacts": null
+    },
+    "sales_details": {
+      "payment_type": "โอนเงินเข้าบริษัท",
+      "brands_sold": [
+        "TTI",
+        "Triple-P"
+      ],
+      "last_order_date": "13/8/2569",
+      "last_order_amount": 0,
+      "calendar_year": 2069,
+      "calendar_month": 8,
+      "monthly_sales": 0,
+      "yearly_sales_ytd": 0,
+      "total_sales_ytd": 0,
+      "order_history": [],
+      "yearly_breakdown": [],
+      "ordered_items": [
+        "TTI GW020-9",
+        "TTI BX2505-1",
+        "TTI BK0855",
+        "TTI GL9034-6",
+        "TTI GW019-7",
+        "TTI GW020-6",
+        "TTI GW020-8 3สี",
+        "TTI BT1107 3เกลอ",
+        "TTI GW35-8",
+        "TTI GW40-8",
+        "TTI GW45-8",
+        "TTI CB7113-5",
+        "TTI CB7113-4",
+        "TTI BK4006",
+        "PPP 1299",
+        "PPP 1299-2",
+        "PPP SF-11",
+        "PPP 118-3"
+      ],
+      "top_selling_products": []
+    },
+    "sales_opportunities": {
+      "recommended_products": [
+        "SPS ไม้แขวนเสื้อลวด No.999",
+        "SPS ทิชชู่",
+        "SC"
+      ],
+      "target_pitch_date": "25/08/2026",
+      "opportunity_status": "🔥 สูง"
+    },
+    "updated_at": "2026-08-13T14:03:56.573Z"
+  },
+  {
+    "id": "STORE-1786768289059",
+    "context_id": "Cacc76a409026f869d53813bb94cc0c58",
+    "store_name": "ปัวเครื่องครัว",
+    "general_info": {
+      "store_name": "ปัวเครื่องครัว",
+      "contact_persons": [
+        "เฮียชัช (เจ้าของร้าน)"
+      ],
+      "phone": "เฮีย 0801230890",
+      "phones": [
+        "เฮีย 0801230890"
+      ],
+      "address": "อ.ปัว จ.น่าน",
+      "map_url": "https://maps.app.goo.gl/LJSeVHWox2a96YCA8?g_st=ic",
+      "delivery_by": "เป็นหนึ่งทรานสปอร์ต",
+      "delivery_schedule": "เป็นหนึ่งทรานสปอร์ต",
+      "notes": "ไม่รับเซลล์วันอาทิตย์,TTIลด2%",
+      "credit_days": 30,
+      "line_contact": null,
+      "line_contacts": null
+    },
+    "sales_details": {
+      "payment_type": "โอนเงินเข้าส่วนตัว",
+      "brands_sold": [
+        "TTI"
+      ],
+      "last_order_date": "29/7/69",
+      "last_order_amount": 2295,
+      "calendar_year": 2026,
+      "calendar_month": 8,
+      "monthly_sales": 22480,
+      "yearly_sales_ytd": 22480,
+      "total_sales_ytd": 22480,
+      "order_history": [
+        {
+          "date": "16/7/69",
+          "amount": 15,
+          "year": 2026,
+          "month": 8,
+          "timestamp": 1786768522033
+        },
+        {
+          "date": "29/7/69",
+          "amount": 15,
+          "year": 2026,
+          "month": 8,
+          "timestamp": 1786768571809
+        },
+        {
+          "date": "29/7/69",
+          "amount": 2280,
+          "year": 2026,
+          "month": 8,
+          "timestamp": 1786768580187
+        },
+        {
+          "date": "29/7/69",
+          "amount": 2280,
+          "year": 2026,
+          "month": 8,
+          "timestamp": 1786768636292
+        },
+        {
+          "date": "29/7/69",
+          "amount": 15595,
+          "year": 2026,
+          "month": 8,
+          "timestamp": 1786768643273
+        },
+        {
+          "date": "29/7/69",
+          "amount": 2295,
+          "year": 2026,
+          "month": 8,
+          "timestamp": 1786768710315
+        }
+      ],
+      "yearly_breakdown": [
+        {
+          "year": 2026,
+          "buddhistYear": 2569,
+          "total": 22480
+        }
+      ],
+      "ordered_items": [],
+      "top_selling_products": []
+    },
+    "sales_opportunities": {
+      "recommended_products": [
+        "Triple-P"
+      ]
+    },
+    "updated_at": "2026-08-15T04:39:43.215Z"
+  },
+  {
+    "id": "STORE-1786770733205",
+    "context_id": "Cacc76a409026f869d53813bb94cc0c58",
+    "store_name": "กิ่งแก้ว",
+    "general_info": {
+      "store_name": "กิ่งแก้ว",
+      "contact_persons": [
+        "เจ๊ต่าย (เจ้าของร้าน)"
+      ],
+      "phone": "เจ๊ 0819613906",
+      "phones": [
+        "เจ๊ 0819613906"
+      ],
+      "address": "อ.ปัว จ.น่าน",
+      "map_url": "https://maps.app.goo.gl/nC3E1FHGcGVcHL7v5?g_st=ic",
+      "delivery_by": "ทรัพย์ธนวงศ์,เพ็ญนภา",
+      "delivery_schedule": "ทรัพย์ธนวงศ์,เพ็ญนภา",
+      "notes": "ไม่รับเซลล์วันอาทิตย์,ถึงดีลให้ทวงถาม,ของถึงโอนลด3%",
+      "credit_days": 30,
+      "line_contact": null,
+      "line_contacts": null
+    },
+    "sales_details": {
+      "payment_type": "ไม่ระบุ",
+      "brands_sold": [
+        "-"
+      ],
+      "last_order_date": "15/8/2569",
+      "last_order_amount": 0,
+      "calendar_year": 2069,
+      "calendar_month": 8,
+      "monthly_sales": 0,
+      "yearly_sales_ytd": 0,
+      "total_sales_ytd": 0,
+      "order_history": [],
+      "yearly_breakdown": [],
+      "ordered_items": [
+        "SPS ไม้แขวนลวด No.999"
+      ],
+      "top_selling_products": []
+    },
+    "sales_opportunities": {},
+    "updated_at": "2026-08-15T05:16:20.978Z"
+  },
+  {
+    "id": "STORE-1786773056617",
+    "context_id": "Cc95f4836b81ac0fbe191b2bc0e51a792",
+    "store_name": "ดวงพร",
+    "general_info": {
+      "store_name": "ดวงพร",
+      "contact_persons": [
+        "น้าป้อม (เจ้าของร้าน)",
+        "พี่เบิร์ด(สั่งของ)"
+      ],
+      "phone": "น้าป้อม 0815575375",
+      "phones": [
+        "น้าป้อม 0815575375"
+      ],
+      "address": "อ.บางคล้า จ.ฉะเชิงเทรา",
+      "map_url": "https://maps.app.goo.gl/eHc6y6oTSJtTVmmAA?g_st=ic",
+      "delivery_by": "มงคลทรานสปอร์ต",
+      "delivery_schedule": "มงคลทรานสปอร์ต",
+      "notes": "เวลาทำงาน 09.00-16.00 น. , ไม่รับเซลล์วันจันทร์",
+      "credit_days": 30,
+      "line_contact": null,
+      "line_contacts": null
+    },
+    "sales_details": {
+      "payment_type": "เก็บเงินสด,โอนเข้าบริษัท",
+      "brands_sold": [
+        "TTI"
+      ],
+      "last_order_date": "15/8/2569",
+      "last_order_amount": 0,
+      "calendar_year": 2069,
+      "calendar_month": 8,
+      "monthly_sales": 0,
+      "yearly_sales_ytd": 0,
+      "total_sales_ytd": 0,
+      "order_history": [],
+      "yearly_breakdown": [],
+      "ordered_items": [
+        "TTI ขัน 20 ใส",
+        "TTI ขันด้าม 019 ใส"
+      ],
+      "top_selling_products": []
+    },
+    "sales_opportunities": {},
+    "updated_at": "2026-08-15T06:11:04.450Z"
+  }
+]

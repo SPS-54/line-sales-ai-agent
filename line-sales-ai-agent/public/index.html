@@ -267,20 +267,20 @@
     </div>
 
     <div class="quick-chips">
-      <div class="chip" onclick="sendQuick('บันทึกข้อมูล ร้านมิตรภาพการค้า')">📝 ➕ บันทึกข้อมูลร้านใหม่</div>
+      <div class="chip" onclick="sendQuick('แสดงรายชื่อทั้งหมด')">🏪 แสดงรายชื่อทั้งหมด</div>
+      <div class="chip" onclick="sendQuick('ขอข้อมูลร้าน เชียงใหม่ซุปเปอร์ถูก')">🏬 ดึงข้อมูลร้าน (เชียงใหม่ซุปเปอร์ถูก)</div>
+      <div class="chip" onclick="sendQuick('ขอข้อมูลการขายร้าน เชียงใหม่ซุปเปอร์ถูก')">📊 ดึงข้อมูลการขาย (เชียงใหม่ซุปเปอร์ถูก)</div>
+      <div class="chip" onclick="sendQuick('ขอโอกาสเสนอขายร้าน เชียงใหม่ซุปเปอร์ถูก')">🎯 ดึงโอกาสขาย (เชียงใหม่ซุปเปอร์ถูก)</div>
       <div class="chip" onclick="sendQuick('แบบฟอร์ม')">📝 ขอแบบฟอร์มป้อนข้อมูล</div>
-      <div class="chip" onclick="sendQuick('ขอข้อมูลร้านสมศักดิ์การค้า')">🏬 ดึงข้อมูลร้าน</div>
-      <div class="chip" onclick="sendQuick('ขอข้อมูลการขายร้านสมศักดิ์การค้า')">📊 ดึงข้อมูลการขาย</div>
-      <div class="chip" onclick="sendQuick('ขอโอกาสเสนอขายร้านสมศักดิ์การค้า')">🎯 ดึงโอกาสขาย</div>
     </div>
 
     <div class="messages" id="messages">
       <div class="msg msg-ai">
-        สวัสดีค่ะ! SalesAI Assistant พร้อมดูแลและดึงข้อมูลแยก 3 หมวดหลักดังนี้ค่ะ:
-        <br>1. 🏬 <b>ข้อมูลพื้นฐานร้านค้า:</b> พิมพ์ <i>"ขอข้อมูลร้านสมศักดิ์"</i>
-        <br>2. 📊 <b>ข้อมูลการขาย:</b> พิมพ์ <i>"ขอข้อมูลการขายร้านสมศักดิ์"</i>
-        <br>3. 🎯 <b>โอกาสเสนอขาย:</b> พิมพ์ <i>"ขอข้อมูลโอกาสเสนอขายร้านสมศักดิ์"</i>
-        <br><br>💡 สามารถพิมพ์คำว่า <b>"แบบฟอร์ม"</b> เพื่อขอตัวอย่างฟอร์มป้อนข้อมูลตามหมวดหมู่ได้ทุกเมื่อค่ะ!
+        สวัสดีค่ะ! SalesAI Assistant พร้อมดูแลและดึงข้อมูลร้านค้าในระบบ V1.3/V1.4 แยก 3 หมวดหลักดังนี้ค่ะ:
+        <br>1. 🏬 <b>ข้อมูลพื้นฐานร้านค้า:</b> พิมพ์ <i>"ขอข้อมูลร้าน เชียงใหม่ซุปเปอร์ถูก"</i>
+        <br>2. 📊 <b>ข้อมูลการขาย:</b> พิมพ์ <i>"ขอข้อมูลการขายร้าน เชียงใหม่ซุปเปอร์ถูก"</i>
+        <br>3. 🎯 <b>โอกาสเสนอขาย:</b> พิมพ์ <i>"ขอโอกาสเสนอขายร้าน เชียงใหม่ซุปเปอร์ถูก"</i>
+        <br><br>💡 พิมพ์คำว่า <b>"แสดงรายชื่อทั้งหมด"</b> เพื่อเลือกดูร้านค้าทั้งหมดที่มีในระบบได้เลยค่ะ!
       </div>
     </div>
 
@@ -401,12 +401,22 @@
             if (box.weight === 'bold') style += 'font-weight:bold;';
             if (box.color) style += `color:${box.color};`;
             if (box.size === 'md') style += 'font-size:15px;';
-            html += `<p style="${style}">${box.text.replace(/\n/g, '<br>')}</p>`;
+            if (box.decoration === 'underline') style += 'text-decoration:underline;';
+
+            if (box.action && box.action.type === 'uri' && box.action.uri) {
+              const safeUri = box.action.uri.replace(/'/g, "\\'");
+              html += `<p style="${style}cursor:pointer;" onclick="window.open('${safeUri}', '_blank')">${box.text.replace(/\n/g, '<br>')}</p>`;
+            } else {
+              html += `<p style="${style}">${box.text.replace(/\n/g, '<br>')}</p>`;
+            }
           } else if (box.type === 'separator') {
             html += `<hr style="border:none;border-top:1px solid #e5e7eb;margin:6px 0;">`;
           } else if (box.type === 'button') {
-            if (box.action && box.action.text) {
-              const bg = box.color || '#3b82f6';
+            const bg = box.color || '#3b82f6';
+            if (box.action && box.action.type === 'uri' && box.action.uri) {
+              const safeUri = box.action.uri.replace(/'/g, "\\'");
+              html += `<button class="action-btn" style="background:${bg};margin:4px 0;width:100%;" onclick="window.open('${safeUri}', '_blank')">${box.action.label}</button>`;
+            } else if (box.action && box.action.text) {
               html += `<button class="action-btn" style="background:${bg};margin:4px 0;width:100%;" onclick="sendQuick('${box.action.text.replace(/'/g, "\\'")}')">${box.action.label}</button>`;
             }
           } else if (box.contents && Array.isArray(box.contents)) {
@@ -425,8 +435,11 @@
         if (allButtons.length > 0) {
           bodyHTML += `<div class="action-btn-grid">`;
           allButtons.forEach(btn => {
-            if (btn.action && btn.action.text) {
-              const bg = btn.color || '#3b82f6';
+            const bg = btn.color || '#3b82f6';
+            if (btn.action && btn.action.type === 'uri' && btn.action.uri) {
+              const safeUri = btn.action.uri.replace(/'/g, "\\'");
+              bodyHTML += `<button class="action-btn" style="background:${bg};grid-column: span 2;" onclick="window.open('${safeUri}', '_blank')">${btn.action.label}</button>`;
+            } else if (btn.action && btn.action.text) {
               bodyHTML += `<button class="action-btn" style="background:${bg};" onclick="sendQuick('${btn.action.text.replace(/'/g, "\\'")}')">${btn.action.label}</button>`;
             }
           });

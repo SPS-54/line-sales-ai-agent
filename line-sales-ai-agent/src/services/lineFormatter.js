@@ -319,6 +319,22 @@ export function buildAddProductGuideFlex() {
 }
 
 /**
+ * ช่วยสร้างลิงก์ Google Maps สำหรับเปิดนำทางจริง (Google Maps Navigation URL Helper V1.4)
+ */
+export function getGoogleMapsUrl(displayName, info = {}) {
+  const storeName = displayName || info.store_name || 'ร้านค้า';
+  const rawMapUrl = (info.map_url || '').trim();
+
+  if (rawMapUrl.startsWith('http://') || rawMapUrl.startsWith('https://') || rawMapUrl.includes('goo.gl') || rawMapUrl.includes('maps')) {
+    return rawMapUrl.startsWith('http') ? rawMapUrl : `https://${rawMapUrl}`;
+  }
+
+  const addressStr = (info.address || '').trim();
+  const query = `${storeName} ${addressStr}`.trim();
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
+}
+
+/**
  * 2. ข้อมูลพื้นฐานร้านค้า (Store Profile Flex Card - 7 หัวข้อหลัก)
  */
 export function buildStoreGeneralInfoFlex(store, isRecordingSession = false, contextId = 'default') {
@@ -381,11 +397,26 @@ export function buildStoreGeneralInfoFlex(store, isRecordingSession = false, con
     contactBoxContents.push({ type: 'text', text: `📞 เบอร์โทรศัพท์หลัก: ยังไม่มีข้อมูล`, size: 'sm', color: '#333333', margin: 'md' });
   }
 
+  const mapsUrl = getGoogleMapsUrl(displayName, info);
+
   // 3. ที่อยู่ร้าน
   contactBoxContents.push({ type: 'text', text: `📍 ที่อยู่ร้าน: ${info.address || 'ยังไม่มีข้อมูล'}`, size: 'sm', color: '#333333', wrap: true });
 
-  // 4. แผนที่ร้าน
-  contactBoxContents.push({ type: 'text', text: `🗺️ แผนที่ร้าน: ${info.map_url || 'ยังไม่มีข้อมูล'}`, size: 'sm', color: info.map_url ? '#3B82F6' : '#333333', wrap: true });
+  // 4. แผนที่ร้าน (เปิด Google Maps นำทางได้จริง 100%)
+  contactBoxContents.push({
+    type: 'text',
+    text: `🗺️ แผนที่ร้าน: ${info.map_url || (info.address ? '📌 กดที่นี่เพื่อเปิดแผนที่ Google Maps' : 'ยังไม่มีข้อมูล')}`,
+    size: 'sm',
+    color: '#3B82F6',
+    weight: 'bold',
+    decoration: 'underline',
+    wrap: true,
+    action: {
+      type: 'uri',
+      label: 'เปิดแผนที่ร้าน',
+      uri: mapsUrl
+    }
+  });
 
   // 5. จัดส่งโดย (Multiple Delivery Channels)
   const deliveryArr = (info.delivery_by || info.delivery_schedule)
@@ -439,6 +470,10 @@ export function buildStoreGeneralInfoFlex(store, isRecordingSession = false, con
   }
 
   const footerButtons = [
+    {
+      type: 'button', style: 'primary', height: 'sm', color: '#4285F4', margin: 'xs',
+      action: { type: 'uri', label: '🗺️ 📌 เปิดแผนที่นำทาง Google Maps', uri: mapsUrl }
+    },
     {
       type: 'box', layout: 'horizontal', spacing: 'xs', contents: [
         {
@@ -908,10 +943,32 @@ export function buildStoreSalesOpportunitiesFlex(store, isRecordingSession = fal
     });
   }
 
+  const pitchDate = opp.target_pitch_date ? String(opp.target_pitch_date).trim() : null;
+
+  const calendarBoxContents = [
+    { type: 'text', text: `สถานะโอกาส: ${opp.opportunity_status || 'ทั่วไป'}`, size: 'md', color: '#D97706', weight: 'bold' }
+  ];
+
+  if (pitchDate) {
+    calendarBoxContents.push(
+      { type: 'text', text: `🗓️ กำหนดวันเข้าเสนอขาย: ${pitchDate}`, size: 'sm', color: '#1D4ED8', weight: 'bold', wrap: true, margin: 'xs' },
+      { type: 'text', text: `📌 สถานะปฏิทิน: 🟢 พร้อมซิงก์นัดหมายลง Google Calendar (กดปุ่มด้านล่างได้ทันที)`, size: 'xs', color: '#059669', weight: 'bold', wrap: true, margin: 'xs' }
+    );
+  } else {
+    calendarBoxContents.push(
+      { type: 'text', text: `🗓️ แผนงานวันเข้าเสนอขาย: ยังไม่ได้ระบุนัดหมาย`, size: 'sm', color: '#6B7280', wrap: true, margin: 'xs' },
+      { type: 'text', text: `📅 Google Calendar: สามารถกดปุ่มด้านล่างเพื่อสร้างนัดหมายล่วงหน้าได้`, size: 'xs', color: '#9CA3AF', wrap: true, margin: 'xs' }
+    );
+  }
+
   const footerButtons = [
     {
       type: 'button', style: 'primary', height: 'sm', color: '#4285F4',
-      action: { type: 'uri', label: '📅 ➕ เพิ่มนัดหมายลง Google Calendar', uri: googleCalUrl }
+      action: {
+        type: 'uri',
+        label: pitchDate ? `📅 ➕ เพิ่มนัดหมาย (${pitchDate}) ลง Google Calendar` : '📅 ➕ เพิ่มนัดหมายลง Google Calendar',
+        uri: googleCalUrl
+      }
     },
     {
       type: 'box', layout: 'horizontal', spacing: 'xs', contents: [
@@ -966,11 +1023,7 @@ export function buildStoreSalesOpportunitiesFlex(store, isRecordingSession = fal
       body: {
         type: 'box', layout: 'vertical', spacing: 'md', contents: [
           {
-            type: 'box', layout: 'vertical', spacing: 'xs', contents: [
-              { type: 'text', text: `สถานะโอกาส: ${opp.opportunity_status || 'ทั่วไป'}`, size: 'md', color: '#D97706', weight: 'bold' },
-              { type: 'text', text: `🗓️ แผนงานวันเข้าเสนอขาย: ${opp.target_pitch_date || 'ยังไม่ระบุ'}`, size: 'sm', color: '#1D4ED8', weight: 'bold' },
-              { type: 'text', text: `📅 Google Calendar: พร้อมซิงก์นัดหมายลงปฏิทิน`, size: 'xs', color: '#059669', weight: 'bold', margin: 'xs' }
-            ]
+            type: 'box', layout: 'vertical', spacing: 'xs', contents: calendarBoxContents
           },
           { type: 'separator', margin: 'sm' },
           {

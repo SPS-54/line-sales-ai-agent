@@ -15,7 +15,11 @@ const whitelistFilePath = path.join(__dirname, 'whitelist.json');
 
 export function cleanStoreName(name) {
   if (!name) return '';
-  return String(name).replace(/^ร้าน\s*/, '').trim();
+  return String(name)
+    .replace(/^ขอข้อมูลร้าน|^ขอข้อมูลการขายร้าน|^ขอโอกาสเสนอขายร้าน|^ขอข้อมูลพื้นฐาน|^ขอข้อมูล|^ดึงข้อมูลร้าน|^ดึงข้อมูล|^ร้าน\s*/g, '')
+    .replace(/^[()（）\s]+|[()（）\s]+$/g, '')
+    .replace(/[()（）]/g, '')
+    .trim();
 }
 
 export function parseCalendarYearMonth(dateInput) {
@@ -250,12 +254,23 @@ export const db = {
     const cleanTarget = cleanStoreName(name).toLowerCase().trim();
     if (!cleanTarget) return null;
 
-    const stores = this.getStores(contextId);
-    return stores.find(s => {
+    let stores = this.getStores(contextId);
+    let found = stores.find(s => {
       const cleanSName = cleanStoreName(s.store_name || '').toLowerCase().trim();
       if (!cleanSName) return false;
       return cleanSName.includes(cleanTarget) || cleanTarget.includes(cleanSName);
-    }) || null;
+    });
+
+    if (!found && contextId !== 'all') {
+      const allStores = this.getStores('all');
+      found = allStores.find(s => {
+        const cleanSName = cleanStoreName(s.store_name || '').toLowerCase().trim();
+        if (!cleanSName) return false;
+        return cleanSName.includes(cleanTarget) || cleanTarget.includes(cleanSName);
+      });
+    }
+
+    return found || null;
   },
 
   // 1. ข้อมูลพื้นฐานร้านค้า (Store Profile)

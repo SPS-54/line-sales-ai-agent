@@ -14,12 +14,24 @@ export function formatGoogleCalendarDate(dateInput) {
   if (dateInput) {
     const str = String(dateInput).trim();
 
-    // 1. ISO format: YYYY-MM-DD
-    const isoMatch = str.match(/(\d{4})[-/](\d{1,2})[-/](\d{1,2})/);
-    if (isoMatch) {
-      year = parseInt(isoMatch[1]);
-      month = parseInt(isoMatch[2]);
-      day = parseInt(isoMatch[3]);
+    // 1. Slash/Dash format with 3 numbers: DD/MM/YYYY or YYYY/MM/DD
+    const dmyMatch = str.match(/(\d{1,4})[-/](\d{1,2})[-/](\d{1,4})/);
+    if (dmyMatch) {
+      let p1 = parseInt(dmyMatch[1]);
+      let p2 = parseInt(dmyMatch[2]);
+      let p3 = parseInt(dmyMatch[3]);
+
+      if (p1 > 1000) {
+        // YYYY-MM-DD
+        year = p1 > 2500 ? p1 - 543 : p1;
+        month = p2;
+        day = p3;
+      } else {
+        // DD/MM/YYYY
+        day = p1;
+        month = p2;
+        year = p3 > 2500 ? p3 - 543 : (p3 < 100 ? 2000 + p3 : p3);
+      }
     } else {
       // 2. Thai date format: e.g. 25 สิงหาคม 2569 or 15 กันยายน 2026
       const dayMatch = str.match(/(\d{1,2})/);

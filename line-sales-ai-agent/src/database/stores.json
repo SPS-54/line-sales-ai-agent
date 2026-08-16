@@ -1,6 +1,6 @@
 [
   {
-    "id": "STORE-1786628783712",
+    "id": "STORE-1786625360294",
     "context_id": "Cacc76a409026f869d53813bb94cc0c58",
     "store_name": "เชียงใหม่ซุปเปอร์ถูก",
     "general_info": {
@@ -65,7 +65,9 @@
         "SPS ไม้แขวนเสื้อลวด No.999",
         "SPS ทิชชู่",
         "SC"
-      ]
+      ],
+      "target_pitch_date": "25/08/2026",
+      "opportunity_status": "🔥 สูง"
     },
     "updated_at": "2026-08-13T14:03:56.573Z"
   },

@@ -625,7 +625,8 @@ function handleLocalFallbackMode(userMessage, contextId = 'default', userId = nu
   if (text.includes('แสดงรายชื่อ') || text.includes('ขอรายชื่อ') || text.includes('รายชื่อร้าน') || text.includes('รายชื่อร้านค้า') || text.includes('ร้านค้าทั้งหมด')) {
     const isPrivateChat = String(contextId || '').trim().toLowerCase() === String(userId || '').trim().toLowerCase();
     const isMasterGlobalView = isPrivateChat && db.isMasterAdmin(userId, contextId);
-    const targetCtx = isMasterGlobalView ? 'all' : contextId;
+    const isSimulatorOrDefault = !contextId || contextId === 'default' || contextId === 'simulator';
+    const targetCtx = (isMasterGlobalView || isSimulatorOrDefault || text.includes('ทั้งหมด')) ? 'all' : contextId;
     const stores = db.getStores(targetCtx);
 
     const masterNotice = isMasterGlobalView ? '👑 [มุมมองผู้ดูแลหลัก - รายชื่อรวมทุกกลุ่มแชต]: ' : '';
@@ -720,24 +721,23 @@ function handleLocalFallbackMode(userMessage, contextId = 'default', userId = nu
     }
   }
   else if (text.includes('ขอข้อมูลการขาย') || text.includes('ขอรายละเอียดการขาย') || text.includes('ขอยอดขาย') || text.includes('ขอประวัติการสั่ง')) {
-    const storeName = text.replace(/ขอข้อมูลการขาย|ขอรายละเอียดการขาย|ขอประวัติการสั่ง|ขอยอดขายร้าน|ขอยอดขาย|ยอดขายร้าน|ยอดขาย|ร้าน/g, '').trim();
+    const storeName = cleanStoreName(text) || sessionStore.getLastStore(contextId);
     const store = db.findStoreByName(storeName, contextId);
     if (store) {
       sessionStore.setLastStore(contextId, store.store_name);
       return { text: `📊 ข้อมูลการขาย 7 หัวข้อหลักของร้าน "${store.store_name}" ค่ะ`, flexMessage: buildStoreSalesDetailsFlex(store) };
-    } else { return { text: `ไม่พบข้อมูลการขายของร้าน "${storeName}" ในกลุ่มแชตนี้ค่ะ`, flexMessage: null }; }
+    } else { return { text: `ไม่พบข้อมูลการขายของร้าน "${storeName}" ในระบบค่ะ`, flexMessage: null }; }
   }
   else if (text.includes('ขอโอกาสเสนอขาย') || text.includes('ขอข้อมูลโอกาสเสนอขาย') || text.includes('ขอข้อมูลโอกาส') || text.includes('ขอโอกาสขาย') || text.includes('ขอโอกาส')) {
-    const storeName = text.replace(/ขอข้อมูลโอกาสเสนอขาย|ขอข้อมูลโอกาส|ขอโอกาสเสนอขาย|ขอโอกาสขาย|ขอโอกาส|โอกาสเสนอขายร้าน|โอกาสขายร้าน|ร้าน/g, '').trim();
+    const storeName = cleanStoreName(text) || sessionStore.getLastStore(contextId);
     const store = db.findStoreByName(storeName, contextId);
     if (store) {
       sessionStore.setLastStore(contextId, store.store_name);
       return { text: `🎯 สรุปโอกาสเสนอขายและสินค้าแนะนำ (Upsell/Cross-sell) ของร้าน "${store.store_name}" ค่ะ`, flexMessage: buildStoreSalesOpportunitiesFlex(store) };
-    } else { return { text: `ไม่พบข้อมูลโอกาสเสนอขายของร้าน "${storeName}" ในกลุ่มแชตนี้ค่ะ`, flexMessage: null }; }
+    } else { return { text: `ไม่พบข้อมูลโอกาสเสนอขายของร้าน "${storeName}" ในระบบค่ะ`, flexMessage: null }; }
   }
   else if (text.includes('ขอข้อมูลร้าน') || text.includes('ขอข้อมูลพื้นฐาน') || text.includes('ขอข้อมูล') || text.includes('ดึงข้อมูลร้าน')) {
-    const rawTarget = text.replace(/ขอข้อมูลร้าน|ขอข้อมูลพื้นฐาน|ขอข้อมูล|ดึงข้อมูลร้าน|ดึงข้อมูล|ร้าน/g, '').trim();
-    const targetStoreName = cleanStoreName(rawTarget) || sessionStore.getLastStore(contextId);
+    const targetStoreName = cleanStoreName(text) || sessionStore.getLastStore(contextId);
     const isPrivateChat = String(contextId || '').trim().toLowerCase() === String(userId || '').trim().toLowerCase();
     const isMasterGlobalView = isPrivateChat && db.isMasterAdmin(userId, contextId);
     const store = db.findStoreByName(targetStoreName, isMasterGlobalView ? 'all' : contextId);
@@ -748,7 +748,7 @@ function handleLocalFallbackMode(userMessage, contextId = 'default', userId = nu
         flexMessage: buildAll3CategoryFlexCards(store)
       };
     } else {
-      return { text: targetStoreName ? `ไม่พบข้อมูลร้าน "${targetStoreName}" ในกลุ่มแชตนี้ค่ะ` : `กรุณาระบุชื่อร้านค้าที่ต้องการขอข้อมูลค่ะ\n*(เช่น: ขอข้อมูลร้านสมศักดิ์การค้า)*`, flexMessage: null };
+      return { text: targetStoreName ? `ไม่พบข้อมูลร้าน "${targetStoreName}" ในระบบค่ะ` : `กรุณาระบุชื่อร้านค้าที่ต้องการขอข้อมูลค่ะ\n*(เช่น: ขอข้อมูลร้าน เชียงใหม่ซุปเปอร์ถูก)*`, flexMessage: null };
     }
   }
 
