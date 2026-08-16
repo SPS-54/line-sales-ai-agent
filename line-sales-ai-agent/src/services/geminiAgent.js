@@ -626,7 +626,7 @@ function handleLocalFallbackMode(userMessage, contextId = 'default', userId = nu
     const isPrivateChat = String(contextId || '').trim().toLowerCase() === String(userId || '').trim().toLowerCase();
     const isMasterGlobalView = isPrivateChat && db.isMasterAdmin(userId, contextId);
     const isSimulatorOrDefault = !contextId || contextId === 'default' || contextId === 'simulator';
-    const targetCtx = (isMasterGlobalView || isSimulatorOrDefault || text.includes('ทั้งหมด')) ? 'all' : contextId;
+    const targetCtx = (isMasterGlobalView || isSimulatorOrDefault) ? 'all' : contextId;
     const stores = db.getStores(targetCtx);
 
     const masterNotice = isMasterGlobalView ? '👑 [มุมมองผู้ดูแลหลัก - รายชื่อรวมทุกกลุ่มแชต]: ' : '';
