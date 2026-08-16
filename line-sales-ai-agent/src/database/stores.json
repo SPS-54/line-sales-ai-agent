@@ -927,5 +927,27 @@
     "sales_details": {},
     "sales_opportunities": {},
     "updated_at": "2026-08-16T16:01:37.961Z"
+  },
+  {
+    "id": "STORE-1786896249659",
+    "context_id": "Cacc76a409026f869d53813bb94cc0c58",
+    "store_name": "ธงชัยเครื่องครัว",
+    "general_info": {
+      "store_name": "ธงชัยเครื่องครัว",
+      "contact_persons": [],
+      "phone": null,
+      "phones": null,
+      "address": "อ.เมือง จ.พิษณุโลก",
+      "map_url": "",
+      "delivery_by": "",
+      "delivery_schedule": "",
+      "notes": "",
+      "credit_days": null,
+      "line_contact": null,
+      "line_contacts": null
+    },
+    "sales_details": {},
+    "sales_opportunities": {},
+    "updated_at": "2026-08-16T16:04:09.659Z"
   }
 ]
