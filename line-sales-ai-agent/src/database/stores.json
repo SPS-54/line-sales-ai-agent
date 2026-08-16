@@ -597,5 +597,27 @@
     "sales_details": {},
     "sales_opportunities": {},
     "updated_at": "2026-08-16T15:35:36.053Z"
+  },
+  {
+    "id": "STORE-1786894578015",
+    "context_id": "Cacc76a409026f869d53813bb94cc0c58",
+    "store_name": "บีจีเครื่องครัวบัวเงิน",
+    "general_info": {
+      "store_name": "บีจีเครื่องครัวบัวเงิน",
+      "contact_persons": [],
+      "phone": null,
+      "phones": null,
+      "address": "อ.เมือง จ.เชียงใหม่",
+      "map_url": "",
+      "delivery_by": "",
+      "delivery_schedule": "",
+      "notes": "",
+      "credit_days": null,
+      "line_contact": null,
+      "line_contacts": null
+    },
+    "sales_details": {},
+    "sales_opportunities": {},
+    "updated_at": "2026-08-16T15:36:18.015Z"
   }
 ]
