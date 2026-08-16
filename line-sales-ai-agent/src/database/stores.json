@@ -1479,11 +1479,11 @@
     "updated_at": "2026-08-16T16:40:48.294Z"
   },
   {
-    "id": "STORE-1786898470186",
+    "id": "STORE-1786898486466",
     "context_id": "Cc95f4836b81ac0fbe191b2bc0e51a792",
-    "store_name": "จุฑารัตน์",
+    "store_name": "งี่เซ่งฮวด",
     "general_info": {
-      "store_name": "จุฑารัตน์",
+      "store_name": "งี่เซ่งฮวด",
       "contact_persons": [],
       "phone": null,
       "phones": null,
@@ -1498,14 +1498,14 @@
     },
     "sales_details": {},
     "sales_opportunities": {},
-    "updated_at": "2026-08-16T16:41:10.186Z"
+    "updated_at": "2026-08-16T16:41:26.465Z"
   },
   {
-    "id": "STORE-1786898509456",
+    "id": "STORE-1786898529028",
     "context_id": "Cc95f4836b81ac0fbe191b2bc0e51a792",
-    "store_name": "ไข่มุก20",
+    "store_name": "เอพีพลาสติก",
     "general_info": {
-      "store_name": "ไข่มุก20",
+      "store_name": "เอพีพลาสติก",
       "contact_persons": [],
       "phone": null,
       "phones": null,
@@ -1520,6 +1520,6 @@
     },
     "sales_details": {},
     "sales_opportunities": {},
-    "updated_at": "2026-08-16T16:41:49.456Z"
+    "updated_at": "2026-08-16T16:42:09.028Z"
   }
 ]
