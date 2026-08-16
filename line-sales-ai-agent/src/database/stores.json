@@ -255,5 +255,32 @@
     },
     "sales_opportunities": {},
     "updated_at": "2026-08-15T06:11:04.450Z"
+  },
+  {
+    "id": "STORE-1786893369617",
+    "context_id": "Cacc76a409026f869d53813bb94cc0c58",
+    "store_name": "เมืองน่านกิ๊ฟช็อป",
+    "general_info": {
+      "store_name": "เมืองน่านกิ๊ฟช็อป",
+      "contact_persons": [
+        "เจ๊ลำพูน (เจ้าของร้าน)",
+        "พี่กิ๊ก(ลูกสาว)"
+      ],
+      "phone": "ร้าน 054711079",
+      "phones": [
+        "ร้าน 054711079"
+      ],
+      "address": "อ.เมือง จ.น่าน",
+      "map_url": "",
+      "delivery_by": "",
+      "delivery_schedule": "",
+      "notes": "เจ๊เข้าร้านเฉพาะวันเสาร์",
+      "credit_days": null,
+      "line_contact": null,
+      "line_contacts": null
+    },
+    "sales_details": {},
+    "sales_opportunities": {},
+    "updated_at": "2026-08-16T15:16:09.617Z"
   }
 ]
