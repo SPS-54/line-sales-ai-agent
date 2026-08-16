@@ -377,5 +377,27 @@
     "sales_details": {},
     "sales_opportunities": {},
     "updated_at": "2026-08-16T15:27:13.115Z"
+  },
+  {
+    "id": "STORE-1786894092313",
+    "context_id": "Cacc76a409026f869d53813bb94cc0c58",
+    "store_name": "คุณาสิน",
+    "general_info": {
+      "store_name": "คุณาสิน",
+      "contact_persons": [],
+      "phone": null,
+      "phones": null,
+      "address": "อ.เมือง จ.พะเยา",
+      "map_url": "",
+      "delivery_by": "",
+      "delivery_schedule": "",
+      "notes": "",
+      "credit_days": null,
+      "line_contact": null,
+      "line_contacts": null
+    },
+    "sales_details": {},
+    "sales_opportunities": {},
+    "updated_at": "2026-08-16T15:28:12.313Z"
   }
 ]
