@@ -687,15 +687,15 @@
     "updated_at": "2026-08-16T15:44:56.571Z"
   },
   {
-    "id": "STORE-1786895115251",
+    "id": "STORE-1786895146034",
     "context_id": "Cacc76a409026f869d53813bb94cc0c58",
-    "store_name": "ฮัลโหล20",
+    "store_name": "มีดีสโตร์",
     "general_info": {
-      "store_name": "ฮัลโหล20",
+      "store_name": "มีดีสโตร์",
       "contact_persons": [],
       "phone": null,
       "phones": null,
-      "address": "อ.เมือง จ.แพร่",
+      "address": "อ.เมือง จ.อุตรดิตถ์",
       "map_url": "",
       "delivery_by": "",
       "delivery_schedule": "",
@@ -706,6 +706,6 @@
     },
     "sales_details": {},
     "sales_opportunities": {},
-    "updated_at": "2026-08-16T15:45:15.251Z"
+    "updated_at": "2026-08-16T15:45:46.034Z"
   }
 ]
