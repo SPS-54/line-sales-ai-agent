@@ -1323,5 +1323,49 @@
     "sales_details": {},
     "sales_opportunities": {},
     "updated_at": "2026-08-16T16:33:25.518Z"
+  },
+  {
+    "id": "STORE-1786898068021",
+    "context_id": "Cc95f4836b81ac0fbe191b2bc0e51a792",
+    "store_name": "ชามบ้านฉาง",
+    "general_info": {
+      "store_name": "ชามบ้านฉาง",
+      "contact_persons": [],
+      "phone": null,
+      "phones": null,
+      "address": "อ.บ้านฉาง จ.ระยอง",
+      "map_url": "",
+      "delivery_by": "",
+      "delivery_schedule": "",
+      "notes": "",
+      "credit_days": null,
+      "line_contact": null,
+      "line_contacts": null
+    },
+    "sales_details": {},
+    "sales_opportunities": {},
+    "updated_at": "2026-08-16T16:34:28.021Z"
+  },
+  {
+    "id": "STORE-1786898122849",
+    "context_id": "Cc95f4836b81ac0fbe191b2bc0e51a792",
+    "store_name": "พีพีเจริญ",
+    "general_info": {
+      "store_name": "พีพีเจริญ",
+      "contact_persons": [],
+      "phone": null,
+      "phones": null,
+      "address": "อ.ปลวกแดง จ.ระยอง",
+      "map_url": "",
+      "delivery_by": "",
+      "delivery_schedule": "",
+      "notes": "",
+      "credit_days": null,
+      "line_contact": null,
+      "line_contacts": null
+    },
+    "sales_details": {},
+    "sales_opportunities": {},
+    "updated_at": "2026-08-16T16:35:22.849Z"
   }
 ]
