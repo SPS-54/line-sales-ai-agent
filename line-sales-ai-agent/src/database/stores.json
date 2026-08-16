@@ -1651,8 +1651,12 @@
       "line_contacts": null
     },
     "sales_details": {},
-    "sales_opportunities": {},
-    "updated_at": "2026-08-16T16:47:15.172Z"
+    "sales_opportunities": {
+      "recommended_products": [
+        "สังของครับ\nร้านพ.ผลิตภัณฑ์\n5579=1\nขนส่ง บลาๆ"
+      ]
+    },
+    "updated_at": "2026-08-16T16:56:43.707Z"
   },
   {
     "id": "STORE-1786898859175",
