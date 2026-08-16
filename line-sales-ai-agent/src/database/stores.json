@@ -355,5 +355,27 @@
     "sales_details": {},
     "sales_opportunities": {},
     "updated_at": "2026-08-16T15:25:51.983Z"
+  },
+  {
+    "id": "STORE-1786894033115",
+    "context_id": "Cacc76a409026f869d53813bb94cc0c58",
+    "store_name": "T20",
+    "general_info": {
+      "store_name": "T20",
+      "contact_persons": [],
+      "phone": null,
+      "phones": null,
+      "address": "อ.เมือง จ.น่าน",
+      "map_url": "",
+      "delivery_by": "",
+      "delivery_schedule": "",
+      "notes": "",
+      "credit_days": null,
+      "line_contact": null,
+      "line_contacts": null
+    },
+    "sales_details": {},
+    "sales_opportunities": {},
+    "updated_at": "2026-08-16T15:27:13.115Z"
   }
 ]
