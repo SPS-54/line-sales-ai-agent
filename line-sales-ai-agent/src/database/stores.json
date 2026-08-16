@@ -1545,11 +1545,11 @@
     "updated_at": "2026-08-16T16:43:51.722Z"
   },
   {
-    "id": "STORE-1786898647372",
+    "id": "STORE-1786898660749",
     "context_id": "Cc95f4836b81ac0fbe191b2bc0e51a792",
-    "store_name": "พ.ผลิตภัณฑ์",
+    "store_name": "แม่กิมลี้",
     "general_info": {
-      "store_name": "พ.ผลิตภัณฑ์",
+      "store_name": "แม่กิมลี้",
       "contact_persons": [],
       "phone": null,
       "phones": null,
@@ -1564,6 +1564,6 @@
     },
     "sales_details": {},
     "sales_opportunities": {},
-    "updated_at": "2026-08-16T16:44:07.372Z"
+    "updated_at": "2026-08-16T16:44:20.749Z"
   }
 ]
