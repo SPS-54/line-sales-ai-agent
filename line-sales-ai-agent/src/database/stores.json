@@ -1389,5 +1389,27 @@
     "sales_details": {},
     "sales_opportunities": {},
     "updated_at": "2026-08-16T16:36:39.226Z"
+  },
+  {
+    "id": "STORE-1786898353690",
+    "context_id": "Cc95f4836b81ac0fbe191b2bc0e51a792",
+    "store_name": "แสงเจริญ",
+    "general_info": {
+      "store_name": "แสงเจริญ",
+      "contact_persons": [],
+      "phone": null,
+      "phones": null,
+      "address": "อ.สัตหีบ จ.ชลบุรี",
+      "map_url": "",
+      "delivery_by": "",
+      "delivery_schedule": "",
+      "notes": "",
+      "credit_days": null,
+      "line_contact": null,
+      "line_contacts": null
+    },
+    "sales_details": {},
+    "sales_opportunities": {},
+    "updated_at": "2026-08-16T16:39:13.690Z"
   }
 ]
