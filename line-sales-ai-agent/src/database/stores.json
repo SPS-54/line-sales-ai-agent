@@ -7,19 +7,20 @@
       "store_name": "เชียงใหม่ซุปเปอร์ถูก",
       "contact_persons": [
         "เฮียย้ง (เจ้าของร้าน)",
-        "พี่ปี(สั่งของ)"
+        "พี่ปี(สั่งของ)",
+        "พี่สมชาย (ผู้จัดการ)"
       ],
       "phone": "ร้าน 053298851, มือถือร้าน 0946930597",
       "phones": [
         "ร้าน 053298851",
         "มือถือร้าน 0946930597"
       ],
-      "address": "อ.แม่ริม จ.เชียงใหม่",
+      "address": null,
       "map_url": "https://maps.app.goo.gl/K6eHAGC9KjWBmaj57?g_st=ic",
       "delivery_by": "สหทิพย์ทอง",
       "delivery_schedule": "สหทิพย์ทอง",
       "notes": "เวลาทำงาน 09.00-17.00 น. , ไม่รับเซลล์วันอาทิตย์\n• จดออเดอร์แล้วขออนุมัติในกลุ่มก่อนส่ง",
-      "credit_days": 30,
+      "credit_days": null,
       "line_contact": null,
       "line_contacts": null
     },
@@ -69,7 +70,7 @@
       "target_pitch_date": "25/08/2026",
       "opportunity_status": "🔥 สูง"
     },
-    "updated_at": "2026-08-13T14:03:56.573Z"
+    "updated_at": "2026-08-17T13:52:56.767Z"
   },
   {
     "id": "STORE-1786768289059",

@@ -50,9 +50,14 @@ export async function processUserMessage(rawUserMessage, contextId = 'default', 
   const hasMention = rawText.includes('@') || /^(?:บอท|bot|salesai)\b/i.test(rawText);
   const isSystemCommand = /^(?:ขอข้อมูล|ดึงข้อมูล|ขอโอกาส|ขอรูป|แสดงรายชื่อ|บันทึกข้อมูล|จบการบันทึก|เสร็จสิ้นการบันทึก|เลิกบันทึก|ขอเพิ่ม|ขอเปลี่ยน|ขอใส่|ขอเลือกลบ|ดูสินค้า|แบบฟอร์ม|คู่มือ|เช็คสิทธิ์|ลงทะเบียน|ยกเลิกสิทธิ์|ตั้งชื่อ|ตั้งค่า)/i.test(rawText);
 
+  // ตรวจสอบสถานะรอรับค่าปุ่ม 1-Tap หรือการยืนยัน หรือโหมดบันทึก
+  const hasPendingPrompt = !!(sessionStore.findActivePendingField(contextId) || sessionStore.findActivePending(contextId));
+  const activeSession = sessionStore.getActiveStoreSession(contextId);
+  const isRecordingSession = activeSession && activeSession.isRecording === true;
+
   // 🏷️ ระบบตรวจสอบการแท็กเรียกในกลุ่มแชต (Tag Requirement Check in Group Chat)
   const requireGroupTag = db.getRequireGroupTag();
-  if (isGroupChat && requireGroupTag && !hasMention && !isSystemCommand) {
+  if (isGroupChat && requireGroupTag && !hasMention && !isSystemCommand && !hasPendingPrompt && !isRecordingSession) {
     // สมาชิกคุยเรื่องทั่วไปในกลุ่มโดยไม่แท็กบอท -> เงียบไม่ตอบแทรก 100%
     return null;
   }

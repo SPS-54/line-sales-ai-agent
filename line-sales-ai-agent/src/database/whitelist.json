@@ -15,14 +15,7 @@
     "Cacc76a409026f869d53813bb94cc0c58",
     "Cc95f4836b81ac0fbe191b2bc0e51a792"
   ],
-  "allowed_groups_details": {
-    "Cc95f4836b81ac0fbe191b2bc0e51a792": "ข้อมูลร้านค้า น้องบี",
-    "Cacc76a409026f869d53813bb94cc0c58": "ข้อมูลร้านค้า แบงค์"
-  },
-  "allowed_users_details": {
-    "U38d0a817340a8b35375641be73a86b5e": "แบงค์",
-    "U0cb7dacb82ec352c12ba11e1c3da879c": "บี ธารทิพย์(TTI.)",
-    "Ufdbc2cb193c2ffbe0e72dcef599b09a2": "Admin"
-  },
+  "allowed_groups_details": {},
+  "allowed_users_details": {},
   "require_group_tag": true
 }
