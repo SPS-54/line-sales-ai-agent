@@ -652,8 +652,8 @@
       "phones": null,
       "address": "อ.เมือง จ.แพร่",
       "map_url": "",
-      "delivery_by": "แสดงรายชื่อ",
-      "delivery_schedule": "แสดงรายชื่อ",
+      "delivery_by": "นิ่มซี่เส็ง",
+      "delivery_schedule": "นิ่มซี่เส็ง",
       "notes": "",
       "credit_days": null,
       "line_contact": null,
@@ -661,7 +661,7 @@
     },
     "sales_details": {},
     "sales_opportunities": {},
-    "updated_at": "2026-08-17T14:00:04.985Z"
+    "updated_at": "2026-08-17T15:22:56.635Z"
   },
   {
     "id": "STORE-1786895096571",
