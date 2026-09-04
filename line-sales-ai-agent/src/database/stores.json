@@ -1044,12 +1044,11 @@
     "general_info": {
       "store_name": "ไทยทอยส์กำแพงเพชร",
       "contact_persons": [],
-      "phone": null,
       "phones": null,
       "address": "อ.เมือง จ.กำแพงเพชร",
       "map_url": "",
-      "delivery_by": "",
-      "delivery_schedule": "",
+      "delivery_by": "ป.สยาม",
+      "delivery_schedule": "ป.สยาม",
       "notes": "",
       "credit_days": null,
       "line_contact": null,
@@ -1057,7 +1056,7 @@
     },
     "sales_details": {},
     "sales_opportunities": {},
-    "updated_at": "2026-08-16T16:08:55.616Z"
+    "updated_at": "2026-09-04T02:28:19.068Z"
   },
   {
     "id": "STORE-1786896618105",
