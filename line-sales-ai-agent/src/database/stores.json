@@ -1046,7 +1046,7 @@
       "contact_persons": [],
       "phones": null,
       "address": "อ.เมือง จ.กำแพงเพชร",
-      "map_url": "",
+      "map_url": "https://maps.app.goo.gl/TrDXqnUE926XAQmZ6?g_st=ic",
       "delivery_by": "ป.สยาม",
       "delivery_schedule": "ป.สยาม",
       "notes": "ไม่รับเซลล์วันเสาร์อาทิตย์ , คนสั่งของหยุดวันจันทร์",
@@ -1056,7 +1056,7 @@
     },
     "sales_details": {},
     "sales_opportunities": {},
-    "updated_at": "2026-09-04T02:28:57.328Z"
+    "updated_at": "2026-09-04T02:29:52.349Z"
   },
   {
     "id": "STORE-1786896618105",
