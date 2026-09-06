@@ -1043,21 +1043,23 @@
     "general_info": {
       "store_name": "ไทยทอยส์กำแพงเพชร",
       "contact_persons": [
-        "พี่ไพร(สั่งของ)"
+        "พี่ไพร(สั่งของ)",
+        "แสดงรายชื่อ"
       ],
       "phones": null,
-      "address": "อ.เมือง จ.กำแพงเพชร",
+      "address": null,
       "map_url": "",
       "delivery_by": "ป.สยาม",
       "delivery_schedule": "ป.สยาม",
       "notes": "เสาร์อาทิตย์ ไม่รับเซล , พี่ไพรหยุดวันจันทร์ ,เวลาทำงาน 09.30-16.00",
       "credit_days": null,
       "line_contact": null,
-      "line_contacts": null
+      "line_contacts": null,
+      "phone": null
     },
     "sales_details": {},
     "sales_opportunities": {},
-    "updated_at": "2026-09-06T08:35:52.185Z"
+    "updated_at": "2026-09-06T09:27:41.444Z"
   },
   {
     "id": "STORE-1786896618105",
