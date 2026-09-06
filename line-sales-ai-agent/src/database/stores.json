@@ -1094,10 +1094,9 @@
         "พี่เก๋ หัวหน้าพลาสติก",
         "น้องเมย์ เมลามีน"
       ],
-      "phone": null,
       "phones": null,
       "address": null,
-      "map_url": "",
+      "map_url": "https://maps.app.goo.gl/hzb78Akj2uLqSHkd7?g_st=ic",
       "delivery_by": "",
       "delivery_schedule": "",
       "notes": "",
@@ -1107,7 +1106,7 @@
     },
     "sales_details": {},
     "sales_opportunities": {},
-    "updated_at": "2026-09-06T08:18:28.694Z"
+    "updated_at": "2026-09-06T08:32:11.229Z"
   },
   {
     "id": "STORE-1786896827459",
