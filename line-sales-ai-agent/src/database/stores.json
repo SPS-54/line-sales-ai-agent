@@ -1000,10 +1000,9 @@
     "general_info": {
       "store_name": "ฟินลี่แลนด์ พิษณุโลก",
       "contact_persons": [],
-      "phone": null,
       "phones": null,
       "address": "อ.เมือง จ.พิษณุโลก",
-      "map_url": "",
+      "map_url": "https://maps.app.goo.gl/qFnMC4dWtFRx21JL6?g_st=ic",
       "delivery_by": "",
       "delivery_schedule": "",
       "notes": "",
@@ -1013,7 +1012,7 @@
     },
     "sales_details": {},
     "sales_opportunities": {},
-    "updated_at": "2026-08-16T16:05:41.845Z"
+    "updated_at": "2026-09-06T09:17:26.709Z"
   },
   {
     "id": "STORE-1786896424479",
