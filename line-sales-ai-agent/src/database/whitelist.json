@@ -20,7 +20,8 @@
     "C12f1f2414018a46f14ac9d61065d88fd": "อัลบั้มรวม"
   },
   "allowed_users_details": {
-    "U38d0a817340a8b35375641be73a86b5e": "แบงค์"
+    "U38d0a817340a8b35375641be73a86b5e": "แบงค์",
+    "Ufdbc2cb193c2ffbe0e72dcef599b09a2": "Admin"
   },
   "require_group_tag": true
 }
