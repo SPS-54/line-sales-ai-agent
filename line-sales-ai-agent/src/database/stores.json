@@ -999,20 +999,23 @@
     "store_name": "ฟินลี่แลนด์ พิษณุโลก",
     "general_info": {
       "store_name": "ฟินลี่แลนด์ พิษณุโลก",
-      "contact_persons": [],
+      "contact_persons": [
+        "พี่เรย์"
+      ],
       "phones": null,
-      "address": "อ.เมือง จ.พิษณุโลก",
+      "address": null,
       "map_url": "https://maps.app.goo.gl/qFnMC4dWtFRx21JL6?g_st=ic",
       "delivery_by": "",
       "delivery_schedule": "",
       "notes": "ทำงานได้ทุกวัน 09.00-19.00",
       "credit_days": null,
       "line_contact": null,
-      "line_contacts": null
+      "line_contacts": null,
+      "phone": null
     },
     "sales_details": {},
     "sales_opportunities": {},
-    "updated_at": "2026-09-06T09:18:13.111Z"
+    "updated_at": "2026-09-06T09:28:30.358Z"
   },
   {
     "id": "STORE-1786896424479",
