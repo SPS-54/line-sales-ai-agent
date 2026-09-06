@@ -1089,10 +1089,12 @@
     "store_name": "ดิลกภัณฑ์",
     "general_info": {
       "store_name": "ดิลกภัณฑ์",
-      "contact_persons": [],
+      "contact_persons": [
+        "พี่ดิ่ง CN(0856531966)"
+      ],
       "phone": null,
       "phones": null,
-      "address": "อ.เมือง จ.พิษณุโลก",
+      "address": null,
       "map_url": "",
       "delivery_by": "",
       "delivery_schedule": "",
@@ -1103,7 +1105,7 @@
     },
     "sales_details": {},
     "sales_opportunities": {},
-    "updated_at": "2026-08-16T16:13:03.725Z"
+    "updated_at": "2026-09-06T07:24:33.029Z"
   },
   {
     "id": "STORE-1786896827459",
